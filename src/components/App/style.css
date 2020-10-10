@@ -1,0 +1,92 @@
+/*
+ * This is a slightly tweaked version of [Eric Meyer's reset stylesheet, v2.0, 2011-01-26]
+ * http://meyerweb.com/eric/tools/css/reset/
+ */
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend, input, textarea, select,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, button, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+  margin: 0;
+  border: 0;
+  padding: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+  background: transparent;
+  color: inherit;
+}
+
+main, article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+  display: block;
+}
+
+html {
+  font-family: sans-serif;
+  line-height: 1;
+}
+
+ol, ul {
+  list-style: none;
+}
+
+blockquote, q {
+  quotes: none;
+}
+
+blockquote::before, blockquote::after,
+q::before, q::after {
+  content: '';
+  content: none;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+label {
+  cursor: pointer;
+}
+
+/* Remove the outline of active or focused links. */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+:focus {
+  outline: none;
+}
+
+::-moz-focus-inner {
+  border: none;
+}
+
+/* Safari mobile does not trigger .click() on SVG elements otherwise */
+a svg {
+  pointer-events: none;
+}
+
+/* set correct flex default */
+* {
+  flex: 0 1 auto;
+}
+
+/*
+ * Fonts, Variables & General Styles
+ */
+
+.App {
+  min-height: 100vh;
+  overflow-y: scroll;
+}

@@ -1,0 +1,21 @@
+{
+  "name": "ShaderLabWeb",
+  "description": "ShaderLabWeb",
+  "version": "0.0.1",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=14"
+  },
+  "scripts": {
+    "transpile": "yarn babel src --out-dir _transpiled --delete-dir-on-start --copy-files",
+    "build": "yarn transpile && yarn node --es-module-specifier-resolution=node _transpiled/build.js"
+  },
+  "dependencies": {
+    "@babel/cli": "^7.11.6",
+    "@babel/core": "^7.11.6",
+    "@babel/preset-react": "^7.10.4",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1"
+  }
+}
