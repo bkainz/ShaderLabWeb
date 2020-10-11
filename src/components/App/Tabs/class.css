@@ -1,0 +1,59 @@
+.${className} {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-flow: column;
+}
+
+.${className}-State {
+  display: none;
+}
+
+.${className}-Tabs {
+  display: flex;
+  flex-flow: row wrap;
+  background: var(--color-panel);
+}
+
+.${className}-Tab {
+  padding: 0.5em;
+}
+
+.${className}-Cards {
+  flex: 1 1 auto;
+}
+
+.${className}-Card {
+  display: none;
+
+  position: relative;
+
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  padding: 0.5em;
+  background: var(--color-input);
+}
+
+.${className}-State:nth-child(1):checked ~ * .${className}-Tab:nth-child(1),
+.${className}-State:nth-child(2):checked ~ * .${className}-Tab:nth-child(2),
+.${className}-State:nth-child(3):checked ~ * .${className}-Tab:nth-child(3),
+.${className}-State:nth-child(4):checked ~ * .${className}-Tab:nth-child(4),
+.${className}-State:nth-child(5):checked ~ * .${className}-Tab:nth-child(5),
+.${className}-State:nth-child(6):checked ~ * .${className}-Tab:nth-child(6),
+.${className}-State:nth-child(7):checked ~ * .${className}-Tab:nth-child(7),
+.${className}-State:nth-child(8):checked ~ * .${className}-Tab:nth-child(8) {
+  background: white;
+}
+
+.${className}-State:nth-child(1):checked ~ * .${className}-Card:nth-child(1),
+.${className}-State:nth-child(2):checked ~ * .${className}-Card:nth-child(2),
+.${className}-State:nth-child(3):checked ~ * .${className}-Card:nth-child(3),
+.${className}-State:nth-child(4):checked ~ * .${className}-Card:nth-child(4),
+.${className}-State:nth-child(5):checked ~ * .${className}-Card:nth-child(5),
+.${className}-State:nth-child(6):checked ~ * .${className}-Card:nth-child(6),
+.${className}-State:nth-child(7):checked ~ * .${className}-Card:nth-child(7),
+.${className}-State:nth-child(8):checked ~ * .${className}-Card:nth-child(8) {
+  display: block;
+}
+
