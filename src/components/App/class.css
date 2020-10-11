@@ -83,10 +83,87 @@ a svg {
 }
 
 /*
- * Fonts, Variables & General Styles
+ * App Styles
  */
+.${className} {
+  --color-panel: #ddd;
+  --color-input: #fff;
 
-.App {
-  min-height: 100vh;
-  overflow-y: scroll;
+  width: 100vw;
+  height: 100vh;
+
+  display: grid;
+  grid-template: "canvas  vborder editor" 50%
+                 "hborder vborder editor" 0
+                 "options vborder editor" 1fr / 50% 0 1fr;
+}
+
+.${className}-HorizontalBorder {
+  grid-area: hborder;
+  cursor: ns-resize;
+}
+
+.${className}-VerticalBorder {
+  grid-area: vborder;
+  cursor: ew-resize;
+}
+
+.${className}-HorizontalBorder,
+.${className}-VerticalBorder {
+  position: relative;
+  background: #ccc;
+}
+
+.${className}-VerticalBorder::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 5px;
+  height: 100%;
+  transform: translateX(-50%);
+  z-index: 1;
+}
+
+.${className}-HorizontalBorder::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 5px;
+  transform: translateY(-50%);
+  z-index: 1;
+}
+
+.${className}-VerticalBorder::after,
+.${className}-HorizontalBorder::after {
+  content: '';
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+}
+
+.${className}-VerticalBorder.active::after,
+.${className}-HorizontalBorder.active::after {
+  display: block;
+}
+
+.${className}-CanvasPanel {
+  grid-area: canvas;
+  position: relative;
+}
+
+.${className}-ControlsPanel {
+  grid-area: options;
+  position: relative;
+}
+
+.${className}-EditorPanel {
+  grid-area: editor;
+  position: relative;
 }

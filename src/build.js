@@ -4,6 +4,7 @@ import url from 'url'
 import React from 'react'
 import ReactDomServer from 'react-dom/server'
 import App from './components/App'
+import compReg from './componentRegistry'
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url))
 const __rootdir = path.dirname(__dirname)
@@ -12,17 +13,33 @@ const publicDir = path.join(__rootdir, 'public')
 fs.existsSync(publicDir) && fs.rmdirSync(publicDir, {recursive: true})
 fs.mkdirSync(publicDir)
 
-global.usedComponents = new Set()
 const body = ReactDomServer.renderToStaticMarkup(<App/>)
 
-const style = []
-const script = []
-global.usedComponents.forEach(comp => {
-  const dir = decodeURI(new url.URL(path.dirname(comp.url)).pathname)
-  const stylePath = path.join(dir, 'style.css')
-  const scriptPath = path.join(dir, 'script.js')
-  if (fs.existsSync(stylePath)) style.push(fs.readFileSync(stylePath, 'utf-8'))
-  if (fs.existsSync(scriptPath)) script.push(fs.readFileSync(scriptPath, 'utf-8'))
+function escapeCSS(value) {
+  value = value.replace(/\s/g, '-')
+  value = value.replace(/[^0-9a-zA-Z_-\u0080-\uFFFF]/g, '\\$&')
+  value = /\d/.test(value[0]) ? '\\3'+value[0]+' '+value.slice(1) : value
+  return value
+}
+
+const classStyles = []
+const instanceStyles = []
+const instanceScripts = []
+Object.values(compReg.classes).forEach(comp => {
+  const classStyle = path.join(comp.dir, 'class.css')
+  if (fs.existsSync(classStyle))
+    classStyles.push(fs.readFileSync(classStyle, 'utf-8').replace(/\${className}/g, escapeCSS(comp.className)))
+
+  const instanceScript = path.join(comp.dir, 'instance.js')
+  if (fs.existsSync(instanceScript))
+    instanceScripts.push({className: comp.className, content: fs.readFileSync(instanceScript, 'utf-8')})
+
+  const instanceStyle = path.join(comp.dir, 'instance.css')
+  if (fs.existsSync(instanceStyle))
+    Object.values(comp.instances).forEach(instance => {
+      instanceStyles.push(fs.readFileSync(instanceStyle, 'utf-8').replace(/\${className}/g, escapeCSS(comp.className))
+                                                                 .replace(/\${id}/g, escapeCSS(instance.id)))
+    })
 })
 
 fs.writeFileSync(path.join(publicDir, 'index.html'), `
@@ -37,10 +54,35 @@ fs.writeFileSync(path.join(publicDir, 'index.html'), `
     <title>ShaderLabWeb</title>
     
     <style>
-      ${style.join('\n')}
+      ${classStyles.join('\n')}
+      ${instanceStyles.join('\n')}
     </style>
     <script>
-      ${script.join('\n')}
+      window.components = ${JSON.stringify(compReg.classes)}
+
+      new MutationObserver(mutations => {
+        for (let mIdx = 0; mIdx < mutations.length; mIdx += 1) {
+          for (let nIdx = 0; nIdx < mutations[mIdx].addedNodes.length; nIdx += 1) {
+            const node = mutations[mIdx].addedNodes[nIdx]
+
+            if (node.nodeType !== Node.ELEMENT_NODE) continue
+
+            const className = node.classList.item(0)
+            const id = node.id
+
+            if (!window.components[className] || !window.components[className].Constructor) continue
+
+            node.__component__ = new window.components[className].Constructor(node, window.components[className].instances[id])
+          }
+        }
+      }).observe(document.documentElement, {childList: true, subtree: true})
+
+      ${instanceScripts.map(script => `
+      !function(module) {
+        ${script.content.replace(/\n/g, '\n        ')}
+        window.components['${script.className}'].Constructor = module.exports
+      }({})`
+      ).join('\n')}
     </script>
   </head>
   ${body}
