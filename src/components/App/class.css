@@ -95,7 +95,7 @@ a svg {
   display: grid;
   grid-template: "canvas  vborder editor" 50%
                  "hborder vborder editor" 0
-                 "options vborder editor" 1fr / 50% 0 1fr;
+                 "options vborder editor" 50% / 50% 0 50%;
 }
 
 .${className}-HorizontalBorder {

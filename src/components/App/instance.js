@@ -1,4 +1,6 @@
 module.exports = function(el, {className}) {
+  this.el = el
+
   const verticalBorderEl = el.querySelector(`.${className}-VerticalBorder`)
   const horizontalBorderEl = el.querySelector(`.${className}-HorizontalBorder`)
 

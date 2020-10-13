@@ -1,18 +1,19 @@
 import React from 'react'
 import compReg from '../../../componentRegistry'
 import Tabs from '../Tabs'
+import Shader from './Shader'
 
 export default function(props) {
   const {className, id} = compReg.register(import.meta.url, props)
 
-  return <div className={className} id={id}>
-           <Tabs tabs={[{label: 'Vertex Shader',
-                         content: <textarea className="App/Editor-Textarea" defaultValue="Vertex Shader"/>},
-                        {label: 'Fragment Shader',
-                         content: <textarea className="App/Editor-Textarea" defaultValue="Fragment Shader"/>},
-                        {label: 'R2T Vertex Shader',
-                         content: <textarea className="App/Editor-Textarea" defaultValue="R2T Vertex Shader"/>},
-                        {label: 'R2T Fragment Shader',
-                         content: <textarea className="App/Editor-Textarea" defaultValue="R2T Fragment Shader"/>}]}/>
-         </div>
+  return <form className={className} id={id}>
+           <div className={className+'-Shaders'}>
+             <Tabs tabs={props.shaders.map(shader => {
+               return {label: shader.name, content: <Shader shader={shader}/>}
+             })}/>
+           </div>
+           <div className={className+'-Controls'}>
+             <button className={className+'-CompileButton'}>Compile & Link</button>
+           </div>
+         </form>
 }
