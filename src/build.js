@@ -13,6 +13,8 @@ const publicDir = path.join(__rootdir, 'public')
 fs.existsSync(publicDir) && fs.rmdirSync(publicDir, {recursive: true})
 fs.mkdirSync(publicDir)
 
+fs.symlinkSync(path.join(__rootdir, 'objects'), path.join(publicDir, 'objects'))
+
 const body = ReactDomServer.renderToStaticMarkup(<App/>)
 
 function escapeCSS(value) {

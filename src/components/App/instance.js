@@ -1,13 +1,14 @@
 module.exports = function(el, {className}) {
   this.el = el
 
-  const verticalBorderEl = el.querySelector(`.${className}-VerticalBorder`)
-  const horizontalBorderEl = el.querySelector(`.${className}-HorizontalBorder`)
+  window.addEventListener('resize', e => el.dispatchEvent(new Event('resized')))
 
+  const verticalBorderEl = el.querySelector(`.${className}-VerticalBorder`)
   verticalBorderEl.addEventListener('mousedown', e => {
     function resize(e) {
       const bb = el.getBoundingClientRect()
       el.style.gridTemplateColumns = ((bb.left+e.clientX)/bb.width * 100)+'% 0 1fr'
+      el.dispatchEvent(new Event('resized'))
     }
 
     verticalBorderEl.classList.add('active')
@@ -18,10 +19,12 @@ module.exports = function(el, {className}) {
     })
   })
 
+  const horizontalBorderEl = el.querySelector(`.${className}-HorizontalBorder`)
   horizontalBorderEl.addEventListener('mousedown', e => {
     function resize(e) {
       const bb = el.getBoundingClientRect()
       el.style.gridTemplateRows = ((bb.top+e.clientY)/bb.height * 100)+'% 0 1fr'
+      el.dispatchEvent(new Event('resized'))
     }
 
     horizontalBorderEl.classList.add('active')

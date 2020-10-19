@@ -2,13 +2,14 @@ import React from 'react'
 import compReg from '../../../componentRegistry'
 import Tabs from '../Tabs'
 import Log from './Log'
+import Scene from './Scene'
 
 export default function(props) {
   const {className, id} = compReg.register(import.meta.url, props)
 
   return <div className={className} id={id}>
            <Tabs tabs={[{label: 'Log', content: <Log/>},
-                        {label: 'Scene', content: 'Scene'},
+                        {label: 'Scene', content: <Scene/>},
                         {label: 'Uniforms', content: 'Uniforms'}]}/>
          </div>
 }
