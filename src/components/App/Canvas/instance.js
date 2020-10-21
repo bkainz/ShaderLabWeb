@@ -154,40 +154,48 @@ Scene.prototype = {
   }
 }
 
-module.exports = function(el, {props}) {
-  const appEl = el.closest('.App')
-  const scene = new Scene(el.getContext('webgl'), props.shaders)
-
-  appEl.addEventListener('shadersChanged', ({detail}) => {
-    appEl.dispatchEvent(new CustomEvent('log', {detail: {scope: '<hr data-text="Compile & Link Shaders">', message: ''}}))
-    detail.forEach(shader => {
-      const message = scene.stages[shader.stage].updateShader(shader)
-      const scope = shader.name
-      appEl.dispatchEvent(new CustomEvent('log', {detail: {scope, message}}))
-    })
-    for (const stageKey in scene.stages) {
-      const message = scene.stages[stageKey].relink()
-      const scope = scene.stages[stageKey].name
-      appEl.dispatchEvent(new CustomEvent('log', {detail: {scope, message}}))
-    }
-  })
-
-  appEl.addEventListener('geometryChanged', ({detail: {stage, object}}) => {
-    const scope = `<hr data-text="Load ${scene.stages[stage].name} Geometry">`
-    const message = object.path.split('/').pop()
-    appEl.dispatchEvent(new CustomEvent('log', {detail: {scope, message}}))
-    scene.stages[stage].geometry = new Geometry(scene.webGL, object)
-  })
-
-  appEl.addEventListener('resized', e => {
-    el.width = el.offsetWidth
-    el.height = el.offsetHeight
-    scene.updateViewport(el.width, el.height)
-  })
-
-  function render() {
-    scene.draw()
-    requestAnimationFrame(render)
-  }
-  render()
+function Canvas(el, {props}) {
+  this.el = el
+  this.app = el.closest('.App').__component__
+  this.app.canvas = this
+  this.scene = new Scene(el.getContext('webgl'), props.shaders)
 }
+
+Canvas.prototype = {
+  initialize() {
+    // nothing to do
+  },
+
+  updateShaders(shaders) {
+    this.app.log.append('<hr data-text="Compile & Link Shaders">', '')
+    shaders.forEach(shader => {
+      const scope = shader.name
+      const message = this.scene.stages[shader.stage].updateShader(shader)
+      this.app.log.append(scope, message)
+    })
+    for (const stageKey in this.scene.stages) {
+      const scope = this.scene.stages[stageKey].name
+      const message = this.scene.stages[stageKey].relink()
+      this.app.log.append(scope, message)
+    }
+  },
+
+  updateGeometry(stage, object) {
+    const scope = `<hr data-text="Load ${this.scene.stages[stage].name} Geometry">`
+    const message = object.path.split('/').pop()
+    this.app.log.append(scope, message)
+    this.scene.stages[stage].geometry = new Geometry(this.scene.webGL, object)
+  },
+
+  updateViewport() {
+    this.el.width = this.el.offsetWidth
+    this.el.height = this.el.offsetHeight
+    this.scene.updateViewport(this.el.width, this.el.height)
+  },
+
+  render() {
+    this.scene.draw()
+  }
+}
+
+module.exports = Canvas

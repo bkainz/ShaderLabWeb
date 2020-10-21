@@ -1,13 +1,19 @@
 function Editor(el, {props}) {
+  this.el = el
   this.app = el.closest('.App').__component__
   this.app.editor = this
-  this.el = el
   this.props = props
-
-  el.addEventListener('submit', e => e.preventDefault())
 }
 
 Editor.prototype = {
+  initialize() {
+    this.el.addEventListener('submit', e => {
+      this.app.el.dispatchEvent(new CustomEvent('shadersChanged', {detail: this.shaders}))
+      e.preventDefault()
+    })
+    this.app.el.dispatchEvent(new CustomEvent('shadersChanged', {detail: this.shaders}))
+  },
+
   get shaders() {
     return this.props.shaders.map(shader => {
       const shaderId = [shader.stage, shader.type].filter(Boolean).join('/')

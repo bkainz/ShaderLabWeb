@@ -73,11 +73,14 @@ function Scene(el) {
   this.app = el.closest('.App').__component__
   this.app.scene = this
   this.objects = {}
-  this.updateObject('base', 'objects/teapot.obj')
-  this.updateObject('R2T', 'quad')
 }
 
 Scene.prototype = {
+  initialize() {
+    this.updateObject('base', 'objects/teapot.obj')
+    this.updateObject('R2T', 'quad')
+  },
+
   async updateObject(stage, path) {
     this.objects[stage] = path === 'void' ? createObject.void()
                         : path === 'quad' ? createObject.quad()
@@ -86,7 +89,7 @@ Scene.prototype = {
                                               const content = await fetch(fullPath).then(response => response.text())
                                               return createObject.wavefront(path, content)
                                             })()
-    this.el.dispatchEvent(new CustomEvent('objectChanged', {detail: {stage, object: this.objects[stage]}}))
+    this.app.el.dispatchEvent(new CustomEvent('objectChanged', {detail: {stage, object: this.objects[stage]}}))
   }
 }
 

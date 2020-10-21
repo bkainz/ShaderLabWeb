@@ -1,37 +1,68 @@
-module.exports = function(el, {className}) {
+function App(el, {className}) {
   this.el = el
-
-  window.addEventListener('resize', e => el.dispatchEvent(new Event('resized')))
-
-  const verticalBorderEl = el.querySelector(`.${className}-VerticalBorder`)
-  verticalBorderEl.addEventListener('mousedown', e => {
-    function resize(e) {
-      const bb = el.getBoundingClientRect()
-      el.style.gridTemplateColumns = ((bb.left+e.clientX)/bb.width * 100)+'% 0 1fr'
-      el.dispatchEvent(new Event('resized'))
-    }
-
-    verticalBorderEl.classList.add('active')
-    verticalBorderEl.addEventListener('mousemove', resize)
-    verticalBorderEl.addEventListener('mouseup', e => {
-      verticalBorderEl.classList.remove('active')
-      verticalBorderEl.removeEventListener('mousemove', resize)
-    })
-  })
-
-  const horizontalBorderEl = el.querySelector(`.${className}-HorizontalBorder`)
-  horizontalBorderEl.addEventListener('mousedown', e => {
-    function resize(e) {
-      const bb = el.getBoundingClientRect()
-      el.style.gridTemplateRows = ((bb.top+e.clientY)/bb.height * 100)+'% 0 1fr'
-      el.dispatchEvent(new Event('resized'))
-    }
-
-    horizontalBorderEl.classList.add('active')
-    horizontalBorderEl.addEventListener('mousemove', resize)
-    horizontalBorderEl.addEventListener('mouseup', e => {
-      horizontalBorderEl.classList.remove('active')
-      horizontalBorderEl.removeEventListener('mousemove', resize)
-    })
-  })
+  this.className = className
 }
+
+App.prototype = {
+  initialize() {
+    this.el.addEventListener('shadersChanged', ({detail: shaders}) => {
+      this.canvas.updateShaders(shaders)
+    })
+
+    this.el.addEventListener('objectChanged', ({detail: {stage, object}}) => {
+      this.canvas.updateGeometry(stage, object)
+    })
+
+    this.el.addEventListener('viewportChanged', e => {
+      this.canvas.updateViewport()
+    })
+
+    this.canvas.initialize()
+    this.editor.initialize()
+    this.log.initialize()
+    this.scene.initialize()
+
+    this.el.dispatchEvent(new Event('viewportChanged'))
+
+    window.addEventListener('resize', e => this.el.dispatchEvent(new Event('viewportChanged')))
+
+    function initalizeDraggableBorder(el, callback) {
+      el.addEventListener('mousedown', e => {
+        el.classList.add('active')
+        el.addEventListener('mousemove', callback)
+        el.addEventListener('mouseup', e => {
+          el.classList.remove('active')
+          el.removeEventListener('mousemove', callback)
+        })
+      })
+    }
+
+    initalizeDraggableBorder(this.el.querySelector(`.${this.className}-VerticalBorder`), e => {
+      const bb = this.el.getBoundingClientRect()
+      this.resizeVertically((bb.left+e.clientX)/bb.width * 100)
+    })
+
+    initalizeDraggableBorder(this.el.querySelector(`.${this.className}-HorizontalBorder`), e => {
+      const bb = this.el.getBoundingClientRect()
+      this.resizeHorizontally((bb.top+e.clientY)/bb.height * 100)
+    })
+
+    const render = () => {
+      this.canvas.render()
+      requestAnimationFrame(render)
+    }
+    render()
+  },
+
+  resizeVertically(percent) {
+    this.el.style.gridTemplateColumns = percent+'% 0 1fr'
+    this.el.dispatchEvent(new Event('viewportChanged'))
+  },
+
+  resizeHorizontally(percent) {
+    this.el.style.gridTemplateRows = percent+'% 0 1fr'
+    this.el.dispatchEvent(new Event('viewportChanged'))
+  }
+}
+
+module.exports = App
