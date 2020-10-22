@@ -107,6 +107,7 @@ function Scene(webGL, shaders) {
 
 Scene.prototype = {
   updateViewport(width, height) {
+    this.webGL.viewport(0, 0, width, height)
     this.renderedTexture = this.webGL.createTexture()
     this.webGL.bindTexture(this.webGL.TEXTURE_2D, this.renderedTexture)
     this.webGL.texImage2D(this.webGL.TEXTURE_2D, 0, this.webGL.RGBA,
@@ -142,13 +143,11 @@ Scene.prototype = {
                 0, 0, near*far / (near-far) * 2, 0]
       }
       this.stages.base.setUniform('Matrix4fv', 'pMatrix', false, perspective(60, width/height, 0.001, 10000))
-      this.webGL.viewport(0, 0, width, height)
       return this.baseFramebuffer
     })
 
     this.stages.R2T.draw(() => {
       this.webGL.bindTexture(this.webGL.TEXTURE_2D, this.renderedTexture)
-      this.webGL.viewport(0, 0, width, height)
       return null // render to canvas
     })
   }
@@ -164,6 +163,10 @@ function Canvas(el, {props}) {
 Canvas.prototype = {
   initialize() {
     // nothing to do
+  },
+
+  get size() {
+    return {width: this.el.offsetWidth, height: this.el.offsetHeight}
   },
 
   updateShaders(shaders) {
@@ -187,10 +190,10 @@ Canvas.prototype = {
     this.scene.stages[stage].geometry = new Geometry(this.scene.webGL, object)
   },
 
-  updateViewport() {
-    this.el.width = this.el.offsetWidth
-    this.el.height = this.el.offsetHeight
-    this.scene.updateViewport(this.el.width, this.el.height)
+  updateViewport(width, height) {
+    this.el.width = width
+    this.el.height = height
+    this.scene.updateViewport(width, height)
   },
 
   render() {

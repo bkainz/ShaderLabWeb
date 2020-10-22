@@ -13,8 +13,8 @@ App.prototype = {
       this.canvas.updateGeometry(stage, object)
     })
 
-    this.el.addEventListener('viewportChanged', e => {
-      this.canvas.updateViewport()
+    this.el.addEventListener('viewportChanged', ({detail: {width, height}}) => {
+      this.canvas.updateViewport(width, height)
     })
 
     this.canvas.initialize()
@@ -22,9 +22,9 @@ App.prototype = {
     this.log.initialize()
     this.scene.initialize()
 
-    this.el.dispatchEvent(new Event('viewportChanged'))
+    this.el.dispatchEvent(new CustomEvent('viewportChanged', {detail: this.canvas.size}))
 
-    window.addEventListener('resize', e => this.el.dispatchEvent(new Event('viewportChanged')))
+    window.addEventListener('resize', e => this.el.dispatchEvent(new CustomEvent('viewportChanged', {detail: this.canvas.size})))
 
     function initalizeDraggableBorder(el, callback) {
       el.addEventListener('mousedown', e => {
@@ -56,12 +56,12 @@ App.prototype = {
 
   resizeVertically(percent) {
     this.el.style.gridTemplateColumns = percent+'% 0 1fr'
-    this.el.dispatchEvent(new Event('viewportChanged'))
+    this.el.dispatchEvent(new CustomEvent('viewportChanged', {detail: this.canvas.size}))
   },
 
   resizeHorizontally(percent) {
     this.el.style.gridTemplateRows = percent+'% 0 1fr'
-    this.el.dispatchEvent(new Event('viewportChanged'))
+    this.el.dispatchEvent(new CustomEvent('viewportChanged', {detail: this.canvas.size}))
   }
 }
 
