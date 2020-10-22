@@ -34,6 +34,7 @@
   height: 100%;
   padding: 0.5em;
   background: var(--color-input);
+  overflow: auto;
 }
 
 .${className}-State:nth-child(1):checked ~ * .${className}-Tab:nth-child(1),

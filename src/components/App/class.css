@@ -161,6 +161,7 @@ a svg {
 .${className}-ControlsPanel {
   grid-area: options;
   position: relative;
+  min-height: 0;
 }
 
 .${className}-EditorPanel {
