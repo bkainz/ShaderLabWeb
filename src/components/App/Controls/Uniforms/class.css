@@ -1,0 +1,26 @@
+.${className}-Uniform + .${className}-Uniform {
+  margin-top: 1em;
+}
+
+.${className}-UniformName {
+  font-weight: bold;
+}
+
+.${className}-UniformValue {
+  margin-bottom: 0.25em;
+}
+
+.${className}-UniformValueRow {
+  display: flex;
+  margin: -0.5em;
+}
+
+.${className}-UniformInput {
+  margin: 0.5em;
+  border: 1px solid black;
+  padding: 0.25em;
+}
+
+.${className}-UniformInput[type="number"] {
+  max-width: 5em;
+}

@@ -9,6 +9,10 @@ App.prototype = {
       this.canvas.updateShaders(shaders)
     })
 
+    this.el.addEventListener('uniformChanged', ({detail: uniform}) => {
+      this.canvas.updateUniform(uniform)
+    })
+
     this.el.addEventListener('objectChanged', ({detail: {stage, object}}) => {
       this.canvas.updateGeometry(stage, object)
     })
@@ -18,9 +22,10 @@ App.prototype = {
     })
 
     this.canvas.initialize()
-    this.editor.initialize()
     this.log.initialize()
     this.scene.initialize()
+    this.uniforms.initialize()
+    this.editor.initialize()
 
     this.el.dispatchEvent(new CustomEvent('viewportChanged', {detail: this.canvas.size}))
 

@@ -45,8 +45,41 @@ Stage.prototype = {
     this.webGL.linkProgram(this.program)
     return this.webGL.getProgramInfoLog(this.program) || 'Linking successful'
   },
-  setUniform(type, name, ...values) {
-    this.webGL['uniform'+type](this.webGL.getUniformLocation(this.program, name), ...values)
+  setUniform(type, name, value) {
+    this.webGL.useProgram(this.program)
+    const location = this.webGL.getUniformLocation(this.program, name)
+    switch (type) {
+      case 'int':
+      case 'bool':
+        this.webGL.uniform1i(location, value)
+        break
+      case 'ivec2':
+      case 'bvec2':
+      case 'ivec3':
+      case 'bvec3':
+      case 'ivec4':
+      case 'bvec4':
+        this.webGL[`uniform${type[4]}iv`](location, value)
+        break
+      case 'float':
+        this.webGL.uniform1f(location, value)
+        break
+      case 'vec2':
+      case 'vec3':
+      case 'vec4':
+        this.webGL[`uniform${type[3]}fv`](location, value)
+        break
+      case 'mat2':
+      case 'mat3':
+      case 'mat4':
+        this.webGL[`uniformMatrix${type[3]}fv`](location, false, value)
+        break
+      case 'sampler2D':
+        // ignore for now
+        break
+      default:
+        throw new Error(`unknown uniform type '${type}'`)
+    }
   },
   draw(prepare) {
     if (!this.webGL.getProgramParameter(this.program, this.webGL.LINK_STATUS) || !this.geometry) return
@@ -126,23 +159,7 @@ Scene.prototype = {
     this.webGL.framebufferRenderbuffer(this.webGL.FRAMEBUFFER, this.webGL.DEPTH_ATTACHMENT, this.webGL.RENDERBUFFER, depthBuffer)
   },
   draw() {
-    const width = this.webGL.canvas.width
-    const height = this.webGL.canvas.height
-
     this.stages.base.draw(() => {
-      const deg = 90
-      const sin = Math.sin(deg/180*Math.PI)
-      const cos = Math.cos(deg/180*Math.PI)
-      this.stages.base.setUniform('Matrix4fv', 'mvMatrix', false, [1, 0, 0, 0,  0, cos, -sin, 0,  0, sin, cos, 0,  0, -8, -40, 1])
-
-      function perspective(fov, aspect, near, far) {
-        const f = Math.tan(Math.PI * 0.5 - 0.5 * fov*180/Math.PI)
-        return [f/aspect, 0, 0, 0,
-                0, f, 0, 0,
-                0, 0, (near+far) / (near-far), -1,
-                0, 0, near*far / (near-far) * 2, 0]
-      }
-      this.stages.base.setUniform('Matrix4fv', 'pMatrix', false, perspective(60, width/height, 0.001, 10000))
       return this.baseFramebuffer
     })
 
@@ -180,6 +197,12 @@ Canvas.prototype = {
       const scope = this.scene.stages[stageKey].name
       const message = this.scene.stages[stageKey].relink()
       this.app.log.append(scope, message)
+    }
+  },
+
+  updateUniform(uniform) {
+    for (const stageKey in this.scene.stages) {
+      this.scene.stages[stageKey].setUniform(uniform.type, uniform.name, uniform.value)
     }
   },
 
