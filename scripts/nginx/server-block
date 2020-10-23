@@ -1,0 +1,17 @@
+server {
+  server_name $URL;
+
+  listen 80;
+  listen [::]:80;
+
+  rewrite ^/index(?:\.html|/)?$ / permanent;
+  rewrite ^/(.*)/index(?:\.html|/)?$ /$1 permanent;
+  rewrite ^/(.*)(?:\.html|/)$ /$1 permanent;
+
+  try_files $uri $uri.html $uri/index.html =404;
+
+  root $DIR;
+
+  access_log /var/log/nginx/$URL.access.log;
+  error_log /var/log/nginx/$URL.error.log;
+}
