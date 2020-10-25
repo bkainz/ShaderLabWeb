@@ -16,8 +16,8 @@ Editor.prototype = {
 
   get shaders() {
     return this.props.shaders.map(shader => {
-      const shaderId = [shader.stage, shader.type].filter(Boolean).join('/')
-      return {stage: shader.stage,
+      const shaderId = [shader.pass, shader.type].filter(Boolean).join('/')
+      return {pass: shader.pass,
               type: shader.type,
               name: shader.name,
               linked: this.el.elements[shaderId+'-linked'].checked,

@@ -45,11 +45,13 @@ function P(fov, aspect, near, far) {
           0, 0, near*far / (near-far) * 2, 0]
 }
 
+
 function Uniform(uniforms, name, type) {
   this.uniforms = uniforms
   this.name = name
   this.type = type
   this._value = Uniform.DEFAULT_VALUES[type]
+  this.passes = {}
 
   this.el = document.createElement('div')
   this.el.classList.add(uniforms.className+'-Uniform')
@@ -139,7 +141,7 @@ Uniform.prototype = {
   },
 
   triggerChange() {
-    const detail = {name: this.name, type: this.type, value: this.value}
+    const detail = {name: this.name, type: this.type, value: this.value, passes: this.passes}
     this.uniforms.app.el.dispatchEvent(new CustomEvent('uniformChanged', {detail}))
   }
 }
@@ -180,6 +182,7 @@ Uniforms.prototype = {
           const type = match[1]
           const key = name+'-'+type
           this.state[key] = this.defaultState[key] || oldState[key] || new Uniform(this, name, type)
+          this.state[key].passes[shader.pass] = true
         }
       })
 

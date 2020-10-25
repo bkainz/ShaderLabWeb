@@ -8,7 +8,7 @@ import Initializer from './Initializer'
 export default function() {
   const props = {
     shaders: [{
-      stage: 'base',
+      pass: 'base',
       name: 'Vertex Shader',
       type: 'vertex',
       default: `
@@ -19,28 +19,28 @@ attribute vec2 textureCoordinate_input;
 uniform mat4 mvMatrix;
 uniform mat4 pMatrix;
 
-varying vec4 normal;
+varying vec3 normal;
 
 void main() {
   vec4 vertex_camSpace = mvMatrix * vec4(vertex_worldSpace, 1.0);
   gl_Position = pMatrix * vertex_camSpace;
 
-  normal = vec4(normal_worldSpace, 1.0);
+  normal = normal_worldSpace;
 }`.trim()
     },{
-      stage: 'base',
+      pass: 'base',
       name: 'Fragment Shader',
       type: 'fragment',
       default: `
 precision mediump float;
 
-varying vec4 normal;
+varying vec3 normal;
 
 void main() {
-  gl_FragColor = 0.5 + 0.5*normal;
+  gl_FragColor = vec4(0.5 + 0.5*normal, 1.0);
 }`.trim()
     },{
-      stage: 'R2T',
+      pass: 'R2T',
       name: 'R2T Vertex Shader',
       type: 'vertex',
       default: `
@@ -54,7 +54,7 @@ void main() {
   varyingTextureCoordinate = textureCoordinate_input;
 }`.trim()
     },{
-      stage: 'R2T',
+      pass: 'R2T',
       name: 'R2T Fragment Shader',
       type: 'fragment',
       default: `

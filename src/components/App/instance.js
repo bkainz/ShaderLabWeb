@@ -13,8 +13,8 @@ App.prototype = {
       this.canvas.updateUniform(uniform)
     })
 
-    this.el.addEventListener('objectChanged', ({detail: {stage, object}}) => {
-      this.canvas.updateGeometry(stage, object)
+    this.el.addEventListener('objectChanged', ({detail: {pass, object}}) => {
+      this.canvas.updateGeometry(pass, object)
     })
 
     this.el.addEventListener('viewportChanged', ({detail: {width, height}}) => {

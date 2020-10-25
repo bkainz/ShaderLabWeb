@@ -79,17 +79,18 @@ Scene.prototype = {
   initialize() {
     this.updateObject('base', 'objects/teapot.obj')
     this.updateObject('R2T', 'quad')
+    this.app.canvas.scene.outputPass.updateGeometry(createObject.quad())
   },
 
-  async updateObject(stage, path) {
-    this.objects[stage] = path === 'void' ? createObject.void()
-                        : path === 'quad' ? createObject.quad()
-                        :                   await (async () => {
-                                              const fullPath = new URL(path, document.baseURI).href
-                                              const content = await fetch(fullPath).then(response => response.text())
-                                              return createObject.wavefront(path, content)
-                                            })()
-    this.app.el.dispatchEvent(new CustomEvent('objectChanged', {detail: {stage, object: this.objects[stage]}}))
+  async updateObject(pass, path) {
+    this.objects[pass] = path === 'void' ? createObject.void()
+                       : path === 'quad' ? createObject.quad()
+                       :                   await (async () => {
+                                             const fullPath = new URL(path, document.baseURI).href
+                                             const content = await fetch(fullPath).then(response => response.text())
+                                             return createObject.wavefront(path, content)
+                                           })()
+    this.app.el.dispatchEvent(new CustomEvent('objectChanged', {detail: {pass, object: this.objects[pass]}}))
   }
 }
 

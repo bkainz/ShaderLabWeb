@@ -10,15 +10,53 @@ function createShader(webGL, type, source) {
   return {shader, message}
 }
 
-function Stage(webGL, key) {
+function Pass(webGL, key, renderToCanvas = false) {
   this.webGL = webGL
-  this.name = key[0].toUpperCase()+key.slice(1)+' Stage'
+  this.key = key
+  this.name = key[0].toUpperCase()+key.slice(1)+' Pass'
   this.program = this.webGL.createProgram()
   this.shaders = {}
   this.geometry = null
+
+  if (renderToCanvas) {
+    this.framebuffer = null
+    this.attachments = {color: null}
+    return
+  }
+
+  this.framebuffer = this.webGL.createFramebuffer()
+  this.attachments = {color: this.webGL.createTexture()}
+  this.depthBuffer = this.webGL.createRenderbuffer()
+
+  this.webGL.bindFramebuffer(this.webGL.FRAMEBUFFER, this.framebuffer)
+  this.webGL.activeTexture(this.webGL.TEXTURE0)
+  this.webGL.bindTexture(this.webGL.TEXTURE_2D, this.attachments.color)
+  this.webGL.bindRenderbuffer(this.webGL.RENDERBUFFER, this.depthBuffer)
+  this.webGL.framebufferTexture2D(this.webGL.FRAMEBUFFER, this.webGL.COLOR_ATTACHMENT0, this.webGL.TEXTURE_2D, this.attachments.color, 0)
+  this.webGL.framebufferRenderbuffer(this.webGL.FRAMEBUFFER, this.webGL.DEPTH_ATTACHMENT, this.webGL.RENDERBUFFER, this.depthBuffer)
+  this.webGL.bindFramebuffer(this.webGL.FRAMEBUFFER, null)
+  this.webGL.bindTexture(this.webGL.TEXTURE_2D, null)
+  this.webGL.bindRenderbuffer(this.webGL.RENDERBUFFER, null)
 }
 
-Stage.prototype = {
+Pass.prototype = {
+  updateViewport(width, height) {
+    if (!this.framebuffer) return
+
+    this.webGL.activeTexture(this.webGL.TEXTURE0)
+    this.webGL.bindTexture(this.webGL.TEXTURE_2D, this.attachments.color)
+    this.webGL.texImage2D(this.webGL.TEXTURE_2D, 0, this.webGL.RGBA, width, height, 0,
+                          this.webGL.RGBA, this.webGL.UNSIGNED_BYTE, null)
+    this.webGL.texParameteri(this.webGL.TEXTURE_2D, this.webGL.TEXTURE_MIN_FILTER, this.webGL.LINEAR)
+    this.webGL.texParameteri(this.webGL.TEXTURE_2D, this.webGL.TEXTURE_WRAP_S, this.webGL.CLAMP_TO_EDGE)
+    this.webGL.texParameteri(this.webGL.TEXTURE_2D, this.webGL.TEXTURE_WRAP_T, this.webGL.CLAMP_TO_EDGE)
+    this.webGL.bindTexture(this.webGL.TEXTURE_2D, null)
+
+    this.webGL.bindRenderbuffer(this.webGL.RENDERBUFFER, this.depthBuffer)
+    this.webGL.renderbufferStorage(this.webGL.RENDERBUFFER, this.webGL.DEPTH_COMPONENT16, width, height)
+    this.webGL.bindRenderbuffer(this.webGL.RENDERBUFFER, null)
+  },
+
   updateShader({type, source, linked}) {
     this.shaders[type] && this.webGL.detachShader(this.program, this.shaders[type])
     this.shaders[type] && this.webGL.deleteShader(this.shaders[type])
@@ -34,18 +72,17 @@ Stage.prototype = {
 
     return message
   },
-  enableAttribute(attribute) {
-    const location = this.webGL.getAttribLocation(this.program, attribute.name)
-    if (location === -1) return // does not exist or optimized away during compilation
-    this.webGL.enableVertexAttribArray(location)
-    this.webGL.bindBuffer(this.webGL.ARRAY_BUFFER, attribute.buffer)
-    this.webGL.vertexAttribPointer(location, attribute.elementSize, attribute.elementType, false, 0, 0)
-  },
+
   relink() {
     this.webGL.linkProgram(this.program)
     return this.webGL.getProgramInfoLog(this.program) || 'Linking successful'
   },
-  setUniform(type, name, value) {
+
+  updateGeometry(geometry) {
+    this.geometry = new Geometry(this.webGL, geometry)
+  },
+
+  updateUniform(type, name, value) {
     this.webGL.useProgram(this.program)
     const location = this.webGL.getUniformLocation(this.program, name)
     switch (type) {
@@ -75,22 +112,30 @@ Stage.prototype = {
         this.webGL[`uniformMatrix${type[3]}fv`](location, false, value)
         break
       case 'sampler2D':
-        // ignore for now
+        this.webGL.activeTexture(this.webGL.TEXTURE0)
+        this.webGL.bindTexture(this.webGL.TEXTURE_2D, value)
+        this.webGL.uniform1i(location, 0)
         break
       default:
-        throw new Error(`unknown uniform type '${type}'`)
+        throw new Error(`unknown or unsupported uniform type '${type}'`)
     }
   },
-  draw(prepare) {
+  draw(prevPassColor) {
     if (!this.webGL.getProgramParameter(this.program, this.webGL.LINK_STATUS) || !this.geometry) return
 
+    this.updateUniform('sampler2D', 'textureRendered', prevPassColor)
+
     this.webGL.useProgram(this.program)
-    const framebuffer = prepare()
-    this.webGL.bindFramebuffer(this.webGL.FRAMEBUFFER, framebuffer)
     this.webGL.enable(this.webGL.DEPTH_TEST)
-    this.webGL.clearColor(0, 0, 0, 0)
+
+    this.webGL.bindFramebuffer(this.webGL.FRAMEBUFFER, this.framebuffer)
+    this.webGL.clearColor(0, 0, 0, 1)
     this.webGL.clear(this.webGL.COLOR_BUFFER_BIT | this.webGL.DEPTH_BUFFER_BIT)
     this.geometry.drawWith(this.program)
+
+    this.webGL.bindFramebuffer(this.webGL.FRAMEBUFFER, null)
+
+    return this.attachments.color
   }
 }
 
@@ -104,10 +149,12 @@ function Geometry(webGL, {data, elements, attributes}) {
   this.elementBuffer = this.webGL.createBuffer()
   this.webGL.bindBuffer(this.webGL.ELEMENT_ARRAY_BUFFER, this.elementBuffer)
   this.webGL.bufferData(this.webGL.ELEMENT_ARRAY_BUFFER, new IndexArrayType(elements), this.webGL.STATIC_DRAW)
+  this.webGL.bindBuffer(this.webGL.ELEMENT_ARRAY_BUFFER, null)
 
   this.dataBuffer = this.webGL.createBuffer()
   this.webGL.bindBuffer(this.webGL.ARRAY_BUFFER, this.dataBuffer)
   this.webGL.bufferData(this.webGL.ARRAY_BUFFER, data, this.webGL.STATIC_DRAW)
+  this.webGL.bindBuffer(this.webGL.ARRAY_BUFFER, null)
 
   this.attributes = {vertex_worldSpace: attributes.vertex,
                      normal_worldSpace: attributes.normal,
@@ -117,56 +164,65 @@ function Geometry(webGL, {data, elements, attributes}) {
 Geometry.prototype = {
   drawWith(program) {
     for (const name in this.attributes) {
-      const attribute = this.attributes[name]
       const location = this.webGL.getAttribLocation(program, name)
       if (location === -1) continue // does not exist or optimized away during compilation
       this.webGL.enableVertexAttribArray(location)
       this.webGL.bindBuffer(this.webGL.ARRAY_BUFFER, this.dataBuffer)
+      const attribute = this.attributes[name]
       this.webGL.vertexAttribPointer(location, attribute.count, this.webGL.FLOAT, false, attribute.stride, attribute.offset)
     }
     this.webGL.bindBuffer(this.webGL.ELEMENT_ARRAY_BUFFER, this.elementBuffer)
+
     this.webGL.drawElements(this.webGL.TRIANGLES, this.elementCount, this.elementType, 0)
+
+    this.webGL.bindBuffer(this.webGL.ELEMENT_ARRAY_BUFFER, null)
+    for (const name in this.attributes) {
+      const location = this.webGL.getAttribLocation(program, name)
+      if (location === -1) continue // does not exist or optimized away during compilation
+      this.webGL.disableVertexAttribArray(location)
+      this.webGL.bindBuffer(this.webGL.ARRAY_BUFFER, null)
+    }
   }
 }
 
 function Scene(webGL, shaders) {
   this.webGL = webGL
-  this.stages = shaders.reduce((stages, shader) => {
-                  stages[shader.stage] = stages[shader.stage] || new Stage(webGL, shader.stage)
-                  stages[shader.stage].shaders[shader.type] = null
-                  return stages
-                }, {})
+  this.passByKey = shaders.reduce((passes, shader) => {
+                     passes[shader.pass] = passes[shader.pass] || new Pass(webGL, shader.pass)
+                     passes[shader.pass].shaders[shader.type] = null
+                     return passes
+                   }, {})
+  this.passes = Object.values(this.passByKey)
+
+  this.outputPass = new Pass(webGL, '__output__', true)
+  this.outputPass.updateShader({type: 'vertex', linked: true, source: `
+attribute vec3 vertex_worldSpace;
+attribute vec2 textureCoordinate_input;
+varying vec2 uvs;
+
+void main() {
+  gl_Position = vec4(vertex_worldSpace, 1.0);
+  uvs = textureCoordinate_input;
+}`})
+  this.outputPass.updateShader({type: 'fragment', linked: true, source: `
+precision mediump float;
+uniform sampler2D textureRendered;
+varying vec2 uvs;
+
+void main() {
+  gl_FragColor = texture2D(textureRendered, uvs.st);
+}`})
+  this.outputPass.relink()
 }
 
 Scene.prototype = {
   updateViewport(width, height) {
     this.webGL.viewport(0, 0, width, height)
-    this.renderedTexture = this.webGL.createTexture()
-    this.webGL.bindTexture(this.webGL.TEXTURE_2D, this.renderedTexture)
-    this.webGL.texImage2D(this.webGL.TEXTURE_2D, 0, this.webGL.RGBA,
-                          width, height, 0,
-                          this.webGL.RGBA, this.webGL.UNSIGNED_BYTE, null)
-    this.webGL.texParameteri(this.webGL.TEXTURE_2D, this.webGL.TEXTURE_MIN_FILTER, this.webGL.LINEAR)
-    this.webGL.texParameteri(this.webGL.TEXTURE_2D, this.webGL.TEXTURE_WRAP_S, this.webGL.CLAMP_TO_EDGE)
-    this.webGL.texParameteri(this.webGL.TEXTURE_2D, this.webGL.TEXTURE_WRAP_T, this.webGL.CLAMP_TO_EDGE)
-
-    this.baseFramebuffer = this.webGL.createFramebuffer()
-    this.webGL.bindFramebuffer(this.webGL.FRAMEBUFFER, this.baseFramebuffer)
-    this.webGL.framebufferTexture2D(this.webGL.FRAMEBUFFER, this.webGL.COLOR_ATTACHMENT0, this.webGL.TEXTURE_2D, this.renderedTexture, 0)
-    const depthBuffer = this.webGL.createRenderbuffer()
-    this.webGL.bindRenderbuffer(this.webGL.RENDERBUFFER, depthBuffer)
-    this.webGL.renderbufferStorage(this.webGL.RENDERBUFFER, this.webGL.DEPTH_COMPONENT16, width, height)
-    this.webGL.framebufferRenderbuffer(this.webGL.FRAMEBUFFER, this.webGL.DEPTH_ATTACHMENT, this.webGL.RENDERBUFFER, depthBuffer)
+    this.passes.forEach(pass => pass.updateViewport(width, height))
   },
   draw() {
-    this.stages.base.draw(() => {
-      return this.baseFramebuffer
-    })
-
-    this.stages.R2T.draw(() => {
-      this.webGL.bindTexture(this.webGL.TEXTURE_2D, this.renderedTexture)
-      return null // render to canvas
-    })
+    const result = this.passes.reduce((prevPassColor, pass) => pass.draw(prevPassColor), null)
+    this.outputPass.draw(result)
   }
 }
 
@@ -190,27 +246,28 @@ Canvas.prototype = {
     this.app.log.append('<hr data-text="Compile & Link Shaders">', '')
     shaders.forEach(shader => {
       const scope = shader.name
-      const message = this.scene.stages[shader.stage].updateShader(shader)
+      const message = this.scene.passByKey[shader.pass].updateShader(shader)
       this.app.log.append(scope, message)
     })
-    for (const stageKey in this.scene.stages) {
-      const scope = this.scene.stages[stageKey].name
-      const message = this.scene.stages[stageKey].relink()
+    for (const passKey in this.scene.passByKey) {
+      const scope = this.scene.passByKey[passKey].name
+      const message = this.scene.passByKey[passKey].relink()
       this.app.log.append(scope, message)
     }
   },
 
   updateUniform(uniform) {
-    for (const stageKey in this.scene.stages) {
-      this.scene.stages[stageKey].setUniform(uniform.type, uniform.name, uniform.value)
+    if (uniform.type.startsWith('sampler')) return
+    for (const passKey in uniform.passes) {
+      this.scene.passByKey[passKey].updateUniform(uniform.type, uniform.name, uniform.value)
     }
   },
 
-  updateGeometry(stage, object) {
-    const scope = `<hr data-text="Load ${this.scene.stages[stage].name} Geometry">`
-    const message = object.path.split('/').pop()
+  updateGeometry(pass, geometry) {
+    const scope = `<hr data-text="Load ${this.scene.passByKey[pass].name} Geometry">`
+    const message = geometry.path.split('/').pop()
     this.app.log.append(scope, message)
-    this.scene.stages[stage].geometry = new Geometry(this.scene.webGL, object)
+    this.scene.passByKey[pass].updateGeometry(geometry)
   },
 
   updateViewport(width, height) {
