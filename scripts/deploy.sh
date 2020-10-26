@@ -1,3 +1,5 @@
+#!/bin/bash 
+
 USR_SRV=(${1//@/ })
 USR=${USR_SRV[0]}
 SRV=${USR_SRV[1]}
