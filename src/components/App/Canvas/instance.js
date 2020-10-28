@@ -16,6 +16,7 @@ function Pass(webGL, key, renderToCanvas = false) {
   this.name = key[0].toUpperCase()+key.slice(1)+' Pass'
   this.program = this.webGL.createProgram()
   this.shaders = {}
+  this.textureUnits = {}
   this.geometry = null
 
   if (renderToCanvas) {
@@ -112,18 +113,60 @@ Pass.prototype = {
         this.webGL[`uniformMatrix${type[3]}fv`](location, false, value)
         break
       case 'sampler2D':
-        this.webGL.activeTexture(this.webGL.TEXTURE0)
-        this.webGL.bindTexture(this.webGL.TEXTURE_2D, value)
-        this.webGL.uniform1i(location, 0)
+      case 'samplerCube':
+        let texture
+        if (type === 'sampler2D' && value.TEXTURE_2D instanceof WebGLTexture) {
+          texture = value.TEXTURE_2D
+        }
+        else {
+          texture = this.webGL.createTexture()
+          const target = type === 'sampler2D'   ? this.webGL.TEXTURE_2D
+                       : type === 'samplerCube' ? this.webGL.TEXTURE_CUBE_MAP
+                       :                          null
+          this.webGL.activeTexture(this.webGL.TEXTURE0)
+          this.webGL.bindTexture(target, texture)
+
+          function isPowerOf2(value){ return (value & (value - 1)) === 0 }
+          let isPow2 = true
+          for (const target in value) {
+            const image = value[target]
+            const width = image instanceof Image ? image.width : 1
+            const height = image instanceof Image ? image.height : 1
+            isPow2 = isPow2 && isPowerOf2(width) && isPowerOf2(height)
+            if (image instanceof Image)
+              this.webGL.texImage2D(this.webGL[target], 0, this.webGL.RGBA,
+                                    this.webGL.RGBA, this.webGL.UNSIGNED_BYTE, image)
+            else
+              this.webGL.texImage2D(this.webGL[target], 0, this.webGL.RGBA, width, height, 0,
+                                    this.webGL.RGBA, this.webGL.UNSIGNED_BYTE, new Uint8Array([0, 0, 0, 1]))
+
+          }
+
+          if (isPow2) {
+            this.webGL.generateMipmap(target)
+            this.webGL.texParameteri(target, this.webGL.TEXTURE_MIN_FILTER, this.webGL.LINEAR_MIPMAP_LINEAR)
+          } else {
+            this.webGL.texParameteri(target, this.webGL.TEXTURE_MIN_FILTER, this.webGL.LINEAR)
+            this.webGL.texParameteri(target, this.webGL.TEXTURE_WRAP_S, this.webGL.CLAMP_TO_EDGE)
+            this.webGL.texParameteri(target, this.webGL.TEXTURE_WRAP_T, this.webGL.CLAMP_TO_EDGE)
+          }
+          this.webGL.bindTexture(target, null)
+        }
+
+        this.textureUnits[name].texture = texture
+        this.webGL.uniform1i(location, this.textureUnits[name].unit)
         break
       default:
         throw new Error(`unknown or unsupported uniform type '${type}'`)
     }
   },
-  draw(prevPassColor) {
-    if (!this.webGL.getProgramParameter(this.program, this.webGL.LINK_STATUS) || !this.geometry) return
 
-    this.updateUniform('sampler2D', 'textureRendered', prevPassColor)
+  updateTextureUnits(textureUnits) {
+    this.textureUnits = textureUnits
+  },
+
+  draw() {
+    if (!this.webGL.getProgramParameter(this.program, this.webGL.LINK_STATUS) || !this.geometry) return
 
     this.webGL.useProgram(this.program)
     this.webGL.enable(this.webGL.DEPTH_TEST)
@@ -131,9 +174,27 @@ Pass.prototype = {
     this.webGL.bindFramebuffer(this.webGL.FRAMEBUFFER, this.framebuffer)
     this.webGL.clearColor(0, 0, 0, 1)
     this.webGL.clear(this.webGL.COLOR_BUFFER_BIT | this.webGL.DEPTH_BUFFER_BIT)
+
+    for (const uniformName in this.textureUnits) {
+      const textureUnit = this.textureUnits[uniformName]
+      const target = textureUnit.type === 'sampler2D'   ? this.webGL.TEXTURE_2D
+                   : textureUnit.type === 'samplerCube' ? this.webGL.TEXTURE_CUBE_MAP
+                   :                                      null
+      this.webGL.activeTexture(this.webGL.TEXTURE0+textureUnit.unit)
+      this.webGL.bindTexture(target, textureUnit.texture)
+    }
+
     this.geometry.drawWith(this.program)
 
     this.webGL.bindFramebuffer(this.webGL.FRAMEBUFFER, null)
+    for (const uniformName in this.textureUnits) {
+      const textureUnit = this.textureUnits[uniformName]
+      const target = textureUnit.type === 'sampler2D'   ? this.webGL.TEXTURE_2D
+                   : textureUnit.type === 'samplerCube' ? this.webGL.TEXTURE_CUBE_MAP
+                   :                                      null
+      this.webGL.activeTexture(this.webGL.TEXTURE0+textureUnit.unit)
+      this.webGL.bindTexture(target, null)
+    }
 
     return this.attachments.color
   }
@@ -206,13 +267,15 @@ void main() {
 }`})
   this.outputPass.updateShader({type: 'fragment', linked: true, source: `
 precision mediump float;
-uniform sampler2D textureRendered;
+uniform sampler2D image;
 varying vec2 uvs;
 
 void main() {
-  gl_FragColor = texture2D(textureRendered, uvs.st);
+  gl_FragColor = texture2D(image, uvs.st);
 }`})
   this.outputPass.relink()
+  this.outputPass.updateTextureUnits({image: {type: 'sampler2D', unit: 0}})
+  this.outputPass.updateUniform('sampler2D', 'image', {TEXTURE_2D: this.passes[this.passes.length-1].attachments.color})
 }
 
 Scene.prototype = {
@@ -221,8 +284,8 @@ Scene.prototype = {
     this.passes.forEach(pass => pass.updateViewport(width, height))
   },
   draw() {
-    const result = this.passes.reduce((prevPassColor, pass) => pass.draw(prevPassColor), null)
-    this.outputPass.draw(result)
+    this.passes.forEach(pass => pass.draw())
+    this.outputPass.draw()
   }
 }
 
@@ -257,10 +320,13 @@ Canvas.prototype = {
   },
 
   updateUniform(uniform) {
-    if (uniform.type.startsWith('sampler')) return
     for (const passKey in uniform.passes) {
       this.scene.passByKey[passKey].updateUniform(uniform.type, uniform.name, uniform.value)
     }
+  },
+
+  updateTextureUnits(pass, textureUnits) {
+    this.scene.passByKey[pass].updateTextureUnits(textureUnits)
   },
 
   updateGeometry(pass, geometry) {
