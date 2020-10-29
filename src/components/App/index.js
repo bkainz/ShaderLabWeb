@@ -16,13 +16,14 @@ attribute vec3 vertex_worldSpace;
 attribute vec3 normal_worldSpace;
 attribute vec2 textureCoordinate_input;
 
-uniform mat4 mvMatrix;
-uniform mat4 pMatrix;
+uniform mat4 mMatrix /* attach to: Model Matrix */;
+uniform mat4 vMatrix /* attach to: View Matrix */;
+uniform mat4 pMatrix /* attach to: Projection Matrix */;
 
 varying vec3 normal;
 
 void main() {
-  vec4 vertex_camSpace = mvMatrix * vec4(vertex_worldSpace, 1.0);
+  vec4 vertex_camSpace = vMatrix * mMatrix * vec4(vertex_worldSpace, 1.0);
   gl_Position = pMatrix * vertex_camSpace;
 
   normal = normal_worldSpace;
@@ -60,7 +61,7 @@ void main() {
       default: `
 precision mediump float;
 
-uniform sampler2D textureRendered;
+uniform sampler2D textureRendered /* attach to: Base Pass color */;
 
 varying vec2 varyingTextureCoordinate;
 
@@ -75,11 +76,11 @@ void main() {
            <section className={className+'-EditorPanel'}>
              <Editor shaders={props.shaders}/>
            </section>
-           <section className={className+'-ControlsPanel'}>
-             <Controls/>
-           </section>
            <section className={className+'-CanvasPanel'}>
              <Canvas shaders={props.shaders}/>
+           </section>
+           <section className={className+'-ControlsPanel'}>
+             <Controls/>
            </section>
            <section className={className+'-VerticalBorder'}/>
            <section className={className+'-HorizontalBorder'}/>

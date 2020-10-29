@@ -115,8 +115,8 @@ Pass.prototype = {
       case 'sampler2D':
       case 'samplerCube':
         let texture
-        if (type === 'sampler2D' && value.TEXTURE_2D instanceof WebGLTexture) {
-          texture = value.TEXTURE_2D
+        if (value instanceof WebGLTexture) {
+          texture = value
         }
         else {
           texture = this.webGL.createTexture()
@@ -275,7 +275,7 @@ void main() {
 }`})
   this.outputPass.relink()
   this.outputPass.updateTextureUnits({image: {type: 'sampler2D', unit: 0}})
-  this.outputPass.updateUniform('sampler2D', 'image', {TEXTURE_2D: this.passes[this.passes.length-1].attachments.color})
+  this.outputPass.updateUniform('sampler2D', 'image', this.passes[this.passes.length-1].attachments.color)
 }
 
 Scene.prototype = {

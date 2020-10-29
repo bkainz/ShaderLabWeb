@@ -1,13 +1,19 @@
-.${className}-Uniform + .${className}-Uniform {
+.${className}\/Uniform + .${className}\/Uniform {
   margin-top: 1em;
 }
 
-.${className}-UniformName {
+.${className}\/Uniform-Name {
   font-weight: bold;
 }
 
-.${className}-UniformValue {
+.${className}\/Uniform-Value {
   margin: 0.25em 0;
+}
+
+.${className}\/Uniform-Attachment {
+  border: 1px solid black;
+  padding: 0.25em;
+  margin-bottom: 0.25em;
 }
 
 .${className}\/NumericUniform-Row {
@@ -63,12 +69,6 @@
   grid-area: b2;
 }
 
-.${className}\/SamplerImage-Source {
-  border: 1px solid black;
-  padding: 0.25em;
-  margin-bottom: 0.25em;
-}
-
 .${className}\/ImageUpload-Browse {
   display: flex;
   align-items: center;
@@ -93,27 +93,27 @@
   padding: 0.25em;
 }
 
-.${className}\/SamplerUniform-Image.TEXTURE_CUBE_MAP_POSITIVE_X .${className}\/ImageUpload-Browse::before {
+.${className}\/ImageUpload.TEXTURE_CUBE_MAP_POSITIVE_X .${className}\/ImageUpload-Browse::before {
   content: '+X'
 }
 
-.${className}\/SamplerUniform-Image.TEXTURE_CUBE_MAP_NEGATIVE_X .${className}\/ImageUpload-Browse::before {
+.${className}\/ImageUpload.TEXTURE_CUBE_MAP_NEGATIVE_X .${className}\/ImageUpload-Browse::before {
   content: '-X'
 }
 
-.${className}\/SamplerUniform-Image.TEXTURE_CUBE_MAP_POSITIVE_Y .${className}\/ImageUpload-Browse::before {
+.${className}\/ImageUpload.TEXTURE_CUBE_MAP_POSITIVE_Y .${className}\/ImageUpload-Browse::before {
   content: '+Y'
 }
 
-.${className}\/SamplerUniform-Image.TEXTURE_CUBE_MAP_NEGATIVE_Y .${className}\/ImageUpload-Browse::before {
+.${className}\/ImageUpload.TEXTURE_CUBE_MAP_NEGATIVE_Y .${className}\/ImageUpload-Browse::before {
   content: '-Y'
 }
 
-.${className}\/SamplerUniform-Image.TEXTURE_CUBE_MAP_POSITIVE_Z .${className}\/ImageUpload-Browse::before {
+.${className}\/ImageUpload.TEXTURE_CUBE_MAP_POSITIVE_Z .${className}\/ImageUpload-Browse::before {
   content: '+Z'
 }
 
-.${className}\/SamplerUniform-Image.TEXTURE_CUBE_MAP_NEGATIVE_Z .${className}\/ImageUpload-Browse::before {
+.${className}\/ImageUpload.TEXTURE_CUBE_MAP_NEGATIVE_Z .${className}\/ImageUpload-Browse::before {
   content: '-Z'
 }
 
