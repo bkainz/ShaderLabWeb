@@ -15,14 +15,18 @@ Editor.prototype = {
   },
 
   get shaders() {
-    return this.props.shaders.map(shader => {
-      const shaderId = [shader.pass, shader.type].filter(Boolean).join('/')
-      return {pass: shader.pass,
-              type: shader.type,
-              name: shader.name,
-              linked: this.el.elements[shaderId+'-linked'].checked,
-              source: this.el.elements[shaderId+'-source'].value}
-    })
+    const shaders = []
+    for (const passKey in this.props.passes)
+      for (const shaderKey in this.props.passes[passKey].shaders) {
+        const shader = this.props.passes[passKey].shaders[shaderKey]
+        const shaderId = [passKey, shaderKey].filter(Boolean).join('/')
+        shaders.push({pass: passKey,
+                      type: shaderKey,
+                      name: shader.name,
+                      linked: this.el.elements[shaderId+'-linked'].checked,
+                      source: this.el.elements[shaderId+'-source'].value})
+      }
+    return shaders
   }
 }
 

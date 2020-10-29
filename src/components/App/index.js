@@ -7,11 +7,14 @@ import Initializer from './Initializer'
 
 export default function() {
   const props = {
-    shaders: [{
-      pass: 'base',
-      name: 'Vertex Shader',
-      type: 'vertex',
-      default: `
+    passes: {
+      base: {
+        name: 'Base Pass',
+        geometry: 'objects/teapot.obj',
+        shaders: {
+          vertex: {
+            name: 'Vertex Shader',
+            default: `
 attribute vec3 vertex_worldSpace;
 attribute vec3 normal_worldSpace;
 attribute vec2 textureCoordinate_input;
@@ -28,11 +31,10 @@ void main() {
 
   normal = normal_worldSpace;
 }`.trim()
-    },{
-      pass: 'base',
-      name: 'Fragment Shader',
-      type: 'fragment',
-      default: `
+          },
+          fragment: {
+            name: 'Fragment Shader',
+            default: `
 precision mediump float;
 
 varying vec3 normal;
@@ -40,11 +42,16 @@ varying vec3 normal;
 void main() {
   gl_FragColor = vec4(0.5 + 0.5*normal, 1.0);
 }`.trim()
-    },{
-      pass: 'R2T',
-      name: 'R2T Vertex Shader',
-      type: 'vertex',
-      default: `
+          }
+        }
+      },
+      R2T: {
+        name: 'R2T Pass',
+        geometry: 'quad',
+        shaders: {
+          vertex: {
+            name: 'R2T Vertex Shader',
+            default: `
 attribute vec3 vertex_worldSpace;
 attribute vec2 textureCoordinate_input;
 
@@ -54,11 +61,10 @@ void main() {
   gl_Position = vec4(vertex_worldSpace, 1.0);
   varyingTextureCoordinate = textureCoordinate_input;
 }`.trim()
-    },{
-      pass: 'R2T',
-      name: 'R2T Fragment Shader',
-      type: 'fragment',
-      default: `
+          },
+          fragment: {
+            name: 'R2T Fragment Shader',
+            default: `
 precision mediump float;
 
 uniform sampler2D textureRendered /* attach to: Base Pass color */;
@@ -68,16 +74,19 @@ varying vec2 varyingTextureCoordinate;
 void main() {
   gl_FragColor = texture2D(textureRendered, varyingTextureCoordinate.st);
 }`.trim()
-    }]
+          }
+        }
+      }
+    }
   }
   const {className, id} = compReg.register(import.meta.url, props)
 
   return <body className={className} id={id}>
            <section className={className+'-EditorPanel'}>
-             <Editor shaders={props.shaders}/>
+             <Editor passes={props.passes}/>
            </section>
            <section className={className+'-CanvasPanel'}>
-             <Canvas shaders={props.shaders}/>
+             <Canvas passes={props.passes}/>
            </section>
            <section className={className+'-ControlsPanel'}>
              <Controls/>

@@ -1,0 +1,11 @@
+.${className}\/Section + .${className}\/Section {
+  margin-top: 1em;
+}
+
+.${className}\/Section-Name {
+  font-weight: bold;
+}
+
+.${className}\/Section-Content {
+  margin: 0.25em 0;
+}

@@ -17,8 +17,8 @@ App.prototype = {
       this.canvas.updateTextureUnits(pass, textureUnits)
     })
 
-    this.el.addEventListener('objectChanged', ({detail: {pass, object}}) => {
-      this.canvas.updateGeometry(pass, object)
+    this.el.addEventListener('geometryChanged', ({detail: {pass, geometry}}) => {
+      this.canvas.updateGeometry(pass, geometry)
     })
 
     this.el.addEventListener('viewportChanged', ({detail: {width, height}}) => {

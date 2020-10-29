@@ -10,12 +10,12 @@ function createShader(webGL, type, source) {
   return {shader, message}
 }
 
-function Pass(webGL, key, renderToCanvas = false) {
+function Pass(webGL, key, config, renderToCanvas = false) {
   this.webGL = webGL
   this.key = key
-  this.name = key[0].toUpperCase()+key.slice(1)+' Pass'
+  this.name = config.name
+  this.shaders = Object.keys(config.shaders).reduce((shaders, shaderType) => (shaders[shaderType] = null, shaders), {})
   this.program = this.webGL.createProgram()
-  this.shaders = {}
   this.textureUnits = {}
   this.geometry = null
 
@@ -246,16 +246,13 @@ Geometry.prototype = {
   }
 }
 
-function Scene(webGL, shaders) {
+function Scene(webGL, passes) {
   this.webGL = webGL
-  this.passByKey = shaders.reduce((passes, shader) => {
-                     passes[shader.pass] = passes[shader.pass] || new Pass(webGL, shader.pass)
-                     passes[shader.pass].shaders[shader.type] = null
-                     return passes
-                   }, {})
+  this.passByKey = {}
+  for (const passKey in passes) this.passByKey[passKey] = new Pass(webGL, passKey, passes[passKey])
   this.passes = Object.values(this.passByKey)
 
-  this.outputPass = new Pass(webGL, '__output__', true)
+  this.outputPass = new Pass(webGL, '__output__', {name: 'Output Pass', shaders: {vertex: null, fragment: null}}, true)
   this.outputPass.updateShader({type: 'vertex', linked: true, source: `
 attribute vec3 vertex_worldSpace;
 attribute vec2 textureCoordinate_input;
@@ -291,14 +288,19 @@ Scene.prototype = {
 
 function Canvas(el, {props}) {
   this.el = el
+  this.props = props
   this.app = el.closest('.App').__component__
   this.app.canvas = this
-  this.scene = new Scene(el.getContext('webgl'), props.shaders)
+  this.scene = new Scene(el.getContext('webgl'), props.passes)
 }
 
 Canvas.prototype = {
-  initialize() {
-    // nothing to do
+  async initialize() {
+    this.scene.passes.forEach(async pass => {
+      const geometry = await this.app.scene.geometry.load(this.props.passes[pass.key].geometry)
+      this.app.el.dispatchEvent(new CustomEvent('geometryChanged', {detail: {pass: pass.key, geometry}}))
+    })
+    this.scene.outputPass.updateGeometry(await this.app.scene.geometry.load('quad'))
   },
 
   get size() {

@@ -8,8 +8,11 @@ export default function(props) {
 
   return <form className={className} id={id}>
            <div className={className+'-Shaders'}>
-             <Tabs tabs={props.shaders.map(shader => {
-               return {label: shader.name, content: <Shader shader={shader}/>}
+             <Tabs tabs={Object.keys(props.passes).flatMap(passKey => {
+               return Object.keys(props.passes[passKey].shaders).map(shaderKey => {
+                 const shader = props.passes[passKey].shaders[shaderKey]
+                 return {label: shader.name, content: <Shader pass={passKey} type={shaderKey} default={shader.default}/>}
+               })
              })}/>
            </div>
            <div className={className+'-Controls'}>
