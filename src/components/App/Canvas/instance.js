@@ -296,6 +296,12 @@ function Canvas(el, {props}) {
 
 Canvas.prototype = {
   async initialize() {
+    const pass = this.scene.passByKey.base
+    for (const bufferKey in pass.attachments) {
+      this.app.registerValue(pass.name+' '+bufferKey, 'sampler2D')
+      this.app.values.sampler2D[pass.name+' '+bufferKey].value = pass.attachments[bufferKey]
+    }
+
     this.scene.passes.forEach(async pass => {
       const geometry = await this.app.scene.geometry.load(this.props.passes[pass.key].geometry)
       this.app.el.dispatchEvent(new CustomEvent('geometryChanged', {detail: {pass: pass.key, geometry}}))

@@ -6,7 +6,8 @@ function Scene(el) {
 
 Scene.prototype = {
   initialize() {
-    // nothing to do
+    this.camera.initialize()
+    this.geometry.initialize()
   }
 }
 

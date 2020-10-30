@@ -1,4 +1,6 @@
-import escapeCSS from '../../../../../helpers/escapeCSS'
+import algebra from '../../../../../helpers/algebra'
+
+const {R} = algebra
 
 function normalize(v) {
   let sum = 0; for (let i = 0; i < v.length; i+=1) sum += v[i]*v[i]
@@ -75,11 +77,16 @@ const load = {
 
 function Geometry(el, {className}) {
   this.el = el
-  this.scene = el.closest('.'+escapeCSS(className.split('/').slice(0, -1).join('/'))).__component__
-  this.scene.geometry = this
+  this.app = el.closest('.App').__component__
+  this.app.scene.geometry = this
 }
 
 Geometry.prototype = {
+  initialize() {
+    this.app.registerValue('Model Matrix', 'mat4')
+    this.app.values.mat4['Model Matrix'].value = R(-90, 1, 0, 0)
+  },
+
   async load(path) {
     return path === 'void' ? load.void()
          : path === 'quad' ? load.quad()
