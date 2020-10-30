@@ -63,7 +63,7 @@ function Uniform(uniforms, name, type, defaultAttachment) {
   this.nameEl = this.el.querySelector(`.${helpers.escapeCSS(this.className)}-Name`)
   this.valueEl = this.el.querySelector(`.${helpers.escapeCSS(this.className)}-Value`)
 
-  const attachments = uniforms.attachments[type] || {}
+  const attachments = uniforms.app.values[type] || {}
   this.valueEl.innerHTML = Object.keys(attachments).length ? `
 attach to: <select name="${this.id}-Attachment" class="${this.className}-Attachment">
   <option value="">None</option>${Object.keys(attachments).map(name => `
@@ -118,7 +118,7 @@ Uniform.prototype = {
     return this._attachment
   },
   set attachment(attachment) {
-    const attachments = this.uniforms.attachments[this.type]
+    const attachments = this.uniforms.app.values[this.type]
 
     if (this._attachment) attachments[this._attachment].el.removeEventListener('valueChanged', this._attachmentChangeListener)
     this._attachment = attachment
@@ -265,7 +265,7 @@ function SamplerUniform(uniforms, name, type, defaultAttachment) {
     this.imagesEl.style.display = attachment ? 'none' : ''
 
     if (attachment) {
-      this.value = this.uniforms.attachments[this.type][attachment].value
+      this.value = this.uniforms.app.values[this.type][attachment].value
     } else {
       const value = {}
       await Promise.all(Object.keys(this.images).map(async target => value[target] = await this.images[target].value))
@@ -277,26 +277,6 @@ function SamplerUniform(uniforms, name, type, defaultAttachment) {
 SamplerUniform.prototype = Object.create(Uniform.prototype)
 
 
-function Attachment(name, type, value) {
-  this.name = name
-  this.type = type
-  this._value = value
-  this.el = document.createElement('div')
-}
-Attachment.prototype = {
-  register(owner) {
-    owner[this.type] = owner[this.type] || {}
-    owner[this.type][this.name] = this
-  },
-  get value() {
-    return this._value
-  },
-  set value(value) {
-    this._value = value
-    this.el.dispatchEvent(new CustomEvent('valueChanged', {detail: value}))
-  }
-}
-
 function Uniforms(el, {id, className}) {
   this.el = el
   this.id = id
@@ -305,21 +285,25 @@ function Uniforms(el, {id, className}) {
   this.app.uniforms = this
 
   this.state = {}
-  this.attachments = {}
 
-  new Attachment('Model Matrix', 'mat4', R(-90, 1, 0, 0)).register(this.attachments)
-  new Attachment('View Matrix', 'mat4', T(0, -8, -40)).register(this.attachments)
-  new Attachment('Projection Matrix', 'mat4', T(0, 0, 0)).register(this.attachments)
+  this.app.registerValue('Model Matrix', 'mat4')
+  this.app.values.mat4['Model Matrix'].value = R(-90, 1, 0, 0)
+  this.app.registerValue('View Matrix', 'mat4')
+  this.app.values.mat4['View Matrix'].value = T(0, -8, -40)
+  this.app.registerValue('Projection Matrix', 'mat4')
+  this.app.values.mat4['Projection Matrix'].value = T(0, 0, 0)
 
   const pass = this.app.canvas.scene.passByKey.base
-  for (const bufferKey in pass.attachments)
-    new Attachment(pass.name+' '+bufferKey, 'sampler2D', pass.attachments[bufferKey]).register(this.attachments)
+  for (const bufferKey in pass.attachments) {
+    this.app.registerValue(pass.name+' '+bufferKey, 'sampler2D')
+    this.app.values.sampler2D[pass.name+' '+bufferKey].value = pass.attachments[bufferKey]
+  }
 }
 
 Uniforms.prototype = {
   initialize() {
     this.app.el.addEventListener('viewportChanged', ({detail: {width, height}}) => {
-      this.attachments.mat4['Projection Matrix'].value = P(60, width/height, 0.001, 10000)
+      this.app.values.mat4['Projection Matrix'].value = P(60, width/height, 0.001, 10000)
     })
 
     this.app.el.addEventListener('shadersChanged', ({detail: shaders}) => {
