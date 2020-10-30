@@ -1,3 +1,5 @@
+import escapeCSS from '../../../../helpers/escapeCSS'
+
 function M(a, b) {
   const c00 = a[0]*b[0]  + a[4]*b[1]  + a[8] *b[2]  + a[12]*b[3] ,
         c01 = a[1]*b[0]  + a[5]*b[1]  + a[9] *b[2]  + a[13]*b[3] ,
@@ -60,8 +62,8 @@ function Uniform(uniforms, name, type, defaultAttachment) {
 <div class="${this.className+'-Name'}">${this.name}</div>
 <div class="${this.className+'-Value'}"></div>
 `.trim()
-  this.nameEl = this.el.querySelector(`.${helpers.escapeCSS(this.className)}-Name`)
-  this.valueEl = this.el.querySelector(`.${helpers.escapeCSS(this.className)}-Value`)
+  this.nameEl = this.el.querySelector(`.${escapeCSS(this.className)}-Name`)
+  this.valueEl = this.el.querySelector(`.${escapeCSS(this.className)}-Value`)
 
   const attachments = uniforms.app.values[type] || {}
   this.valueEl.innerHTML = Object.keys(attachments).length ? `
@@ -72,7 +74,7 @@ attach to: <select name="${this.id}-Attachment" class="${this.className}-Attachm
 <input type="hidden" name="${this.id}-Attachment" value="" class="${this.className}-Attachment">`.trim()
 
   this._attachmentChangeListener = (({detail: value}) => this.value = value)
-  this.attachmentEl = this.el.querySelector(`.${helpers.escapeCSS(this.className)}-Attachment`)
+  this.attachmentEl = this.el.querySelector(`.${escapeCSS(this.className)}-Attachment`)
   this.attachmentEl.addEventListener('change', e => this.attachment = this.attachmentEl.value)
   this.el.addEventListener('attachmentChanged', ({detail: attachment}) => this.attachmentEl.value = attachment)
   this.attachment = this.attachmentEl.value
@@ -208,8 +210,8 @@ function ImageUpload(uniformsClassName, target) {
   <img src="" class="${this.className}-Preview">
 </label>
 `.trim()
-  this.fileEl = this.el.querySelector(`.${helpers.escapeCSS(this.className)}-File`)
-  const previewEl = this.el.querySelector(`.${helpers.escapeCSS(this.className)}-Preview`)
+  this.fileEl = this.el.querySelector(`.${escapeCSS(this.className)}-File`)
+  const previewEl = this.el.querySelector(`.${escapeCSS(this.className)}-Preview`)
 
   this.fileEl.addEventListener('change', async e => {
     URL.revokeObjectURL(previewEl.src)

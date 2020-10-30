@@ -1,3 +1,5 @@
+import escapeCSS from '../../../../../helpers/escapeCSS'
+
 function normalize(v) {
   let sum = 0; for (let i = 0; i < v.length; i+=1) sum += v[i]*v[i]
   const len = Math.sqrt(sum)
@@ -73,7 +75,7 @@ const load = {
 
 function Geometry(el, {className}) {
   this.el = el
-  this.scene = el.closest('.'+helpers.escapeCSS(className.split('/').slice(0, -1).join('/'))).__component__
+  this.scene = el.closest('.'+escapeCSS(className.split('/').slice(0, -1).join('/'))).__component__
   this.scene.geometry = this
 }
 

@@ -5,6 +5,7 @@ import React from 'react'
 import ReactDomServer from 'react-dom/server'
 import App from './components/App'
 import compReg from './componentRegistry'
+import modReg from './moduleRegistry'
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url))
 const __rootdir = path.dirname(__dirname)
@@ -33,8 +34,10 @@ Object.values(compReg.classes).forEach(comp => {
     classStyles.push(fs.readFileSync(classStyle, 'utf-8').replace(/\${className}/g, escapeCSS(comp.className)))
 
   const instanceScript = path.join(comp.dir, 'instance.js')
-  if (fs.existsSync(instanceScript))
-    instanceScripts.push({className: comp.className, content: fs.readFileSync(instanceScript, 'utf-8')})
+  if (fs.existsSync(instanceScript)) {
+    const {content, dependencies} = modReg.extractDependencies(fs.readFileSync(instanceScript, 'utf-8'), instanceScript)
+    instanceScripts.push({className: comp.className, content, dependencies})
+  }
 
   const instanceStyle = path.join(comp.dir, 'instance.css')
   if (fs.existsSync(instanceStyle))
@@ -60,39 +63,40 @@ fs.writeFileSync(path.join(publicDir, 'index.html'), `
       ${instanceStyles.join('\n')}
     </style>
     <script>
-      window.components = ${JSON.stringify(compReg.classes)}
-      window.helpers = {
-        escapeCSS(value) {
-          value = value.replace(/\\s/g, '-')
-          value = value.replace(/[^0-9a-zA-Z_-\u0080-\uFFFF]/g, '\\\\$&')
-          value = /\\d/.test(value[0]) ? '\\\\3'+value[0]+' '+value.slice(1) : value
-          return value
-        }
-      }
+      !function() {
+        const modules = {}
+        ${Object.keys(modReg.modules).map(id => `
+        !function(module${Object.values(modReg.modules[id].dependencies).map(alias => `, ${alias}`).join('')}) {
+          ${modReg.modules[id].content.replace(/\n/g, '\n          ')}
+          modules['${id}'] = module.exports
+        }({}${Object.keys(modReg.modules[id].dependencies).map(id => `, modules['${id}']`).join('')})`
+        ).join('\n')}
 
-      new MutationObserver(mutations => {
-        for (let mIdx = 0; mIdx < mutations.length; mIdx += 1) {
-          for (let nIdx = 0; nIdx < mutations[mIdx].addedNodes.length; nIdx += 1) {
-            const node = mutations[mIdx].addedNodes[nIdx]
+        const components = ${JSON.stringify(compReg.classes)}
+        ${instanceScripts.map(script => `
+        !function(module${Object.values(script.dependencies).map(alias => `, ${alias}`).join('')}) {
+          ${script.content.replace(/\n/g, '\n          ')}
+          components['${script.className}'].Constructor = module.exports
+        }({}${Object.keys(script.dependencies).map(id => `, modules['${id}']`).join('')})`
+        ).join('\n')}
 
-            if (node.nodeType !== Node.ELEMENT_NODE) continue
+        new MutationObserver(mutations => {
+          for (let mIdx = 0; mIdx < mutations.length; mIdx += 1) {
+            for (let nIdx = 0; nIdx < mutations[mIdx].addedNodes.length; nIdx += 1) {
+              const node = mutations[mIdx].addedNodes[nIdx]
 
-            const className = node.classList.item(0)
-            const id = node.id
+              if (node.nodeType !== Node.ELEMENT_NODE) continue
 
-            if (!window.components[className] || !window.components[className].Constructor) continue
+              const className = node.classList.item(0)
+              const id = node.id
 
-            node.__component__ = new window.components[className].Constructor(node, window.components[className].instances[id])
+              if (!components[className] || !components[className].Constructor) continue
+
+              node.__component__ = new components[className].Constructor(node, components[className].instances[id])
+            }
           }
-        }
-      }).observe(document.documentElement, {childList: true, subtree: true})
-
-      ${instanceScripts.map(script => `
-      !function(module) {
-        ${script.content.replace(/\n/g, '\n        ')}
-        window.components['${script.className}'].Constructor = module.exports
-      }({})`
-      ).join('\n')}
+        }).observe(document.documentElement, {childList: true, subtree: true})
+      }()
     </script>
   </head>
   ${body}
