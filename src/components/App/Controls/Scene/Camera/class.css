@@ -1,0 +1,33 @@
+.${className}-Field {
+  display: flex;
+}
+
+.${className}-Field + .${className}-Field {
+  margin-top: 0.5em;
+}
+
+.${className}-FieldLabel {
+  box-sizing: border-box;
+  width: 10.5em;
+  padding: 0.25em 0;
+  border-top: 1px solid transparent;
+  display: flex;
+  align-items: center;
+}
+
+.${className}-FieldValue {
+  display: flex;
+  margin: -0.25em;
+}
+
+.${className}-FieldInput {
+  margin: 0.25em;
+  box-sizing: border-box;
+  width: 5em;
+  padding: 0.25em;
+  border: 1px solid black;
+}
+
+.${className}-FieldInput.projection {
+  width: 10.5em;
+}

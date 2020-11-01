@@ -1,13 +1,6 @@
 import algebra from '../../../../../helpers/algebra'
 
-const {R} = algebra
-
-function normalize(v) {
-  let sum = 0; for (let i = 0; i < v.length; i+=1) sum += v[i]*v[i]
-  const len = Math.sqrt(sum)
-  const n = []; for (let i = 0; i < v.length; i+=1) n[i] = v[i]/len
-  return n
-}
+const {normalize, M, T, R} = algebra
 
 const load = {
   void() {
@@ -84,7 +77,7 @@ function Geometry(el, {className}) {
 Geometry.prototype = {
   initialize() {
     this.app.registerValue('Model Matrix', 'mat4')
-    this.app.values.mat4['Model Matrix'].value = R(-90, 1, 0, 0)
+    this.app.values.mat4['Model Matrix'].value = M(T(0, -8, 0), R(-90, 1, 0, 0))
   },
 
   async load(path) {
