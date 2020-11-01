@@ -5,6 +5,46 @@ export default function(props) {
   const {className, id} = compReg.register(import.meta.url, props)
 
   return <div className={className} id={id}>
-           teapot.obj
+           <div className={className+'-Field depth-test'}>
+             <div className={className+'-FieldLabel'}>
+               Depth Test:
+             </div>
+             <div className={className+'-FieldValue'}>
+               <select className={className+'-FieldInput depth-test'}>
+                 <option value="NEVER">Never</option>
+                 <option value="LESS" selected={true}>Less</option>
+                 <option value="LEQUAL">Less Or Equal</option>
+                 <option value="EQUAL">Equal</option>
+                 <option value="NOTEQUAL">Not Equal</option>
+                 <option value="GEQUAL">Greater Or Equal</option>
+                 <option value="GREATER">Greater</option>
+                 <option value="ALWAYS">Always</option>
+               </select>
+             </div>
+           </div>
+           <div className={className+'-Field front-face'}>
+             <div className={className+'-FieldLabel'}>
+               Front Face:
+             </div>
+             <div className={className+'-FieldValue'}>
+               <select className={className+'-FieldInput front-face'}>
+                 <option value="CCW">Counter-clock-wise winding</option>
+                 <option value="CW">Clock-wise winding</option>
+               </select>
+             </div>
+           </div>
+           <div className={className+'-Field face-culling'}>
+             <div className={className+'-FieldLabel'}>
+               Face Culling:
+             </div>
+             <div className={className+'-FieldValue'}>
+               <select className={className+'-FieldInput face-culling'}>
+                 <option value="">Disabled</option>
+                 <option value="BACK">Back</option>
+                 <option value="FRONT">Front</option>
+                 <option value="FRONT_AND_BACK">Front & Back</option>
+               </select>
+             </div>
+           </div>
          </div>
 }

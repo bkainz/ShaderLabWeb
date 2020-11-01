@@ -17,6 +17,11 @@ function Pass(webGL, key, config, renderToCanvas = false) {
   this.shaders = Object.keys(config.shaders).reduce((shaders, shaderType) => (shaders[shaderType] = null, shaders), {})
   this.program = this.webGL.createProgram()
   this.textureUnits = {}
+  this.config = {
+    depthTest: '',
+    faceCull: '',
+    frontFace: 'CCW'
+  }
   this.geometry = null
 
   if (renderToCanvas) {
@@ -195,7 +200,22 @@ Pass.prototype = {
     if (!this.webGL.getProgramParameter(this.program, this.webGL.LINK_STATUS) || !this.geometry) return
 
     this.webGL.useProgram(this.program)
-    this.webGL.enable(this.webGL.DEPTH_TEST)
+
+    if (this.config.depthTest) {
+      this.webGL.enable(this.webGL.DEPTH_TEST)
+      this.webGL.depthFunc(this.webGL[this.config.depthTest])
+    } else {
+      this.webGL.disable(this.webGL.DEPTH_TEST)
+    }
+
+    if (this.config.faceCull) {
+      this.webGL.enable(this.webGL.CULL_FACE)
+      this.webGL.cullFace(this.webGL[this.config.faceCull])
+    } else {
+      this.webGL.disable(this.webGL.CULL_FACE)
+    }
+
+    this.webGL.frontFace(this.webGL[this.config.frontFace])
 
     this.webGL.bindFramebuffer(this.webGL.FRAMEBUFFER, this.framebuffer)
     this.webGL.clearColor(0, 0, 0, 1)
@@ -333,6 +353,21 @@ Canvas.prototype = {
       this.app.el.dispatchEvent(new CustomEvent('geometryChanged', {detail: {pass: pass.key, geometry}}))
     })
     this.scene.outputPass.updateGeometry(await this.app.scene.geometry.load('quad'))
+
+    pass.config.depthTest = this.app.values.config['Depth Test'].value
+    this.app.values.config['Depth Test'].el.addEventListener('valueChanged', ({detail: depthTest}) => {
+      pass.config.depthTest = depthTest
+    })
+
+    pass.config.faceCull = this.app.values.config['Face Culling'].value
+    this.app.values.config['Face Culling'].el.addEventListener('valueChanged', ({detail: faceCull}) => {
+      pass.config.faceCull = faceCull
+    })
+
+    pass.config.frontFace = this.app.values.config['Front Face'].value
+    this.app.values.config['Front Face'].el.addEventListener('valueChanged', ({detail: frontFace}) => {
+      pass.config.frontFace = frontFace
+    })
   },
 
   get size() {
