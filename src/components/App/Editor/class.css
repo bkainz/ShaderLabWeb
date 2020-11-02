@@ -7,6 +7,7 @@
 
 .${className}-Shaders {
   flex: 1 1 auto;
+  position: relative;
 }
 
 .${className}-Controls {
