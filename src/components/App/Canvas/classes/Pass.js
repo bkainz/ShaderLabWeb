@@ -248,4 +248,4 @@ function createShader(webGL, type, source) {
   return {shader, message}
 }
 
-module.exports = Pass
+export default Pass

@@ -77,4 +77,4 @@ NumericType.DEFAULT_VALUES = {
          0, 0, 0, 1]
 }
 
-module.exports = NumericType
+export default NumericType

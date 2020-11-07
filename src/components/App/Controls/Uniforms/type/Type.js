@@ -68,4 +68,4 @@ Type.prototype = {
   }
 }
 
-module.exports = Type
+export default Type

@@ -84,4 +84,4 @@ Canvas.prototype = {
   }
 }
 
-module.exports = Canvas
+export default Canvas

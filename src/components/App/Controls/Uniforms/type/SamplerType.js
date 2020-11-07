@@ -53,4 +53,4 @@ SamplerType.DEFAULT_VALUES = {
                 TEXTURE_CUBE_MAP_NEGATIVE_Z: null}
 }
 
-module.exports = SamplerType
+export default SamplerType

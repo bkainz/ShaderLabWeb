@@ -96,4 +96,4 @@ App.prototype = {
   }
 }
 
-module.exports = App
+export default App

@@ -30,4 +30,4 @@ Editor.prototype = {
   }
 }
 
-module.exports = Editor
+export default Editor

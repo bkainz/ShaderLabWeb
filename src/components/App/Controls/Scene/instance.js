@@ -11,4 +11,4 @@ Scene.prototype = {
   }
 }
 
-module.exports = Scene
+export default Scene

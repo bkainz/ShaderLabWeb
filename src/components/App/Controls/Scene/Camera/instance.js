@@ -188,4 +188,4 @@ Camera.prototype = {
   }
 }
 
-module.exports = Camera
+export default Camera

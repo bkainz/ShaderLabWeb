@@ -126,4 +126,4 @@ Geometry.prototype = {
   }
 }
 
-module.exports = Geometry
+export default Geometry

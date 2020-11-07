@@ -37,4 +37,4 @@ ImageUpload.prototype = {
   }
 }
 
-module.exports = ImageUpload
+export default ImageUpload

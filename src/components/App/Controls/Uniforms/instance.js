@@ -54,4 +54,4 @@ Uniforms.prototype = {
   }
 }
 
-module.exports = Uniforms
+export default Uniforms

@@ -29,4 +29,4 @@ Log.prototype = {
   }
 }
 
-module.exports = Log
+export default Log

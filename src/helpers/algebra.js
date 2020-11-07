@@ -123,4 +123,4 @@ const algebra = {
   }
 }
 
-module.exports = algebra
+export default algebra
