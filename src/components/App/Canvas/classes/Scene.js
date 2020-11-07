@@ -1,0 +1,43 @@
+import Pass from './Pass'
+
+function Scene(webGL, passes) {
+  this.webGL = webGL
+  this.passByKey = {}
+  for (const passKey in passes) this.passByKey[passKey] = new Pass(webGL, passKey, passes[passKey])
+  this.passes = Object.values(this.passByKey)
+
+  this.outputPass = new Pass(webGL, '__output__', {name: 'Output Pass', shaders: {vertex: null, fragment: null}}, true)
+  this.outputPass.updateShader({type: 'vertex', linked: true, source: `
+attribute vec3 vertex_worldSpace;
+attribute vec2 textureCoordinate_input;
+varying vec2 uvs;
+
+void main() {
+  gl_Position = vec4(vertex_worldSpace, 1.0);
+  uvs = textureCoordinate_input;
+}`})
+  this.outputPass.updateShader({type: 'fragment', linked: true, source: `
+precision mediump float;
+uniform sampler2D image;
+varying vec2 uvs;
+
+void main() {
+  gl_FragColor = texture2D(image, uvs.st);
+}`})
+  this.outputPass.relink()
+  this.outputPass.updateTextureUnits({image: {type: 'sampler2D', unit: 0}})
+  this.outputPass.updateUniform('sampler2D', 'image', this.passes[this.passes.length-1].attachments.color)
+}
+
+Scene.prototype = {
+  updateViewport(width, height) {
+    this.webGL.viewport(0, 0, width, height)
+    this.passes.forEach(pass => pass.updateViewport(width, height))
+  },
+  draw() {
+    this.passes.forEach(pass => pass.draw())
+    this.outputPass.draw()
+  }
+}
+
+module.exports = Scene
