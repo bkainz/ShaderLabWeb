@@ -1,21 +1,20 @@
-import Type from './Type'
-import ImageUpload from './SamplerType/ImageUpload'
+import Value from './Value'
+import ImageUpload from './SamplerValue/ImageUpload'
 
-function SamplerType(uniforms, name, type, defaultAttachment) {
-  Type.call(this, uniforms, name, type, defaultAttachment)
-  this.className = uniforms.className+'/SamplerUniform'
+function SamplerValue(owner, name, type, defaultAttachment, passes) {
+  Value.call(this, owner, name, type, defaultAttachment, passes)
 
   this.imagesEl = document.createElement('div')
-  this.imagesEl.classList.add(this.className+'-Images')
+  this.imagesEl.classList.add(this.className+'-SamplerImages')
   this.valueEl.appendChild(this.imagesEl)
 
-  this.images = {...SamplerType.DEFAULT_VALUES[type]}
+  this.images = {...SamplerValue.DEFAULT_VALUES[type]}
   for (const target in this.images) {
     const imageEl = document.createElement('div')
-    imageEl.classList.add(this.className+'-Image', target)
+    imageEl.classList.add(this.className+'-SamplerImage', target)
     this.imagesEl.appendChild(imageEl)
 
-    const image = new ImageUpload(uniforms.className, target)
+    const image = new ImageUpload(this, target)
     image.el.addEventListener('valueChanged', ({detail: imageValue}) => {
       const value = this.value
       value[target] = imageValue
@@ -30,7 +29,7 @@ function SamplerType(uniforms, name, type, defaultAttachment) {
     this.imagesEl.style.display = attachment ? 'none' : ''
 
     if (attachment) {
-      this.value = this.uniforms.app.values[this.type][attachment].value
+      this.value = this.app.values[this.type][attachment].value
     } else {
       const value = {}
       await Promise.all(Object.keys(this.images).map(async target => value[target] = await this.images[target].value))
@@ -39,11 +38,11 @@ function SamplerType(uniforms, name, type, defaultAttachment) {
   })
   this.el.dispatchEvent(new CustomEvent('attachmentChanged', {detail: this.attachment}))
 }
-SamplerType.prototype = Object.create(Type.prototype, Object.getOwnPropertyDescriptors({
-  constructor: SamplerType
+SamplerValue.prototype = Object.create(Value.prototype, Object.getOwnPropertyDescriptors({
+  constructor: SamplerValue
 }))
 
-SamplerType.DEFAULT_VALUES = {
+SamplerValue.DEFAULT_VALUES = {
   sampler2D: {TEXTURE_2D: null},
   samplerCube: {TEXTURE_CUBE_MAP_POSITIVE_X: null,
                 TEXTURE_CUBE_MAP_NEGATIVE_X: null,
@@ -53,4 +52,4 @@ SamplerType.DEFAULT_VALUES = {
                 TEXTURE_CUBE_MAP_NEGATIVE_Z: null}
 }
 
-export default SamplerType
+export default SamplerValue

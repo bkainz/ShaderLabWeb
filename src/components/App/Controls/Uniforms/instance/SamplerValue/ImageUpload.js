@@ -1,7 +1,7 @@
 import escapeCSS from '../../../../../../helpers/escapeCSS'
 
-function ImageUpload(uniformsClassName, target) {
-  this.className = uniformsClassName+'/ImageUpload'
+function ImageUpload(samplerValue, target) {
+  this.className = samplerValue.className+'/ImageUpload'
   this.el = document.createElement('div')
   this.el.classList.add(this.className, target)
   this.el.innerHTML = `

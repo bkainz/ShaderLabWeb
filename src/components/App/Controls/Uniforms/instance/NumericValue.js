@@ -1,8 +1,7 @@
-import Type from './Type'
+import Value from './Value'
 
-function NumericType(uniforms, name, type, defaultAttachment) {
-  Type.call(this, uniforms, name, type, defaultAttachment)
-  this.className = uniforms.className+'/NumericUniform'
+function NumericValue(owner, name, type, defaultAttachment, passes) {
+  Value.call(this, owner, name, type, defaultAttachment, passes)
 
   const nRows = type.startsWith('mat')  ? Number(type[3]) : 1
   const nCols = type.startsWith('mat')  ? Number(type[3])
@@ -18,13 +17,13 @@ function NumericType(uniforms, name, type, defaultAttachment) {
   this.inputEls = []
   for (let row = 0; row < nRows; row += 1) {
     const rowEl = document.createElement('div')
-    rowEl.classList.add(this.className+'-Row')
+    rowEl.classList.add(this.className+'-NumericRow')
     this.valueEl.appendChild(rowEl)
 
     for (let col = 0; col < nCols; col += 1) {
       const index = row*nCols+col
       this.inputEls[index] = document.createElement('input')
-      this.inputEls[index].classList.add(this.className+'-Input')
+      this.inputEls[index].classList.add(this.className+'-NumericInput')
       this.inputEls[index].type = 'number'
       this.inputEls[index].value = this.value[index]
       this.inputEls[index].step = inputStep
@@ -42,18 +41,18 @@ function NumericType(uniforms, name, type, defaultAttachment) {
   })
 }
 
-NumericType.prototype = Object.create(Type.prototype, Object.getOwnPropertyDescriptors({
-  constructor: NumericType,
+NumericValue.prototype = Object.create(Value.prototype, Object.getOwnPropertyDescriptors({
+  constructor: NumericValue,
   get value() {
     return this._value
   },
   set value(value) {
     value = Array.isArray(value) ? value : [value]
-    Object.getOwnPropertyDescriptor(Type.prototype, 'value').set.call(this, value)
+    Object.getOwnPropertyDescriptor(Value.prototype, 'value').set.call(this, value)
   }
 }))
 
-NumericType.DEFAULT_VALUES = {
+NumericValue.DEFAULT_VALUES = {
   int: [0],
   ivec2: [0, 0],
   ivec3: [0, 0, 0],
@@ -77,4 +76,4 @@ NumericType.DEFAULT_VALUES = {
          0, 0, 0, 1]
 }
 
-export default NumericType
+export default NumericValue

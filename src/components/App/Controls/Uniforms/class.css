@@ -1,27 +1,27 @@
-.${className}\/Uniform + .${className}\/Uniform {
+.${className}\/instance\/Value + .${className}\/instance\/Value {
   margin-top: 2em;
 }
 
-.${className}\/Uniform-Name {
+.${className}\/instance\/Value-Name {
   font-weight: bold;
 }
 
-.${className}\/Uniform-Value {
+.${className}\/instance\/Value-Value {
   margin: 0.25em 0;
 }
 
-.${className}\/Uniform-Attachment {
+.${className}\/instance\/Value-Attachment {
   border: 1px solid black;
   padding: 0.25em;
   margin-bottom: 0.25em;
 }
 
-.${className}\/NumericUniform-Row {
+.${className}\/instance\/Value-NumericRow {
   display: flex;
   margin: 0 -0.25em;
 }
 
-.${className}\/NumericUniform-Input {
+.${className}\/instance\/Value-NumericInput {
   margin: 0.25em;
   box-sizing: border-box;
   width: 5em;
@@ -29,7 +29,7 @@
   border: 1px solid black;
 }
 
-.${className}\/SamplerUniform-Images {
+.${className}\/instance\/Value-SamplerImages {
   display: grid;
   grid-template: "t1 t2 t3 t4" min-content
                  "m1 m2 m3 m4" min-content
@@ -37,39 +37,39 @@
   margin: -0.25em;
 }
 
-.${className}\/SamplerUniform-Image {
+.${className}\/instance\/Value-SamplerImage {
   margin: 0.25em;
 }
 
-.${className}\/SamplerUniform-Image.TEXTURE_2D {
+.${className}\/instance\/Value-SamplerImage.TEXTURE_2D {
   grid-area: t1;
 }
 
-.${className}\/SamplerUniform-Image.TEXTURE_CUBE_MAP_POSITIVE_Y {
+.${className}\/instance\/Value-SamplerImage.TEXTURE_CUBE_MAP_POSITIVE_Y {
   grid-area: t2;
 }
 
-.${className}\/SamplerUniform-Image.TEXTURE_CUBE_MAP_NEGATIVE_X {
+.${className}\/instance\/Value-SamplerImage.TEXTURE_CUBE_MAP_NEGATIVE_X {
   grid-area: m1;
 }
 
-.${className}\/SamplerUniform-Image.TEXTURE_CUBE_MAP_POSITIVE_Z {
+.${className}\/instance\/Value-SamplerImage.TEXTURE_CUBE_MAP_POSITIVE_Z {
   grid-area: m2;
 }
 
-.${className}\/SamplerUniform-Image.TEXTURE_CUBE_MAP_POSITIVE_X {
+.${className}\/instance\/Value-SamplerImage.TEXTURE_CUBE_MAP_POSITIVE_X {
   grid-area: m3;
 }
 
-.${className}\/SamplerUniform-Image.TEXTURE_CUBE_MAP_NEGATIVE_Z {
+.${className}\/instance\/Value-SamplerImage.TEXTURE_CUBE_MAP_NEGATIVE_Z {
   grid-area: m4;
 }
 
-.${className}\/SamplerUniform-Image.TEXTURE_CUBE_MAP_NEGATIVE_Y {
+.${className}\/instance\/Value-SamplerImage.TEXTURE_CUBE_MAP_NEGATIVE_Y {
   grid-area: b2;
 }
 
-.${className}\/ImageUpload-Browse {
+.${className}\/instance\/Value\/ImageUpload-Browse {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -82,7 +82,7 @@
   border: 1px solid black;
 }
 
-.${className}\/ImageUpload-Browse::before {
+.${className}\/instance\/Value\/ImageUpload-Browse::before {
   position: absolute;
   top: 0;
   left: 0;
@@ -93,31 +93,31 @@
   padding: 0.25em;
 }
 
-.${className}\/ImageUpload.TEXTURE_CUBE_MAP_POSITIVE_X .${className}\/ImageUpload-Browse::before {
+.${className}\/instance\/Value\/ImageUpload.TEXTURE_CUBE_MAP_POSITIVE_X .${className}\/instance\/Value\/ImageUpload-Browse::before {
   content: '+X'
 }
 
-.${className}\/ImageUpload.TEXTURE_CUBE_MAP_NEGATIVE_X .${className}\/ImageUpload-Browse::before {
+.${className}\/instance\/Value\/ImageUpload.TEXTURE_CUBE_MAP_NEGATIVE_X .${className}\/instance\/Value\/ImageUpload-Browse::before {
   content: '-X'
 }
 
-.${className}\/ImageUpload.TEXTURE_CUBE_MAP_POSITIVE_Y .${className}\/ImageUpload-Browse::before {
+.${className}\/instance\/Value\/ImageUpload.TEXTURE_CUBE_MAP_POSITIVE_Y .${className}\/instance\/Value\/ImageUpload-Browse::before {
   content: '+Y'
 }
 
-.${className}\/ImageUpload.TEXTURE_CUBE_MAP_NEGATIVE_Y .${className}\/ImageUpload-Browse::before {
+.${className}\/instance\/Value\/ImageUpload.TEXTURE_CUBE_MAP_NEGATIVE_Y .${className}\/instance\/Value\/ImageUpload-Browse::before {
   content: '-Y'
 }
 
-.${className}\/ImageUpload.TEXTURE_CUBE_MAP_POSITIVE_Z .${className}\/ImageUpload-Browse::before {
+.${className}\/instance\/Value\/ImageUpload.TEXTURE_CUBE_MAP_POSITIVE_Z .${className}\/instance\/Value\/ImageUpload-Browse::before {
   content: '+Z'
 }
 
-.${className}\/ImageUpload.TEXTURE_CUBE_MAP_NEGATIVE_Z .${className}\/ImageUpload-Browse::before {
+.${className}\/instance\/Value\/ImageUpload.TEXTURE_CUBE_MAP_NEGATIVE_Z .${className}\/instance\/Value\/ImageUpload-Browse::before {
   content: '-Z'
 }
 
-.${className}\/ImageUpload-Browse::after {
+.${className}\/instance\/Value\/ImageUpload-Browse::after {
   content: 'Browse…';
   position: absolute;
   left: 0;
@@ -128,12 +128,12 @@
   color: white;
 }
 
-.${className}\/ImageUpload-Preview {
+.${className}\/instance\/Value\/ImageUpload-Preview {
   display: block;
   max-width: 100%;
   max-height: 100%;
 }
 
-.${className}\/ImageUpload-File {
+.${className}\/instance\/Value\/ImageUpload-File {
   display: none;
 }

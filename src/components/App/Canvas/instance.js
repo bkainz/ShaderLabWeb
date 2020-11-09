@@ -57,7 +57,7 @@ Canvas.prototype = {
   },
 
   updateUniform(uniform) {
-    for (const passKey in uniform.passes) {
+    for (const passKey of uniform.passes) {
       this.scene.passByKey[passKey].updateUniform(uniform.type, uniform.name, uniform.value)
     }
   },
