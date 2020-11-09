@@ -18,10 +18,7 @@ Uniforms.prototype = {
       this.state = {}
 
       const rUniform = /uniform\s+(\S+)\s+(\S+)\s*(?:\/\*\s*attach to:([^*]+)\*\/)?\s*;/g
-      const textureUnits = {}
-      const currentTextureUnitByType = {}
       shaders.forEach(shader => {
-        textureUnits[shader.pass] = textureUnits[shader.pass] || {}
         let match
         while (match = rUniform.exec(shader.source)) {
           const name = match[2]
@@ -33,17 +30,8 @@ Uniforms.prototype = {
                             :                                    undefined
           this.state[key] = oldState[key] || new constructor(this, name, type, attachment)
           this.state[key].passes[shader.pass] = true
-
-          if (type.startsWith('sampler')) {
-            currentTextureUnitByType[type] = currentTextureUnitByType[type] || 0
-            textureUnits[shader.pass][name] = {type, unit: currentTextureUnitByType[type]}
-            currentTextureUnitByType[type] += 1
-          }
         }
       })
-
-      for (const pass in textureUnits)
-        this.app.el.dispatchEvent(new CustomEvent('textureUnitsChanged', {detail: {pass, textureUnits: textureUnits[pass]}}))
 
       this.el.innerHTML = ''
       Object.values(this.state).forEach(uniform => {

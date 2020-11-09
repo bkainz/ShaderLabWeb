@@ -5,7 +5,7 @@ function Canvas(el, {props}) {
   this.props = props
   this.app = el.closest('.App').__component__
   this.app.canvas = this
-  this.scene = new Scene(el.getContext('webgl'), props.passes)
+  this.scene = new Scene(this, props.passes)
 }
 
 Canvas.prototype = {
@@ -60,10 +60,6 @@ Canvas.prototype = {
     for (const passKey in uniform.passes) {
       this.scene.passByKey[passKey].updateUniform(uniform.type, uniform.name, uniform.value)
     }
-  },
-
-  updateTextureUnits(pass, textureUnits) {
-    this.scene.passByKey[pass].updateTextureUnits(textureUnits)
   },
 
   updateGeometry(pass, geometry) {

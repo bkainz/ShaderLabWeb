@@ -1,18 +1,20 @@
+import Textures from './Pass/Textures'
 import Geometry from './Geometry'
 
-function Pass(webGL, key, config, renderToCanvas = false) {
-  this.webGL = webGL
+function Pass(scene, key, config, renderToCanvas = false) {
+  this.scene = scene
+  this.webGL = scene.webGL
   this.key = key
   this.name = config.name
   this.shaders = Object.keys(config.shaders).reduce((shaders, shaderType) => (shaders[shaderType] = null, shaders), {})
   this.program = this.webGL.createProgram()
-  this.textureUnits = {}
   this.config = {
     depthTest: '',
     faceCull: '',
     frontFace: 'CCW'
   }
   this.geometry = null
+  this.textures = new Textures(this, this.webGL.getParameter(this.webGL.MAX_COMBINED_TEXTURE_IMAGE_UNITS))
 
   if (renderToCanvas) {
     this.framebuffer = null
@@ -83,6 +85,7 @@ Pass.prototype = {
     this.shaders[type] && this.webGL.detachShader(this.program, this.shaders[type])
     this.shaders[type] && this.webGL.deleteShader(this.shaders[type])
     this.shaders[type] = null
+    this.textures.reset()
 
     let message
     if (linked) {
@@ -174,16 +177,12 @@ Pass.prototype = {
           this.webGL.bindTexture(target, null)
         }
 
-        this.textureUnits[name].texture = texture
-        this.webGL.uniform1i(location, this.textureUnits[name].unit)
+        const unit = this.textures.add(texture, type)
+        if (unit !== false) this.webGL.uniform1i(location, unit)
         break
       default:
         throw new Error(`unknown or unsupported uniform type '${type}'`)
     }
-  },
-
-  updateTextureUnits(textureUnits) {
-    this.textureUnits = textureUnits
   },
 
   draw() {
@@ -210,27 +209,18 @@ Pass.prototype = {
     this.webGL.bindFramebuffer(this.webGL.FRAMEBUFFER, this.framebuffer)
     this.webGL.clearColor(0, 0, 0, 1)
     this.webGL.clear(this.webGL.COLOR_BUFFER_BIT | this.webGL.DEPTH_BUFFER_BIT)
-
-    for (const uniformName in this.textureUnits) {
-      const textureUnit = this.textureUnits[uniformName]
-      const target = textureUnit.type === 'sampler2D'   ? this.webGL.TEXTURE_2D
-                   : textureUnit.type === 'samplerCube' ? this.webGL.TEXTURE_CUBE_MAP
-                   :                                      null
-      this.webGL.activeTexture(this.webGL.TEXTURE0+textureUnit.unit)
-      this.webGL.bindTexture(target, textureUnit.texture)
-    }
+    this.textures.forEach(texture => {
+      this.webGL.activeTexture(this.webGL.TEXTURE0+texture.unit)
+      this.webGL.bindTexture(texture.target, texture.texture)
+    })
 
     this.geometry.drawWith(this.program)
 
     this.webGL.bindFramebuffer(this.webGL.FRAMEBUFFER, null)
-    for (const uniformName in this.textureUnits) {
-      const textureUnit = this.textureUnits[uniformName]
-      const target = textureUnit.type === 'sampler2D'   ? this.webGL.TEXTURE_2D
-                   : textureUnit.type === 'samplerCube' ? this.webGL.TEXTURE_CUBE_MAP
-                   :                                      null
-      this.webGL.activeTexture(this.webGL.TEXTURE0+textureUnit.unit)
-      this.webGL.bindTexture(target, null)
-    }
+    this.textures.forEach(texture => {
+      this.webGL.activeTexture(this.webGL.TEXTURE0+texture.unit)
+      this.webGL.bindTexture(texture.target, null)
+    })
 
     return this.attachments.color
   }

@@ -30,10 +30,6 @@ App.prototype = {
       this.canvas.updateUniform(uniform)
     })
 
-    this.el.addEventListener('textureUnitsChanged', ({detail: {pass, textureUnits}}) => {
-      this.canvas.updateTextureUnits(pass, textureUnits)
-    })
-
     this.el.addEventListener('geometryChanged', ({detail: {pass, geometry}}) => {
       this.canvas.updateGeometry(pass, geometry)
     })

@@ -85,11 +85,11 @@ void main() {
            <section className={className+'-EditorPanel'}>
              <Editor passes={props.passes}/>
            </section>
-           <section className={className+'-CanvasPanel'}>
-             <Canvas passes={props.passes}/>
-           </section>
            <section className={className+'-ControlsPanel'}>
              <Controls/>
+           </section>
+           <section className={className+'-CanvasPanel'}>
+             <Canvas passes={props.passes}/>
            </section>
            <section className={className+'-VerticalBorder'}/>
            <section className={className+'-HorizontalBorder'}/>
