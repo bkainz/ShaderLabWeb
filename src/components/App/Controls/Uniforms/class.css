@@ -1,13 +1,46 @@
 .${className}\/instance\/Value + .${className}\/instance\/Value {
-  margin-top: 2em;
+  margin-top: 0.5em;
 }
 
-.${className}\/instance\/Value-Name {
+.${className}\/instance\/Value {
+  --indentation: 0.75em;
+  --arrow-size: 0.35em;
+}
+
+.${className}\/instance\/Value-State {
+  display: none;
+}
+
+.${className}\/instance\/Value-Header {
+  display: block;
   font-weight: bold;
+  padding-left: var(--indentation);
+  position: relative;
+}
+
+.${className}\/instance\/Value-Header::before {
+  content: '';
+  position: absolute;
+  top: calc(50% - 0.5*var(--arrow-size));
+  left: 0;
+  width: 0;
+  height: 0;
+  border: var(--arrow-size) solid transparent;
+  border-left-color: black;
+  transform-origin: 25% 50%;
 }
 
 .${className}\/instance\/Value-Value {
-  margin: 0.25em 0;
+  margin: 0.25em var(--indentation) 2em;
+  display: none;
+}
+
+.${className}\/instance\/Value-State:checked ~ .${className}\/instance\/Value-Value {
+  display: block;
+}
+
+.${className}\/instance\/Value-State:checked ~ .${className}\/instance\/Value-Header::before {
+  transform: rotate(45deg);
 }
 
 .${className}\/instance\/Value-Attachment {

@@ -17,10 +17,11 @@ function Value(owner, name, type, defaultAttachment, passes) {
   this.el.id = this.id
   this.el.classList.add(this.className)
   this.el.innerHTML = `
-    <div class="${this.className+'-Name'}">${name}</div>
+    <input type="checkbox" form="${this.className}#${this.id}" id="${this.className}#${this.id}" class="${this.className+'-State'}">
+    <label for="${this.className}#${this.id}" class="${this.className+'-Header'}">${name}</label>
     <div class="${this.className+'-Value'}"></div>
   `.trim().replace(/\n {4}/g, '\n')
-  this.nameEl = this.el.querySelector(`.${escapeCSS(this.className)}-Name`)
+  this.headerEl = this.el.querySelector(`.${escapeCSS(this.className)}-Header`)
   this.valueEl = this.el.querySelector(`.${escapeCSS(this.className)}-Value`)
 
   const attachments = this.app.values[type] || {}
