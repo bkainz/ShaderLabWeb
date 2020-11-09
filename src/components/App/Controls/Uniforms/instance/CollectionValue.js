@@ -8,10 +8,16 @@ function CollectionValue(owner, name, fields, defaultAttachment) {
   this.fields = {}
 
   for (const field of fields) {
-    const Value = NumericValue.DEFAULT_VALUES[field.type] ? NumericValue
+    const Value = field.length                            ? CollectionValue
+                : NumericValue.DEFAULT_VALUES[field.type] ? NumericValue
                 : SamplerValue.DEFAULT_VALUES[field.type] ? SamplerValue
                 :                                           undefined
-    this.fields[field.name] = new Value(this, field.name, field.type, field.defaultAttachment, field.passes)
+    const type = field.length ? Array.from(field, (_, idx) => ({name: idx,
+                                                                type: field.type,
+                                                                defaultAttachment: field.defaultAttachment,
+                                                                passes: field.passes}))
+                              : field.type
+    this.fields[field.name] = new Value(this, field.name, type, field.defaultAttachment, field.passes)
     this.valueEl.appendChild(this.fields[field.name].el)
   }
 }

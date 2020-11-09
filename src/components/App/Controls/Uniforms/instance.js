@@ -14,15 +14,27 @@ Uniforms.prototype = {
   initialize() {
     this.app.el.addEventListener('shadersChanged', ({detail: shaders}) => {
       const uniforms = {}
-      const rUniform = /uniform\s+(\S+)\s+(\S+)\s*(?:\/\*\s*attach to:([^*]+)\*\/)?\s*;/g
+      const rConstInt = /const\s+int\s+(\w+)\s*=\s*([^\s;]+)\s*;/g
+      const rUniform = /uniform\s+(\S+)\s+(\w+)(?:\[([^\]]+)])?\s*(?:\/\*\s*attach to:([^*]+)\*\/)?\s*;/g
+
       shaders.forEach(shader => {
         let match
+
+        const constInts = {}
+        while (match = rConstInt.exec(shader.source)) constInts[match[1]] = match[2]
+
+        const lengthEval = new Function('expression', `${Object.keys(constInts).map(name => `
+          const ${name} = ${constInts[name]}`).join('')}
+          return eval(expression)
+        `)
+
         while (match = rUniform.exec(shader.source)) {
           const type = match[1]
           const name = match[2]
-          const defaultAttachment = match[3] && match[3].trim()
+          const length = match[3] && lengthEval(match[3])
+          const defaultAttachment = match[4] && match[4].trim()
           const key = name+'-'+type
-          uniforms[key] = uniforms[key] || {name, type, defaultAttachment, passes: []}
+          uniforms[key] = uniforms[key] || {name, type, length, defaultAttachment, passes: []}
           uniforms[key].passes.push(shader.pass)
         }
       })
