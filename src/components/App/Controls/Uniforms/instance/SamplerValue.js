@@ -1,8 +1,8 @@
 import Value from './Value'
 import ImageUpload from './SamplerValue/ImageUpload'
 
-function SamplerValue(owner, name, type, defaultAttachment, passes) {
-  Value.call(this, owner, name, type, defaultAttachment, passes)
+function SamplerValue(app, uniformPath, name, type, defaultAttachment, passes) {
+  Value.call(this, app, uniformPath, name, type, defaultAttachment, passes)
 
   this.imagesEl = document.createElement('div')
   this.imagesEl.classList.add(this.className+'-SamplerImages')

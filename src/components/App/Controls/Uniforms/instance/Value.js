@@ -1,25 +1,25 @@
 import escapeCSS from '../../../../../helpers/escapeCSS'
 
-function Value(owner, name, type, defaultAttachment, passes) {
-  this.app = owner.app
-  this.owner = owner
+let instanceId = 0
+
+function Value(app, uniformPath, name, type, defaultAttachment, passes) {
+  this.app = app
   this.name = name
   this.type = type
   this.passes = passes
+  this.uniformName = /^\d+$/.test(name) ? `${uniformPath ? uniformPath+'[' : ''}${name}${uniformPath ? ']' : ''}`
+                                        : `${uniformPath ? uniformPath+'.' : ''}${name}`
 
-  const oun = owner.uniformName
-  this.uniformName = /^\d+$/.test(name) ? `${oun ? owner.uniformName+'[' : ''}${name}${oun ? ']' : ''}`
-                                        : `${oun ? owner.uniformName+'.' : ''}${name}`
-  this.id = owner.id+'-'+name+'-'+type
   this.className = 'App/Controls/Uniforms/instance/Value'
+  this.id = `${this.className}#${instanceId += 1}`
 
   this.el = document.createElement('div')
-  this.el.id = this.id
   this.el.classList.add(this.className)
+  this.el.id = this.id
   this.el.innerHTML = `
-    <input type="checkbox" form="${this.className}#${this.id}" id="${this.className}#${this.id}" class="${this.className+'-State'}">
-    <label for="${this.className}#${this.id}" class="${this.className+'-Header'}">${name}</label>
-    <div class="${this.className+'-Value'}"></div>
+    <input type="checkbox" form="${this.id}-Form" id="${this.id}-State" class="${this.className}-State">
+    <label for="${this.id}-State" class="${this.className}-Header">${name}</label>
+    <div class="${this.className}-Value"></div>
   `.trim().replace(/\n {4}/g, '\n')
   this.headerEl = this.el.querySelector(`.${escapeCSS(this.className)}-Header`)
   this.valueEl = this.el.querySelector(`.${escapeCSS(this.className)}-Value`)

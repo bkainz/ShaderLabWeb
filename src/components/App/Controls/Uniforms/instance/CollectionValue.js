@@ -2,8 +2,8 @@ import Value from './Value'
 import NumericValue from './NumericValue'
 import SamplerValue from './SamplerValue'
 
-function CollectionValue(owner, name, fields, defaultAttachment) {
-  Value.call(this, owner, name, fields, defaultAttachment, [])
+function CollectionValue(app, uniformPath, name, fields, defaultAttachment) {
+  Value.call(this, app, uniformPath, name, fields, defaultAttachment, [])
 
   this.fields = {}
 
@@ -17,7 +17,7 @@ function CollectionValue(owner, name, fields, defaultAttachment) {
                                                                 defaultAttachment: field.defaultAttachment,
                                                                 passes: field.passes}))
                               : field.type
-    this.fields[field.name] = new Value(this, field.name, type, field.defaultAttachment, field.passes)
+    this.fields[field.name] = new Value(this.app, this.uniformName, field.name, type, field.defaultAttachment, field.passes)
     this.valueEl.appendChild(this.fields[field.name].el)
   }
 }
