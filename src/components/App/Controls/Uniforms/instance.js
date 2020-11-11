@@ -7,7 +7,7 @@ function Uniforms(el, {id, className}) {
   this.app = el.closest('.App').__component__
   this.app.uniforms = this
 
-  this.uniforms = new CollectionValue(this, '', [])
+  this.collection = new CollectionValue(this, '', [])
 }
 
 Uniforms.prototype = {
@@ -40,12 +40,9 @@ Uniforms.prototype = {
       })
 
       this.el.innerHTML = ''
-      const oldUniforms = this.uniforms
-      this.uniforms = new CollectionValue(this, '', Object.values(uniforms))
-      for (const name in this.uniforms.fields) this.el.appendChild(this.uniforms.fields[name].el)
-      const uniformsValue = {}
-      for (const name in this.uniforms.value) uniformsValue[name] = oldUniforms.value[name] || this.uniforms.value[name]
-      this.uniforms.value = uniformsValue
+      const oldCollection = this.collection
+      this.collection = new CollectionValue(this, '', Object.values(uniforms))
+      for (const name in this.collection.fields) this.el.appendChild(this.collection.fields[name].el)
     })
   }
 }

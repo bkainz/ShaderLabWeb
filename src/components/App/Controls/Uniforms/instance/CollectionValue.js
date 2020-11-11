@@ -42,6 +42,12 @@ CollectionValue.prototype = Object.create(Value.prototype, Object.getOwnProperty
   set state(state) {
     this.attachment = state.attachment
     if (state.value !== undefined) this.value = state.value
+  },
+
+  get uniforms() {
+    const uniforms = []
+    for (const name in this.fields) uniforms.push(...this.fields[name].uniforms)
+    return uniforms
   }
 }))
 

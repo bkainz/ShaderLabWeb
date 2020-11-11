@@ -85,7 +85,6 @@ Pass.prototype = {
     this.shaders[type] && this.webGL.detachShader(this.program, this.shaders[type])
     this.shaders[type] && this.webGL.deleteShader(this.shaders[type])
     this.shaders[type] = null
-    this.textures.reset()
 
     let message
     if (linked) {
@@ -100,7 +99,15 @@ Pass.prototype = {
 
   relink() {
     this.webGL.linkProgram(this.program)
-    return this.webGL.getProgramInfoLog(this.program) || 'Linking successful'
+    if (this.webGL.getProgramInfoLog(this.program)) {
+      return this.webGL.getProgramInfoLog(this.program)
+    } else {
+      this.textures.reset()
+      this.scene.canvas.app.uniforms.collection.uniforms.forEach(uniform => {
+        this.updateUniform(uniform.type, uniform.name, uniform.value)
+      })
+      return 'Linking successful'
+    }
   },
 
   updateGeometry(geometry) {

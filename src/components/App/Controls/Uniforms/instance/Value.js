@@ -40,8 +40,6 @@ attach to: <select name="${this.id}-Attachment" class="${this.className}-Attachm
   this.attachmentEl.addEventListener('change', e => this.attachment = this.attachmentEl.value)
   this.el.addEventListener('attachmentChanged', ({detail: attachment}) => this.attachmentEl.value = attachment)
   this.attachment = this.attachmentEl.value
-
-  if (owner.valueEl) owner.valueEl.appendChild(this.el)
 }
 
 Value.prototype = {
@@ -81,6 +79,10 @@ Value.prototype = {
   set state(state) {
     this.attachment = state.attachment
     if (state.value !== undefined) this.value = state.value
+  },
+
+  get uniforms() {
+    return [{name: this.name, type: this.type, value: this.value}]
   }
 }
 
