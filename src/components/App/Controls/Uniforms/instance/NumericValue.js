@@ -13,6 +13,7 @@ function NumericValue(owner, name, type, defaultAttachment, passes) {
                   : type.startsWith('vec')   ? 'any'
                   : type.startsWith('float') ? 'any'
                   :                            '1'
+  const roundValue = value => Math.round(value*1000)/1000
 
   this.inputEls = []
   for (let row = 0; row < nRows; row += 1) {
@@ -25,7 +26,7 @@ function NumericValue(owner, name, type, defaultAttachment, passes) {
       this.inputEls[index] = document.createElement('input')
       this.inputEls[index].classList.add(this.className+'-NumericInput')
       this.inputEls[index].type = 'number'
-      this.inputEls[index].value = this.value[index]
+      this.inputEls[index].value = roundValue(this.value[index])
       this.inputEls[index].step = inputStep
       this.inputEls[index].addEventListener('input', e => {
         this._value[index] = Number(this.inputEls[index].value)
@@ -35,9 +36,9 @@ function NumericValue(owner, name, type, defaultAttachment, passes) {
     }
   }
 
-  this.el.addEventListener('valueChanged', ({detail: value}) => {
+  this.el.addEventListener('valueChangedThroughAttachment', ({detail: value}) => {
     for (let idx = 0; idx < value.length; idx += 1)
-      this.inputEls[idx].value = Math.round(value[idx]*1000)/1000
+      this.inputEls[idx].value = roundValue(value[idx])
   })
 }
 

@@ -32,7 +32,10 @@ attach to: <select name="${this.id}-Attachment" class="${this.className}-Attachm
 </select>`.trim() : `
 <input type="hidden" name="${this.id}-Attachment" value="" class="${this.className}-Attachment">`.trim()
 
-  this._attachmentChangeListener = (({detail: value}) => this.value = value)
+  this._attachmentChangeListener = (({detail: value}) => {
+    this.value = value
+    this.el.dispatchEvent(new CustomEvent('valueChangedThroughAttachment', {detail: this.value}))
+  })
   this.attachmentEl = this.el.querySelector(`.${escapeCSS(this.className)}-Attachment`)
   this.attachmentEl.addEventListener('change', e => this.attachment = this.attachmentEl.value)
   this.el.addEventListener('attachmentChanged', ({detail: attachment}) => this.attachmentEl.value = attachment)
@@ -55,10 +58,10 @@ Value.prototype = {
     this.el.dispatchEvent(new CustomEvent('attachmentChanged', {detail: attachment}))
 
     const defaultValue = this.constructor.DEFAULT_VALUES[this.type]
-    this.value = attachment ? attachments[attachment].value
-               : this.value ? this.value
-               :              Array.isArray(defaultValue) ? [...defaultValue]
-                                                          : {...defaultValue}
+    this._attachmentChangeListener({detail: attachment ? attachments[attachment].value
+                                          : this.value ? this.value
+                                          :              Array.isArray(defaultValue) ? [...defaultValue]
+                                                                                     : {...defaultValue}})
   },
 
   get value() {
