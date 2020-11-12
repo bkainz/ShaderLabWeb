@@ -6,10 +6,10 @@ export default function(props) {
   const shaderId = [props.pass, props.type].filter(Boolean).join('/')
 
   return <div className={className} id={id}>
-           <textarea className={className+'-Input'} name={shaderId+'-source'} defaultValue={props.default}/>
+           <textarea className={className+'-Source'} name={shaderId+'-source'} defaultValue={props.default}/>
            <div className={className+'-Controls'}>
              <label>
-               <input type="checkbox" name={shaderId+'-linked'} defaultChecked={true}/> Link to program
+               <input className={className+'-isLinked'} type="checkbox" name={shaderId+'-isLinked'} defaultChecked={true}/> Link to program
              </label>
            </div>
          </div>

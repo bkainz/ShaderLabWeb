@@ -11,7 +11,7 @@ export default function(props) {
              <Tabs tabs={Object.keys(props.passes).flatMap(passKey => {
                return Object.keys(props.passes[passKey].shaders).map(shaderKey => {
                  const shader = props.passes[passKey].shaders[shaderKey]
-                 return {label: shader.name, content: <Shader pass={passKey} type={shaderKey} default={shader.default}/>}
+                 return {label: shader.name, content: <Shader pass={passKey} type={shaderKey} name={shader.name} default={shader.default}/>}
                })
              })}/>
            </div>

@@ -6,7 +6,7 @@
   flex-flow: column;
 }
 
-.${className}-Input {
+.${className}-Source {
   flex: 1 1 auto;
   resize: none;
 }
