@@ -2,22 +2,25 @@ import Value from './Value'
 import NumericValue from './NumericValue'
 import SamplerValue from './SamplerValue'
 
-function CollectionValue(app, uniformPath, name, fields, defaultAttachment) {
-  Value.call(this, app, uniformPath, name, fields, defaultAttachment, [])
+function CollectionValue(app, uniformName, name, type, defaultAttachment, pass) {
+  Value.call(this, app, uniformName, name, type.name, defaultAttachment, [])
 
   this.fields = {}
 
-  for (const field of fields) {
-    const Value = field.length                            ? CollectionValue
-                : NumericValue.DEFAULT_VALUES[field.type] ? NumericValue
-                : SamplerValue.DEFAULT_VALUES[field.type] ? SamplerValue
-                :                                           undefined
-    const type = field.length ? Array.from(field, (_, idx) => ({name: idx,
-                                                                type: field.type,
-                                                                defaultAttachment: field.defaultAttachment,
-                                                                passes: field.passes}))
-                              : field.type
-    this.fields[field.name] = new Value(this.app, this.uniformName, field.name, type, field.defaultAttachment, field.passes)
+  for (const field of type.fields) {
+    if (field instanceof Value) {
+      this.fields[field.name] = field
+      pass.updateUniform(field.type, field.name, field.value)
+    }
+    else {
+      const Value = field.type.name                         ? CollectionValue
+                  : NumericValue.DEFAULT_VALUES[field.type] ? NumericValue
+                  : SamplerValue.DEFAULT_VALUES[field.type] ? SamplerValue
+                  :                                           undefined
+      const fieldUniformName = /^\d+$/.test(field.name) ? `${uniformName ? uniformName+'[' : ''}${field.name}${uniformName ? ']' : ''}`
+                                                        : `${uniformName ? uniformName+'.' : ''}${field.name}`
+      this.fields[field.name] = new Value(this.app, fieldUniformName, field.name, field.type, field.defaultAttachment, pass)
+    }
     this.valueEl.appendChild(this.fields[field.name].el)
   }
 }

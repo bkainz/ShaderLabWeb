@@ -7,8 +7,8 @@ function Scene(canvas, passes) {
   for (const passKey in passes) this.passByKey[passKey] = new Pass(this, passKey, passes[passKey])
   this.passes = Object.values(this.passByKey)
 
-  this.outputPass = new Pass(this, '__output__', {name: 'Output Pass', shaders: {vertex: null, fragment: null}}, true)
-  this.outputPass.updateShader({type: 'vertex', linked: true, source: `
+  this.outputPass = new Pass(this, '__output__', {name: 'Output Pass'}, true)
+  this.outputPass.updateShader({type: 'vertex', isLinked: true, source: `
 attribute vec3 vertex_worldSpace;
 attribute vec2 textureCoordinate_input;
 varying vec2 uvs;
@@ -17,7 +17,7 @@ void main() {
   gl_Position = vec4(vertex_worldSpace, 1.0);
   uvs = textureCoordinate_input;
 }`})
-  this.outputPass.updateShader({type: 'fragment', linked: true, source: `
+  this.outputPass.updateShader({type: 'fragment', isLinked: true, source: `
 precision mediump float;
 uniform sampler2D image;
 varying vec2 uvs;

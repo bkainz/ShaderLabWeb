@@ -6,43 +6,27 @@ function Uniforms(el, {id, className}) {
   this.className = className
   this.app = el.closest('.App').__component__
   this.app.uniforms = this
-
-  this.collection = new CollectionValue(this.app, '', '', [])
+  this.perPass = {}
 }
 
 Uniforms.prototype = {
   initialize() {
-    this.app.el.addEventListener('shadersChanged', ({detail: shaders}) => {
-      const uniforms = {}
-      const rConstInt = /const\s+int\s+(\w+)\s*=\s*([^\s;]+)\s*;/g
-      const rUniform = /uniform\s+(\S+)\s+(\w+)(?:\[([^\]]+)])?\s*(?:\/\*\s*attach to:([^*]+)\*\/)?\s*;/g
+    this.app.el.addEventListener('passLinked', ({detail: pass}) => {
+      const uniforms = pass.uniforms, uniformsConfig = {name: '', fields: []}
+      const oldUniforms = this.perPass[pass.key]
+      for (const key in uniforms) {
+        const newUniform = uniforms[key]
+        const oldUniform = oldUniforms && oldUniforms.fields[newUniform.name]
 
-      shaders.forEach(shader => {
-        let match
-
-        const constInts = {}
-        while (match = rConstInt.exec(shader.source)) constInts[match[1]] = match[2]
-
-        const lengthEval = new Function('expression', `${Object.keys(constInts).map(name => `
-          const ${name} = ${constInts[name]}`).join('')}
-          return eval(expression)
-        `)
-
-        while (match = rUniform.exec(shader.source)) {
-          const type = match[1]
-          const name = match[2]
-          const length = match[3] && lengthEval(match[3])
-          const defaultAttachment = match[4] && match[4].trim()
-          const key = name+'-'+type
-          uniforms[key] = uniforms[key] || {name, type, length, defaultAttachment, passes: []}
-          uniforms[key].passes.push(shader.pass)
-        }
-      })
-
-      this.el.innerHTML = ''
-      const oldCollection = this.collection
-      this.collection = new CollectionValue(this.app, '', '', Object.values(uniforms))
-      for (const name in this.collection.fields) this.el.appendChild(this.collection.fields[name].el)
+        const oldType = oldUniform && oldUniform.type
+        const newType = newUniform && newUniform.type
+        uniformsConfig.fields.push(oldType === newType ? oldUniform : newUniform)
+      }
+      const newUniforms = new CollectionValue(this.app, '', pass.name, uniformsConfig, undefined, pass)
+      newUniforms.stateEl.checked = !oldUniforms || oldUniforms.stateEl.checked
+      oldUniforms ? this.el.replaceChild(newUniforms.el, oldUniforms.el)
+                  : this.el.appendChild(newUniforms.el)
+      this.perPass[pass.key] = newUniforms
     })
   }
 }

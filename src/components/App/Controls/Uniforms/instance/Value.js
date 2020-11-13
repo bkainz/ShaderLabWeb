@@ -2,13 +2,12 @@ import escapeCSS from '../../../../../helpers/escapeCSS'
 
 let instanceId = 0
 
-function Value(app, uniformPath, name, type, defaultAttachment, passes) {
+function Value(app, uniformName, name, type, defaultAttachment, pass) {
   this.app = app
   this.name = name
   this.type = type
-  this.passes = passes
-  this.uniformName = /^\d+$/.test(name) ? `${uniformPath ? uniformPath+'[' : ''}${name}${uniformPath ? ']' : ''}`
-                                        : `${uniformPath ? uniformPath+'.' : ''}${name}`
+  this.pass = pass
+  this.uniformName = uniformName
 
   this.className = 'App/Controls/Uniforms/instance/Value'
   this.id = `${this.className}#${instanceId += 1}`
@@ -21,6 +20,7 @@ function Value(app, uniformPath, name, type, defaultAttachment, passes) {
     <label for="${this.id}-State" class="${this.className}-Header">${name}</label>
     <div class="${this.className}-Value"></div>
   `.trim().replace(/\n {4}/g, '\n')
+  this.stateEl = this.el.querySelector(`.${escapeCSS(this.className)}-State`)
   this.headerEl = this.el.querySelector(`.${escapeCSS(this.className)}-Header`)
   this.valueEl = this.el.querySelector(`.${escapeCSS(this.className)}-Value`)
 
@@ -69,7 +69,7 @@ Value.prototype = {
     this._value = value
     this.el.dispatchEvent(new CustomEvent('valueChanged', {detail: value}))
 
-    const detail = {name: this.uniformName, type: this.type, value, passes: this.passes}
+    const detail = {name: this.uniformName, type: this.type, value, pass: this.pass}
     this.app.el.dispatchEvent(new CustomEvent('uniformChanged', {detail}))
   },
 

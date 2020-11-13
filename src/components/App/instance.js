@@ -22,8 +22,8 @@ function App(el, {className}) {
 
 App.prototype = {
   initialize() {
-    this.el.addEventListener('shadersChanged', ({detail: shaders}) => {
-      this.canvas.updateShaders(shaders)
+    this.el.addEventListener('shadersChanged', ({detail: {pass, shaders}}) => {
+      this.canvas.updateShaders(pass, shaders)
     })
 
     this.el.addEventListener('uniformChanged', ({detail: uniform}) => {

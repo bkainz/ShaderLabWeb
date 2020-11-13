@@ -42,28 +42,18 @@ Canvas.prototype = {
     return {width: this.el.offsetWidth, height: this.el.offsetHeight}
   },
 
-  updateShaders(shaders) {
-    this.app.log.append('<hr data-text="Compile & Link Shaders">', '')
-    shaders.forEach(shader => {
-      const scope = shader.name
-      const message = this.scene.passByKey[shader.pass].updateShader(shader)
-      this.app.log.append(scope, message)
-    })
-    for (const passKey in this.scene.passByKey) {
-      const scope = this.scene.passByKey[passKey].name
-      const message = this.scene.passByKey[passKey].relink()
-      this.app.log.append(scope, message)
-    }
+  updateShaders(pass, shaders) {
+    this.app.log.append(`<hr data-text="${this.scene.passByKey[pass].name}: Compile & Link Shaders">`, '')
+    shaders.forEach(shader => this.scene.passByKey[pass].updateShader(shader))
+    this.scene.passByKey[pass].relink()
   },
 
   updateUniform(uniform) {
-    for (const passKey of uniform.passes) {
-      this.scene.passByKey[passKey].updateUniform(uniform.type, uniform.name, uniform.value)
-    }
+    uniform.pass.updateUniform(uniform.type, uniform.name, uniform.value)
   },
 
   updateGeometry(pass, geometry) {
-    const scope = `<hr data-text="Load ${this.scene.passByKey[pass].name} Geometry">`
+    const scope = `<hr data-text="${this.scene.passByKey[pass].name}: Load Geometry">`
     const message = geometry.path.split('/').pop()
     this.app.log.append(scope, message)
     this.scene.passByKey[pass].updateGeometry(geometry)

@@ -1,12 +1,14 @@
-import Textures from './Pass/Textures'
 import Geometry from './Geometry'
+import Textures from './Pass/Textures'
+import Shader from './Pass/Shader'
 
 function Pass(scene, key, config, renderToCanvas = false) {
   this.scene = scene
   this.webGL = scene.webGL
   this.key = key
   this.name = config.name
-  this.shaders = Object.keys(config.shaders).reduce((shaders, shaderType) => (shaders[shaderType] = null, shaders), {})
+  this.shaders = {}
+  this.uniforms = {}
   this.program = this.webGL.createProgram()
   this.config = {
     depthTest: '',
@@ -81,32 +83,39 @@ Pass.prototype = {
     }
   },
 
-  updateShader({type, source, linked}) {
-    this.shaders[type] && this.webGL.detachShader(this.program, this.shaders[type])
-    this.shaders[type] && this.webGL.deleteShader(this.shaders[type])
-    this.shaders[type] = null
+  updateShader({type, name, source, isLinked}) {
+    this.shaders[type] && this.shaders[type].detach(this.webGL, this.program)
 
     let message
-    if (linked) {
-      ({shader: this.shaders[type], message} = createShader(this.webGL, type, source))
-      this.shaders[type] && this.webGL.attachShader(this.program, this.shaders[type])
-    } else {
-      message = 'not linked'
+    if (isLinked) {
+      const shader = new Shader(this, type, name, source, isLinked)
+      this.shaders[type] = shader
+      this.uniforms = Object.values(this.shaders).reduce((uniforms, shader) => Object.assign(uniforms, shader.uniforms), {})
+      message = shader.attach(this.webGL, this.program)
+    }
+    else {
+      this.shaders[type] = null
+      message = 'Skipped (not linked)'
     }
 
-    return message
+    if (this.key !== '__output__')
+      this.scene.canvas.app.log.append(name, message)
   },
 
   relink() {
+    if (!('fragment' in this.shaders && 'vertex' in this.shaders)) return
+
     this.webGL.linkProgram(this.program)
     if (this.webGL.getProgramInfoLog(this.program)) {
-      return this.webGL.getProgramInfoLog(this.program)
-    } else {
+      this.scene.canvas.app.log.append(this.name, 'Linking failed: '+this.webGL.getProgramInfoLog(this.program))
+    }
+    else {
       this.textures.reset()
-      this.scene.canvas.app.uniforms.collection.uniforms.forEach(uniform => {
-        this.updateUniform(uniform.type, uniform.name, uniform.value)
-      })
-      return 'Linking successful'
+
+      if (this.key !== '__output__') {
+        this.scene.canvas.app.log.append(this.name, 'Linking successful')
+        this.scene.canvas.app.el.dispatchEvent(new CustomEvent('passLinked', {detail: this}))
+      }
     }
   },
 
@@ -231,18 +240,6 @@ Pass.prototype = {
 
     return this.attachments.color
   }
-}
-
-function createShader(webGL, type, source) {
-  let shader = webGL.createShader(webGL[type.toUpperCase()+'_SHADER'])
-  webGL.shaderSource(shader, source)
-  webGL.compileShader(shader)
-  const message = webGL.getShaderInfoLog(shader) || 'Compilation successful'
-  if (!webGL.getShaderParameter(shader, webGL.COMPILE_STATUS)) {
-    webGL.deleteShader(shader)
-    shader = null
-  }
-  return {shader, message}
 }
 
 export default Pass
