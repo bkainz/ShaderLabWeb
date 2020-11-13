@@ -24,7 +24,7 @@ function Value(app, uniformName, name, type, defaultAttachment, pass) {
   this.headerEl = this.el.querySelector(`.${escapeCSS(this.className)}-Header`)
   this.valueEl = this.el.querySelector(`.${escapeCSS(this.className)}-Value`)
 
-  const attachments = this.app.values[type] || {}
+  const attachments = this.app.values[type.signature || type] || {}
   this.valueEl.innerHTML = Object.keys(attachments).length ? `
 attach to: <select name="${this.id}-Attachment" class="${this.className}-Attachment">
   <option value="">None</option>${Object.keys(attachments).map(name => `
@@ -47,7 +47,7 @@ Value.prototype = {
     return this._attachment
   },
   set attachment(attachment) {
-    const attachments = this.app.values[this.type]
+    const attachments = this.app.values[this.type.signature || this.type]
 
     if (this._attachment) attachments[this._attachment].el.removeEventListener('valueChanged', this._attachmentChangeListener)
     this._attachment = attachment

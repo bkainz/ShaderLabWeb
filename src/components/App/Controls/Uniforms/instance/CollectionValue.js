@@ -3,17 +3,17 @@ import NumericValue from './NumericValue'
 import SamplerValue from './SamplerValue'
 
 function CollectionValue(app, uniformName, name, type, defaultAttachment, pass) {
-  Value.call(this, app, uniformName, name, type.name, defaultAttachment, [])
+  Value.call(this, app, uniformName, name, type, defaultAttachment, [])
 
   this.fields = {}
 
   for (const field of type.fields) {
     if (field instanceof Value) {
       this.fields[field.name] = field
-      pass.updateUniform(field.type, field.name, field.value)
+      field.type.fields || pass.updateUniform(field.type, field.name, field.value)
     }
     else {
-      const Value = field.type.name                         ? CollectionValue
+      const Value = field.type.fields                       ? CollectionValue
                   : NumericValue.DEFAULT_VALUES[field.type] ? NumericValue
                   : SamplerValue.DEFAULT_VALUES[field.type] ? SamplerValue
                   :                                           undefined

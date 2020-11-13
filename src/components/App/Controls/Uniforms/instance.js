@@ -18,8 +18,8 @@ Uniforms.prototype = {
         const newUniform = uniforms[key]
         const oldUniform = oldUniforms && oldUniforms.fields[newUniform.name]
 
-        const oldType = oldUniform && oldUniform.type
-        const newType = newUniform && newUniform.type
+        const oldType = oldUniform && oldUniform.type && (oldUniform.type.signature || oldUniform.type)
+        const newType = newUniform && newUniform.type && (newUniform.type.signature || newUniform.type)
         uniformsConfig.fields.push(oldType === newType ? oldUniform : newUniform)
       }
       const newUniforms = new CollectionValue(this.app, '', pass.name, uniformsConfig, undefined, pass)

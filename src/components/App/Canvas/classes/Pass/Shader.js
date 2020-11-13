@@ -6,7 +6,9 @@ function Shader(pass, type, name, source, isLinked) {
   this.name = name
   this.source = source
   this.isLinked = isLinked
-  this.uniforms = GLSLParser.parseUniforms(this.source)
+  this.constInts = GLSLParser.parseConstInts(this.source)
+  this.structs = GLSLParser.parseStructs(this.source, this.constInts)
+  this.uniforms = GLSLParser.parseUniforms(this.source, this.constInts)
   this.webGlShader = null
 }
 
