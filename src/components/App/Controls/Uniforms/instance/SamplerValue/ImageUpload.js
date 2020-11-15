@@ -11,29 +11,21 @@ function ImageUpload(samplerValue, target) {
 </label>
 `.trim()
   this.fileEl = this.el.querySelector(`.${escapeCSS(this.className)}-File`)
-  const previewEl = this.el.querySelector(`.${escapeCSS(this.className)}-Preview`)
+  this.imageEl = this.el.querySelector(`.${escapeCSS(this.className)}-Preview`)
 
   this.fileEl.addEventListener('change', async e => {
-    URL.revokeObjectURL(previewEl.src)
-    previewEl.src = URL.createObjectURL(this.file)
-    this.el.dispatchEvent(new CustomEvent('valueChanged', {detail: await this.value}))
+    const reader = new FileReader()
+    reader.readAsDataURL(this.fileEl.files[0])
+    reader.onloadend = () => this.url = reader.result
   })
 }
 ImageUpload.prototype = {
-  get file() {
-    return this.fileEl.files[0]
+  get url() {
+    return this.imageEl.src
   },
-  get value() {
-    if (!this.file) return null
-    const image = new Image()
-    const loader = new Promise(resolve => {
-      image.onload = function() {
-        URL.revokeObjectURL(image.src)
-        resolve(image)
-      }
-    })
-    image.src = URL.createObjectURL(this.file)
-    return loader
+  set url(url) {
+    this.imageEl.src = url
+    this.imageEl.onload = () => this.el.dispatchEvent(new CustomEvent('imageChanged', {detail: this.imageEl}))
   }
 }
 

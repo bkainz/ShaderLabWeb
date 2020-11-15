@@ -15,7 +15,7 @@ function SamplerValue(app, uniformName, name, type, defaultAttachment, pass) {
     this.imagesEl.appendChild(imageEl)
 
     const image = new ImageUpload(this, target)
-    image.el.addEventListener('valueChanged', ({detail: imageValue}) => {
+    image.el.addEventListener('imageChanged', ({detail: imageValue}) => {
       const value = this.value
       value[target] = imageValue
       this.value = value
