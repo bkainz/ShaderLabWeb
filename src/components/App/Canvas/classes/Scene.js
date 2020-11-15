@@ -1,4 +1,5 @@
 import Pass from './Pass'
+import geometryHelper from '../../../../helpers/geometry'
 
 function Scene(canvas, passes) {
   this.canvas = canvas
@@ -27,6 +28,7 @@ void main() {
 }`})
   this.outputPass.relink()
   this.outputPass.updateUniform('sampler2D', 'image', this.passes[this.passes.length-1].attachments.color)
+  this.outputPass.updateGeometry(geometryHelper.quad)
 }
 
 Scene.prototype = {

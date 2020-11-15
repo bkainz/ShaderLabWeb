@@ -1,4 +1,5 @@
 import Scene from './classes/Scene'
+import geometryHelper from '../../../helpers/geometry'
 
 function Canvas(el, {props}) {
   this.el = el
@@ -9,7 +10,7 @@ function Canvas(el, {props}) {
 }
 
 Canvas.prototype = {
-  async initialize() {
+  initialize() {
     const pass = this.scene.passByKey.base
     for (const bufferKey in pass.attachments) {
       this.app.registerValue(pass.name+' '+bufferKey, 'sampler2D')
@@ -17,10 +18,9 @@ Canvas.prototype = {
     }
 
     this.scene.passes.forEach(async pass => {
-      const geometry = await this.app.scene.geometry.load(this.props.passes[pass.key].geometry)
+      const geometry = await geometryHelper.load(this.props.passes[pass.key].geometry)
       this.app.el.dispatchEvent(new CustomEvent('geometryChanged', {detail: {pass: pass.key, geometry}}))
     })
-    this.scene.outputPass.updateGeometry(await this.app.scene.geometry.load('quad'))
 
     pass.config.depthTest = this.app.values.config['Depth Test'].value
     this.app.values.config['Depth Test'].el.addEventListener('valueChanged', ({detail: depthTest}) => {

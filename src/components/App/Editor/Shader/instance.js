@@ -9,7 +9,7 @@ function Shader(el, {className, props}) {
   this.id = [props.pass, props.type].filter(Boolean).join('/')
   this.app = el.closest('.App').__component__
   this.app.editor.shaders[this.pass] = this.app.editor.shaders[this.pass] || {}
-  this.app.editor.shaders[this.pass][this.id] = this
+  this.app.editor.shaders[this.pass][this.type] = this
 }
 
 Shader.prototype = {

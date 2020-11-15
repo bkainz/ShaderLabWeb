@@ -38,11 +38,13 @@ App.prototype = {
       this.canvas.updateViewport(width, height)
     })
 
-    this.canvas.initialize()
     this.log.initialize()
     this.scene.initialize()
     this.uniforms.initialize()
     this.editor.initialize()
+    this.canvas.initialize()
+
+    this.editor.updateShaders()
 
     this.el.dispatchEvent(new CustomEvent('viewportChanged', {detail: this.canvas.size}))
 
