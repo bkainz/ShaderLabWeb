@@ -17,7 +17,8 @@
 
 .${className}-CompileButton {
   padding: 0.3em 0.5em;
-  background: var(--color-panel);
-  border-radius: 3px;
+  color: var(--color-button-light);
+  background: var(--color-button-dark);
+  font-weight: bold;
   cursor: pointer;
 }

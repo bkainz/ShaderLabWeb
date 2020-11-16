@@ -86,16 +86,47 @@ a svg {
  * App Styles
  */
 .${className} {
-  --color-panel: #ddd;
-  --color-input: #fff;
+  --color-panel-dark: black;
+  --color-panel-light: white;
+  --color-button-dark: black;
+  --color-button-light: white;
+  --color-input: white;
 
   width: 100vw;
   height: 100vh;
 
+  display: flex;
+  flex-flow: column;
+}
+
+.${className}-Header {
+  grid-area: header;
+  position: relative;
+}
+
+.${className}-Content {
+  --border-width: 2px;
+  flex: 1 1 auto;
   display: grid;
   grid-template: "canvas  vborder editor" 50%
-                 "hborder vborder editor" 0
-                 "options vborder editor" 50% / 50% 0 50%;
+                 "hborder vborder editor" var(--border-width)
+                 "options vborder editor" 1fr / 50% var(--border-width) 1fr;
+}
+
+.${className}-CanvasPanel {
+  grid-area: canvas;
+  position: relative;
+}
+
+.${className}-ControlsPanel {
+  grid-area: options;
+  position: relative;
+  min-height: 0;
+}
+
+.${className}-EditorPanel {
+  grid-area: editor;
+  position: relative;
 }
 
 .${className}-HorizontalBorder {
@@ -111,7 +142,7 @@ a svg {
 .${className}-HorizontalBorder,
 .${className}-VerticalBorder {
   position: relative;
-  background: #ccc;
+  background: var(--color-panel-dark);
 }
 
 .${className}-VerticalBorder::before {
@@ -151,20 +182,4 @@ a svg {
 .${className}-VerticalBorder.active::after,
 .${className}-HorizontalBorder.active::after {
   display: block;
-}
-
-.${className}-CanvasPanel {
-  grid-area: canvas;
-  position: relative;
-}
-
-.${className}-ControlsPanel {
-  grid-area: options;
-  position: relative;
-  min-height: 0;
-}
-
-.${className}-EditorPanel {
-  grid-area: editor;
-  position: relative;
 }

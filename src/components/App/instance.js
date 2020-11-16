@@ -18,6 +18,7 @@ function App(el, {className}) {
   this.el = el
   this.className = className
   this.values = {}
+  this.contentEl = this.el.querySelector(`.${this.className}-Content`)
 }
 
 App.prototype = {
@@ -61,14 +62,14 @@ App.prototype = {
       })
     }
 
-    initalizeDraggableBorder(this.el.querySelector(`.${this.className}-VerticalBorder`), e => {
-      const bb = this.el.getBoundingClientRect()
-      this.resizeVertically((bb.left+e.clientX)/bb.width * 100)
+    initalizeDraggableBorder(this.contentEl.querySelector(`.${this.className}-VerticalBorder`), e => {
+      const bb = this.contentEl.getBoundingClientRect()
+      this.resizeVertically((e.clientX-bb.left)/bb.width * 100)
     })
 
-    initalizeDraggableBorder(this.el.querySelector(`.${this.className}-HorizontalBorder`), e => {
-      const bb = this.el.getBoundingClientRect()
-      this.resizeHorizontally((bb.top+e.clientY)/bb.height * 100)
+    initalizeDraggableBorder(this.contentEl.querySelector(`.${this.className}-HorizontalBorder`), e => {
+      const bb = this.contentEl.getBoundingClientRect()
+      this.resizeHorizontally((e.clientY-bb.top)/bb.height * 100)
     })
 
     const render = () => {
@@ -79,12 +80,12 @@ App.prototype = {
   },
 
   resizeVertically(percent) {
-    this.el.style.gridTemplateColumns = percent+'% 0 1fr'
+    this.contentEl.style.gridTemplateColumns = percent+'% var(--border-width) 1fr'
     this.el.dispatchEvent(new CustomEvent('viewportChanged', {detail: this.canvas.size}))
   },
 
   resizeHorizontally(percent) {
-    this.el.style.gridTemplateRows = percent+'% 0 1fr'
+    this.contentEl.style.gridTemplateRows = percent+'% var(--border-width) 1fr'
     this.el.dispatchEvent(new CustomEvent('viewportChanged', {detail: this.canvas.size}))
   },
 

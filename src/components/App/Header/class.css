@@ -1,0 +1,14 @@
+.${className} {
+  display: flex;
+  flex-flow: row;
+  align-items: flex-end;
+  padding: 0.5em;
+  background: black;
+}
+
+.${className}-Title {
+  color: white;
+  font-weight: 300;
+  font-size: 2em;
+}
+

@@ -12,10 +12,10 @@
 }
 
 .${className}\/instance\/Value-Header {
-  display: block;
   font-weight: bold;
   padding-left: var(--indentation);
   position: relative;
+  user-select: none;
 }
 
 .${className}\/instance\/Value-Header::before {
