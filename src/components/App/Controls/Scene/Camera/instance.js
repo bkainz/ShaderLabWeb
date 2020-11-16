@@ -70,14 +70,6 @@ Camera.prototype = {
     this.app.registerValue('View Matrix', 'mat4')
     this.app.registerValue('Projection Matrix', 'mat4')
 
-    this.position = this.positionEls.map(el => el.value)
-    this.target = this.targetEls.map(el => el.value)
-    this.nearClipping = this.nearClippingEl.value
-    this.farClipping = this.farClippingEl.value
-    this.projection = this.projectionEl.value
-    this.perspectiveFov = this.perspectiveFovEl.value
-    this.orthographicFov = this.orthographicFovEl.value
-
     this.app.el.addEventListener('viewportChanged', ({detail: {width, height}}) => {
       this.width = width
       this.height = height
@@ -91,11 +83,12 @@ Camera.prototype = {
     this.orthographicFovEl.addEventListener('input', e => this.orthographicFov = this.orthographicFovEl.value)
 
     const updateViewMatrix = () => {
-      this.app.values.mat4['View Matrix'].value = I(camera(this.position, this.target, [0, 1, 0]))
+      const position = this.position || [0, 0, 0]
+      const target = this.target || [0, 0, 0]
+      this.app.values.mat4['View Matrix'].value = I(camera(position, target, [0, 1, 0]))
     }
     this.app.values.vec3['Camera Position'].el.addEventListener('valueChanged', updateViewMatrix)
     this.app.values.vec3['Camera Target'].el.addEventListener('valueChanged', updateViewMatrix)
-    updateViewMatrix()
 
     const updateProjectionMatrix = () => {
       const pMatrix = this.projection === 'Perspective' ? perspectiveProjection(this.perspectiveFov, this.width/this.height, this.nearClipping, this.farClipping)
@@ -108,7 +101,6 @@ Camera.prototype = {
     this.app.values.float['Far Clipping Plane'].el.addEventListener('valueChanged', updateProjectionMatrix)
     this.app.values.float['Perspective FOV'].el.addEventListener('valueChanged', updateProjectionMatrix)
     this.app.values.float['Orthographic FOV'].el.addEventListener('valueChanged', updateProjectionMatrix)
-    updateProjectionMatrix()
   },
 
   get position() {

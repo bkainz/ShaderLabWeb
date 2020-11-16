@@ -1,0 +1,54 @@
+{
+  "scene": {
+    "camera": {
+      "position": [0,0,40],
+      "target": [0,0,0],
+      "nearClipping": 0.001,
+      "farClipping": 10000,
+      "projection": "Perspective",
+      "perspectiveFov": 45,
+      "orthographicFov": 30
+    },
+    "geometry":{
+      "depthTest":"LESS",
+      "faceCulling":"",
+      "frontFace":"CCW"
+    }
+  },
+  "uniforms": {
+    "base": {
+      "value": {
+        "mMatrix": {"attachment": "Model Matrix"},
+        "vMatrix": {"attachment": "View Matrix"},
+        "pMatrix": {"attachment": "Projection Matrix"}
+      }
+    },
+    "R2T": {
+      "value": {
+        "textureRendered": {"attachment": "Base Pass color"}
+      }
+    }
+  },
+  "editor": {
+    "base": {
+      "vertex": {
+        "source": "attribute vec3 vertex_worldSpace;\nattribute vec3 normal_worldSpace;\nattribute vec2 textureCoordinate_input;\n\nuniform mat4 mMatrix /* attach to: Model Matrix */;\nuniform mat4 vMatrix /* attach to: View Matrix */;\nuniform mat4 pMatrix /* attach to: Projection Matrix */;\n\nvarying vec3 normal;\n\nvoid main() {\n  vec4 vertex_camSpace = vMatrix * mMatrix * vec4(vertex_worldSpace, 1.0);\n  gl_Position = pMatrix * vertex_camSpace;\n\n  normal = normal_worldSpace;\n}",
+        "isLinked": true
+      },
+      "fragment": {
+        "source": "precision mediump float;\n\nvarying vec3 normal;\n\nvoid main() {\n  gl_FragColor = vec4(0.5 + 0.5*normal, 1.0);\n}",
+        "isLinked": true
+      }
+    },
+    "R2T": {
+      "vertex": {
+        "source": "attribute vec3 vertex_worldSpace;\nattribute vec2 textureCoordinate_input;\n\nvarying vec2 varyingTextureCoordinate;\n\nvoid main() {\n  gl_Position = vec4(vertex_worldSpace, 1.0);\n  varyingTextureCoordinate = textureCoordinate_input;\n}",
+        "isLinked": true
+      },
+      "fragment": {
+        "source": "precision mediump float;\n\nuniform sampler2D textureRendered /* attach to: Base Pass color */;\n\nvarying vec2 varyingTextureCoordinate;\n\nvoid main() {\n  gl_FragColor = texture2D(textureRendered, varyingTextureCoordinate.st);\n}",
+        "isLinked": true
+      }
+    }
+  }
+}

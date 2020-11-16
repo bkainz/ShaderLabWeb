@@ -22,9 +22,6 @@ Geometry.prototype = {
     this.app.registerValue('Depth Test', 'config')
     this.app.registerValue('Face Culling', 'config')
     this.app.registerValue('Front Face', 'config')
-    this.depthTest = this.depthTestEl.value
-    this.faceCulling = this.faceCullingEl.value
-    this.frontFace = this.frontFaceEl.value
     this.depthTestEl.addEventListener('input', e => this.depthTest = this.depthTestEl.value)
     this.faceCullingEl.addEventListener('input', e => this.faceCulling = this.faceCullingEl.value)
     this.frontFaceEl.addEventListener('input', e => this.frontFace = this.frontFaceEl.value)

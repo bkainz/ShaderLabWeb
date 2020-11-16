@@ -1,3 +1,5 @@
+import defaultState from '../../defaultState.json'
+
 function Value(name, type) {
   this.name = name
   this.type = type
@@ -46,7 +48,7 @@ App.prototype = {
     this.editor.initialize()
     this.canvas.initialize()
 
-    this.editor.updateShaders()
+    this.state = defaultState
 
     this.el.dispatchEvent(new CustomEvent('viewportChanged', {detail: this.canvas.size}))
 
