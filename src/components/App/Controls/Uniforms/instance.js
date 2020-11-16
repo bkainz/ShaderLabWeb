@@ -28,6 +28,16 @@ Uniforms.prototype = {
                   : this.el.appendChild(newUniforms.el)
       this.perPass[pass.key] = newUniforms
     })
+  },
+
+  get state() {
+    const state = {}
+    for (const pass in this.perPass) state[pass] = this.perPass[pass].state
+    return state
+  },
+
+  set state(state) {
+    for (const pass in this.perPass) this.perPass[pass].state = state[pass]
   }
 }
 

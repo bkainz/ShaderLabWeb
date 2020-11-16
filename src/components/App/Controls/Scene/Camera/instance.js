@@ -53,6 +53,8 @@ function Camera(el, {className}) {
   this.orthographicFovEl = this.el.querySelector(`.${escapeCSS(className)}-FieldInput.orthographic-fov`)
 }
 
+Camera.STATE_FIELDS = 'position target nearClipping farClipping projection perspectiveFov orthographicFov'.split(' ')
+
 Camera.prototype = {
   initialize() {
     this.app.registerValue('Canvas Width', 'float')
@@ -68,11 +70,11 @@ Camera.prototype = {
     this.app.registerValue('View Matrix', 'mat4')
     this.app.registerValue('Projection Matrix', 'mat4')
 
-    this.projection = this.projectionEl.value
     this.position = this.positionEls.map(el => el.value)
     this.target = this.targetEls.map(el => el.value)
     this.nearClipping = this.nearClippingEl.value
     this.farClipping = this.farClippingEl.value
+    this.projection = this.projectionEl.value
     this.perspectiveFov = this.perspectiveFovEl.value
     this.orthographicFov = this.orthographicFovEl.value
 
@@ -185,6 +187,14 @@ Camera.prototype = {
 
   set orthographicFov(orthographicFov) {
     this.app.values.float['Orthographic FOV'].value = Number(orthographicFov)
+  },
+
+  get state() {
+    return Camera.STATE_FIELDS.reduce((state, field) => (state[field] = this[field], state), {})
+  },
+
+  set state(state) {
+    Camera.STATE_FIELDS.forEach(field => this[field] = state[field])
   }
 }
 

@@ -39,7 +39,22 @@ function SamplerValue(app, uniformName, name, type, defaultAttachment, pass) {
   this.el.dispatchEvent(new CustomEvent('attachmentChanged', {detail: this.attachment}))
 }
 SamplerValue.prototype = Object.create(Value.prototype, Object.getOwnPropertyDescriptors({
-  constructor: SamplerValue
+  constructor: SamplerValue,
+
+  get state() {
+    if (this.attachment) {
+      return {attachment: this.attachment}
+    }
+    else {
+      const value = {}
+      for (const target in this.images) value[target] = this.images[target].url
+      return {value}
+    }
+  },
+  set state(state) {
+    this.attachment = state.attachment || ''
+    if (state.value !== undefined) for (const target in this.images) this.images[target].url = state.value[target]
+  }
 }))
 
 SamplerValue.DEFAULT_VALUES = {

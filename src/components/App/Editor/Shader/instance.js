@@ -14,9 +14,13 @@ function Shader(el, {className, props}) {
 
 Shader.prototype = {
   get state() {
-    const source = this.el.querySelector(`.${escapeCSS(this.className)}-Source`).value
-    const isLinked = this.el.querySelector(`.${escapeCSS(this.className)}-isLinked`).checked
-    return {pass: this.pass, type: this.type, source, isLinked, name: this.name}
+    return {source: this.el.querySelector(`.${escapeCSS(this.className)}-Source`).value,
+            isLinked: this.el.querySelector(`.${escapeCSS(this.className)}-isLinked`).checked}
+  },
+
+  set state(state) {
+    this.el.querySelector(`.${escapeCSS(this.className)}-Source`).value = state.source
+    this.el.querySelector(`.${escapeCSS(this.className)}-isLinked`).checked = state.isLinked
   }
 }
 

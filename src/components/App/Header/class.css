@@ -12,3 +12,18 @@
   font-size: 2em;
 }
 
+.${className}-Controls {
+  margin-left: 2em;
+}
+
+.${className}-Button {
+  padding: 0.3em 0.5em;
+  background: var(--color-button-light);
+  color: var(--color-button-dark);
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.${className}-Button + .${className}-Button {
+  margin-left: 0.5em;
+}

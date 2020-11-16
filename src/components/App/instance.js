@@ -39,6 +39,7 @@ App.prototype = {
       this.canvas.updateViewport(width, height)
     })
 
+    this.header.initialize()
     this.log.initialize()
     this.scene.initialize()
     this.uniforms.initialize()
@@ -92,6 +93,18 @@ App.prototype = {
   registerValue(name, type) {
     this.values[type] = this.values[type] || {}
     this.values[type][name] = this.values[type][name] || new Value(name, type)
+  },
+
+  get state() {
+    return {scene: this.scene.state,
+            uniforms: this.uniforms.state,
+            editor: this.editor.state}
+  },
+
+  set state(state) {
+    this.scene.state = state.scene
+    this.uniforms.state = state.uniforms
+    this.editor.state = state.editor
   }
 }
 

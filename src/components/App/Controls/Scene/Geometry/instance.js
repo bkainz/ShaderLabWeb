@@ -12,6 +12,8 @@ function Geometry(el, {className}) {
   this.frontFaceEl = this.el.querySelector(`.${escapeCSS(className)}-FieldInput.front-face`)
 }
 
+Geometry.STATE_FIELDS = 'depthTest faceCulling frontFace'.split(' ')
+
 Geometry.prototype = {
   initialize() {
     this.app.registerValue('Model Matrix', 'mat4')
@@ -50,6 +52,14 @@ Geometry.prototype = {
 
   set frontFace(frontFace) {
     this.app.values.config['Front Face'].value = frontFace
+  },
+
+  get state() {
+    return Geometry.STATE_FIELDS.reduce((state, field) => (state[field] = this[field], state), {})
+  },
+
+  set state(state) {
+    Geometry.STATE_FIELDS.forEach(field => this[field] = state[field])
   }
 }
 

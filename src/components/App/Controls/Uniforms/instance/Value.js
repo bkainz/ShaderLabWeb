@@ -74,10 +74,10 @@ Value.prototype = {
   },
 
   get state() {
-    return {attachment: this.attachment, value: this.attachment ? this.value : undefined}
+    return this.attachment ? {attachment: this.attachment} : {value: this.value}
   },
   set state(state) {
-    this.attachment = state.attachment
+    this.attachment = state.attachment || ''
     if (state.value !== undefined) this.value = state.value
   },
 

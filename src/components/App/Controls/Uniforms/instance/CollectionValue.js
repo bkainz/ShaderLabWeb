@@ -38,13 +38,14 @@ CollectionValue.prototype = Object.create(Value.prototype, Object.getOwnProperty
   },
 
   get state() {
-    const state = {attachment: this.attachment, value: {}}
-    if (!this.attachment) for (const name in this.fields) state.value[name] = this.fields[name].state
+    if (this.attachment) return {attachment: this.attachment}
+    const state = {value: {}}
+    for (const name in this.fields) state.value[name] = this.fields[name].state
     return state
   },
   set state(state) {
-    this.attachment = state.attachment
-    if (state.value !== undefined) this.value = state.value
+    this.attachment = state.attachment || ''
+    if (state.value !== undefined) for (const name in this.fields) this.fields[name].state = state.value[name]
   },
 
   get uniforms() {
