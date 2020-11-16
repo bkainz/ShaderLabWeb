@@ -8,7 +8,11 @@
     "perspectiveFov": 45,
     "orthographicFov": 30
   },
-  "geometry":{
+  "model": {
+    "position": [0,-8,0],
+    "rotationAxis": [1,0,0],
+    "rotationAngle": -90,
+    "scale": [1,1,1],
     "depthTest":"LESS",
     "faceCulling":"",
     "frontFace":"CCW"

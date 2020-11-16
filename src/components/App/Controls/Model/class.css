@@ -1,3 +1,20 @@
+.${className}\/Section + .${className}\/Section {
+  margin-top: 2em;
+}
+
+.${className}\/Section-Name {
+  font-weight: bold;
+}
+
+.${className}\/Section-Content {
+  margin: 0.25em 0;
+}
+
+.${className}\/Section-ContentInfo {
+  font-size: 0.8em;
+  margin: 1em 0;
+}
+
 .${className}-Field {
   display: flex;
 }

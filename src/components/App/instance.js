@@ -44,7 +44,7 @@ App.prototype = {
     this.header.initialize()
     this.log.initialize()
     this.camera.initialize()
-    this.geometry.initialize()
+    this.model.initialize()
     this.uniforms.initialize()
     this.editor.initialize()
     this.canvas.initialize()
@@ -100,14 +100,14 @@ App.prototype = {
 
   get state() {
     return {camera: this.camera.state,
-            geometry: this.geometry.state,
+            model: this.model.state,
             uniforms: this.uniforms.state,
             editor: this.editor.state}
   },
 
   set state(state) {
     this.camera.state = state.camera
-    this.geometry.state = state.geometry
+    this.model.state = state.model
     this.uniforms.state = state.uniforms
     this.editor.state = state.editor
   }
