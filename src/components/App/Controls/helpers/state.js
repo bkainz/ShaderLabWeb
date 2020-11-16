@@ -1,4 +1,4 @@
-import escapeCSS from '../../../../../helpers/escapeCSS'
+import escapeCSS from '../../../../helpers/escapeCSS'
 
 export default {
   initializeForPrototype(prototype, fields) {

@@ -1,12 +1,12 @@
 import state from '../helpers/state'
-import algebra from '../../../../../helpers/algebra'
+import algebra from '../../../../helpers/algebra'
 const {M, T, R} = algebra
 
 function Geometry(el, {className}) {
   this.el = el
   this.className = className
   this.app = el.closest('.App').__component__
-  this.app.scene.geometry = this
+  this.app.geometry = this
 }
 
 const STATE = {

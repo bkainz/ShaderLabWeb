@@ -1,19 +1,17 @@
 {
-  "scene": {
-    "camera": {
-      "position": [0,0,40],
-      "target": [0,0,0],
-      "nearClipping": 0.001,
-      "farClipping": 10000,
-      "projection": "Perspective",
-      "perspectiveFov": 45,
-      "orthographicFov": 30
-    },
-    "geometry":{
-      "depthTest":"LESS",
-      "faceCulling":"",
-      "frontFace":"CCW"
-    }
+  "camera": {
+    "position": [0,0,40],
+    "target": [0,0,0],
+    "nearClipping": 0.001,
+    "farClipping": 10000,
+    "projection": "Perspective",
+    "perspectiveFov": 45,
+    "orthographicFov": 30
+  },
+  "geometry":{
+    "depthTest":"LESS",
+    "faceCulling":"",
+    "frontFace":"CCW"
   },
   "uniforms": {
     "base": {

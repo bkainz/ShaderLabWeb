@@ -1,5 +1,5 @@
-import escapeCSS from '../../../../../helpers/escapeCSS'
-import camera from '../../../../../helpers/camera'
+import escapeCSS from '../../../../helpers/escapeCSS'
+import camera from '../../../../helpers/camera'
 import state from '../helpers/state'
 
 function updateViewMatrix() {
@@ -18,7 +18,7 @@ function Camera(el, {className}) {
   this.el = el
   this.className = className
   this.app = el.closest('.App').__component__
-  this.app.scene.camera = this
+  this.app.camera = this
 }
 
 const STATE = {
