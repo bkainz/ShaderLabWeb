@@ -5,7 +5,7 @@ const rNamedStruct = /struct\s+(\w+)\s*{\s*/g
 const rType = /(\w+)\s+/y
 const rStruct = /struct(?:\s+(\w+))?\s*{\s*/y
 const rStructEnd = /\s*}\s*/y
-const rName = /(\w+)(?:\[([^\]]+)])?\s*(?:\/\*\s*attach to:([^*]+)\*\/)?\s*;\s*/y
+const rName = /(\w+)(?:\[([^\]]+)])?\s*;\s*/y
 
 function parseType(string, ptr) {
   rType.lastIndex = ptr
@@ -44,7 +44,7 @@ function parseStructFields(string, ptr) {
 function parseName(string, ptr) {
   rName.lastIndex = ptr
   const match = rName.exec(string)
-  return match && {name: match[1], length: match[2], defaultAttachment: match[3] && match[3].trim(), ptr: rName.lastIndex}
+  return match && {name: match[1], length: match[2], ptr: rName.lastIndex}
 }
 
 function parseField(string, ptr, allowStruct) {
@@ -57,7 +57,6 @@ function parseField(string, ptr, allowStruct) {
   return {name: nameMatch.name,
           type: typeMatch.type,
           length: nameMatch.length,
-          defaultAttachment: nameMatch.defaultAttachment,
           ptr: nameMatch.ptr}
 }
 
@@ -97,8 +96,7 @@ function buildField(field, structs, constInts) {
   }
 
   return {name: field.name,
-          type,
-          defaultAttachment: field.defaultAttachment}
+          type}
 }
 
 function buildStruct(struct, structs, constInts) {

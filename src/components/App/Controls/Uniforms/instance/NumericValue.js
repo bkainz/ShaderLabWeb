@@ -1,7 +1,7 @@
 import Value from './Value'
 
-function NumericValue(app, uniformName, name, type, defaultAttachment, pass) {
-  Value.call(this, app, uniformName, name, type, defaultAttachment, pass)
+function NumericValue(app, uniformName, name, type, pass) {
+  Value.call(this, app, uniformName, name, type, pass)
 
   const nRows = type.startsWith('mat')  ? Number(type[3]) : 1
   const nCols = type.startsWith('mat')  ? Number(type[3])

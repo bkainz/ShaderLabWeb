@@ -108,8 +108,8 @@ App.prototype = {
   set state(state) {
     this.camera.state = state.camera
     this.model.state = state.model
-    this.uniforms.state = state.uniforms
     this.editor.state = state.editor
+    this.uniforms.state = state.uniforms
   }
 }
 

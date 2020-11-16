@@ -2,7 +2,7 @@ import escapeCSS from '../../../../../helpers/escapeCSS'
 
 let instanceId = 0
 
-function Value(app, uniformName, name, type, defaultAttachment, pass) {
+function Value(app, uniformName, name, type, pass) {
   this.app = app
   this.name = name
   this.type = type
@@ -28,7 +28,7 @@ function Value(app, uniformName, name, type, defaultAttachment, pass) {
   this.valueEl.innerHTML = Object.keys(attachments).length ? `
 attach to: <select name="${this.id}-Attachment" class="${this.className}-Attachment">
   <option value="">None</option>${Object.keys(attachments).map(name => `
-  <option value="${name}"${name === defaultAttachment ? ' selected' : ''}>${name}</option>`).join('')}
+  <option value="${name}">${name}</option>`).join('')}
 </select>`.trim() : `
 <input type="hidden" name="${this.id}-Attachment" value="" class="${this.className}-Attachment">`.trim()
 

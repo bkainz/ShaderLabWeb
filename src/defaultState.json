@@ -34,7 +34,7 @@
   "editor": {
     "base": {
       "vertex": {
-        "source": "attribute vec3 vertex_worldSpace;\nattribute vec3 normal_worldSpace;\nattribute vec2 textureCoordinate_input;\n\nuniform mat4 mMatrix /* attach to: Model Matrix */;\nuniform mat4 vMatrix /* attach to: View Matrix */;\nuniform mat4 pMatrix /* attach to: Projection Matrix */;\n\nvarying vec3 normal;\n\nvoid main() {\n  vec4 vertex_camSpace = vMatrix * mMatrix * vec4(vertex_worldSpace, 1.0);\n  gl_Position = pMatrix * vertex_camSpace;\n\n  normal = normal_worldSpace;\n}",
+        "source": "attribute vec3 vertex_worldSpace;\nattribute vec3 normal_worldSpace;\nattribute vec2 textureCoordinate_input;\n\nuniform mat4 mMatrix;\nuniform mat4 vMatrix;\nuniform mat4 pMatrix;\n\nvarying vec3 normal;\n\nvoid main() {\n  vec4 vertex_camSpace = vMatrix * mMatrix * vec4(vertex_worldSpace, 1.0);\n  gl_Position = pMatrix * vertex_camSpace;\n\n  normal = normal_worldSpace;\n}",
         "isLinked": true
       },
       "fragment": {
@@ -48,7 +48,7 @@
         "isLinked": true
       },
       "fragment": {
-        "source": "precision mediump float;\n\nuniform sampler2D textureRendered /* attach to: Base Pass color */;\n\nvarying vec2 varyingTextureCoordinate;\n\nvoid main() {\n  gl_FragColor = texture2D(textureRendered, varyingTextureCoordinate.st);\n}",
+        "source": "precision mediump float;\n\nuniform sampler2D textureRendered;\n\nvarying vec2 varyingTextureCoordinate;\n\nvoid main() {\n  gl_FragColor = texture2D(textureRendered, varyingTextureCoordinate.st);\n}",
         "isLinked": true
       }
     }

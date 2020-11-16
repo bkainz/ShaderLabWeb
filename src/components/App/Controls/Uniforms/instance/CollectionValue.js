@@ -2,8 +2,8 @@ import Value from './Value'
 import NumericValue from './NumericValue'
 import SamplerValue from './SamplerValue'
 
-function CollectionValue(app, uniformName, name, type, defaultAttachment, pass) {
-  Value.call(this, app, uniformName, name, type, defaultAttachment, [])
+function CollectionValue(app, uniformName, name, type, pass) {
+  Value.call(this, app, uniformName, name, type, [])
 
   this.fields = {}
 
@@ -19,7 +19,7 @@ function CollectionValue(app, uniformName, name, type, defaultAttachment, pass) 
                   :                                           undefined
       const fieldUniformName = /^\d+$/.test(field.name) ? `${uniformName ? uniformName+'[' : ''}${field.name}${uniformName ? ']' : ''}`
                                                         : `${uniformName ? uniformName+'.' : ''}${field.name}`
-      this.fields[field.name] = new Value(this.app, fieldUniformName, field.name, field.type, field.defaultAttachment, pass)
+      this.fields[field.name] = new Value(this.app, fieldUniformName, field.name, field.type, pass)
     }
     this.valueEl.appendChild(this.fields[field.name].el)
   }

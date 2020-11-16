@@ -1,8 +1,8 @@
 import Value from './Value'
 import ImageUpload from './SamplerValue/ImageUpload'
 
-function SamplerValue(app, uniformName, name, type, defaultAttachment, pass) {
-  Value.call(this, app, uniformName, name, type, defaultAttachment, pass)
+function SamplerValue(app, uniformName, name, type, pass) {
+  Value.call(this, app, uniformName, name, type, pass)
 
   this.imagesEl = document.createElement('div')
   this.imagesEl.classList.add(this.className+'-SamplerImages')
@@ -36,7 +36,6 @@ function SamplerValue(app, uniformName, name, type, defaultAttachment, pass) {
       this.value = value
     }
   })
-  this.el.dispatchEvent(new CustomEvent('attachmentChanged', {detail: this.attachment}))
 }
 SamplerValue.prototype = Object.create(Value.prototype, Object.getOwnPropertyDescriptors({
   constructor: SamplerValue,

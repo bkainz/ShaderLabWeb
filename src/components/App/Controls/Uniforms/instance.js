@@ -22,7 +22,7 @@ Uniforms.prototype = {
         const newType = newUniform && newUniform.type && (newUniform.type.signature || newUniform.type)
         uniformsConfig.fields.push(oldType === newType ? oldUniform : newUniform)
       }
-      const newUniforms = new CollectionValue(this.app, '', pass.name, uniformsConfig, undefined, pass)
+      const newUniforms = new CollectionValue(this.app, '', pass.name, uniformsConfig, pass)
       newUniforms.stateEl.checked = !oldUniforms || oldUniforms.stateEl.checked
       oldUniforms ? this.el.replaceChild(newUniforms.el, oldUniforms.el)
                   : this.el.appendChild(newUniforms.el)
