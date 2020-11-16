@@ -10,9 +10,9 @@ export default function(props) {
                Position:
              </div>
              <div className={className+'-FieldValue'}>
-               <input type="number" defaultValue="0" step="any" className={className+'-FieldInput position.x'}/>
-               <input type="number" defaultValue="0" step="any" className={className+'-FieldInput position.y'}/>
-               <input type="number" defaultValue="40" step="any" className={className+'-FieldInput position.z'}/>
+               <input type="number" defaultValue="0" step="any" className={className+'-FieldInput position x'}/>
+               <input type="number" defaultValue="0" step="any" className={className+'-FieldInput position y'}/>
+               <input type="number" defaultValue="40" step="any" className={className+'-FieldInput position z'}/>
              </div>
            </div>
            <div className={className+'-Field target'}>
@@ -20,9 +20,9 @@ export default function(props) {
                Target:
              </div>
              <div className={className+'-FieldValue'}>
-               <input type="number" defaultValue="0" step="any" className={className+'-FieldInput target.x'}/>
-               <input type="number" defaultValue="0" step="any" className={className+'-FieldInput target.y'}/>
-               <input type="number" defaultValue="0" step="any" className={className+'-FieldInput target.z'}/>
+               <input type="number" defaultValue="0" step="any" className={className+'-FieldInput target x'}/>
+               <input type="number" defaultValue="0" step="any" className={className+'-FieldInput target y'}/>
+               <input type="number" defaultValue="0" step="any" className={className+'-FieldInput target z'}/>
              </div>
            </div>
            <div className={className+'-Field near-clipping'}>
@@ -30,7 +30,7 @@ export default function(props) {
                Near Clipping Plane:
              </div>
              <div className={className+'-FieldValue'}>
-               <input type="number" defaultValue="0.001" step="any" min="0" className={className+'-FieldInput near-clipping'}/>
+               <input type="number" defaultValue="0.001" step="any" min="0" className={className+'-FieldInput nearClipping'}/>
              </div>
            </div>
            <div className={className+'-Field'}>
@@ -38,7 +38,7 @@ export default function(props) {
                Far Clipping Plane:
              </div>
              <div className={className+'-FieldValue'}>
-               <input type="number" defaultValue="10000" step="any" min="0" className={className+'-FieldInput far-clipping'}/>
+               <input type="number" defaultValue="10000" step="any" min="0" className={className+'-FieldInput farClipping'}/>
              </div>
            </div>
            <div className={className+'-Field projection'}>
@@ -57,7 +57,7 @@ export default function(props) {
                Perspective FOV:
              </div>
              <div className={className+'-FieldValue'}>
-               <input type="number" defaultValue="45" step="any" min="0" max="180" className={className+'-FieldInput perspective-fov'}/>
+               <input type="number" defaultValue="45" step="any" min="0" max="180" className={className+'-FieldInput perspectiveFov'}/>
              </div>
            </div>
            <div className={className+'-Field orthographic-fov'}>
@@ -65,7 +65,7 @@ export default function(props) {
                Orthographic "FOV":
              </div>
              <div className={className+'-FieldValue'}>
-               <input type="number" defaultValue="30" step="any" min="0" className={className+'-FieldInput orthographic-fov'}/>
+               <input type="number" defaultValue="30" step="any" min="0" className={className+'-FieldInput orthographicFov'}/>
              </div>
            </div>
          </div>

@@ -10,7 +10,8 @@ export default function(props) {
                Depth Test:
              </div>
              <div className={className+'-FieldValue'}>
-               <select className={className+'-FieldInput depth-test'}>
+               <select className={className+'-FieldInput depthTest'}>
+                 <option value="">Disabled</option>
                  <option value="NEVER">Never</option>
                  <option value="LESS" selected={true}>Less</option>
                  <option value="LEQUAL">Less Or Equal</option>
@@ -27,7 +28,7 @@ export default function(props) {
                Front Face:
              </div>
              <div className={className+'-FieldValue'}>
-               <select className={className+'-FieldInput front-face'}>
+               <select className={className+'-FieldInput frontFace'}>
                  <option value="CCW">Counter-clock-wise winding</option>
                  <option value="CW">Clock-wise winding</option>
                </select>
@@ -38,7 +39,7 @@ export default function(props) {
                Face Culling:
              </div>
              <div className={className+'-FieldValue'}>
-               <select className={className+'-FieldInput face-culling'}>
+               <select className={className+'-FieldInput faceCulling'}>
                  <option value="">Disabled</option>
                  <option value="BACK">Back</option>
                  <option value="FRONT">Front</option>
