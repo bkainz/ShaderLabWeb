@@ -19,8 +19,8 @@ const registry = {
       const dependencies = {}
       const content = fs.readFileSync(contentPath, 'utf-8')
                         .replace(importRegexp, (match, alias, _, importPath) => {
-                          const modulePath = path.join(path.dirname(contentPath), importPath)
-                                           + (importPath.endsWith('.js') ? '' : '.js')
+                          const extname = path.extname(importPath)
+                          const modulePath = path.join(path.dirname(contentPath), importPath) + (extname ? '' : '.js')
                           const module = registry.register(modulePath)
                           dependencies[module.id] = alias
                           return ''
@@ -34,10 +34,12 @@ const registry = {
   },
   toScript() {
     return `
-      const modules = {}${Object.values(modules).map(module => `
+      const modules = {}${Object.values(modules).map(module => path.extname(module.id) === '.json' ? `
+      modules['${module.id}'] = ${module.content.replace(/\n/g, '\n      ')}` : `
       !function(${Object.values(module.dependencies).join(', ')}) {
         ${module.content.replace(/\n/g, '\n        ')}
-      }(${Object.keys(module.dependencies).map(id => `modules['${id}']`).join(', ')})`).join('\n')}
+      }(${Object.keys(module.dependencies).map(id => `modules['${id}']`).join(', ')})`
+      ).join('\n')}
     `.trim().replace(/\n {6}/g, '\n')
   }
 }
