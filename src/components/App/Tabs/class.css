@@ -39,7 +39,8 @@
   box-sizing: border-box;
   width: 100%;
   padding: 0.5em;
-  background: var(--color-input);
+  background: var(--color-panel-light);
+  color: var(--color-panel-dark);
   overflow: auto;
 }
 

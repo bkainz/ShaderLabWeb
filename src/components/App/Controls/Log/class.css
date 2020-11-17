@@ -1,7 +1,3 @@
-.${className} {
-  background: var(--color-input);
-}
-
 .${className}-Item {
   display: flex;
 }
@@ -37,7 +33,8 @@
 
 .${className}-Item-Head hr:after {
   content: attr(data-text);
-  background: var(--color-input);
+  background: var(--color-panel-light);
+  color: var(--color-panel-dark);
   position: absolute;
   top: 50%;
   left: 50%;

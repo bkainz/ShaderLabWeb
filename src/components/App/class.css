@@ -86,11 +86,11 @@ a svg {
  * App Styles
  */
 .${className} {
-  --color-panel-dark: black;
+  --color-panel-dark: #333;
   --color-panel-light: white;
-  --color-button-dark: black;
-  --color-button-light: white;
-  --color-input: white;
+  --color-button-dark: var(--color-panel-dark);
+  --color-button-light: var(--color-panel-light);
+  --color-border: var(--color-panel-dark);
 
   width: 100vw;
   height: 100vh;
@@ -105,7 +105,7 @@ a svg {
 }
 
 .${className}-Content {
-  --border-width: 2px;
+  --border-width: 3px;
   flex: 1 1 auto;
   display: grid;
   grid-template: "canvas  vborder editor" 50%
@@ -142,7 +142,7 @@ a svg {
 .${className}-HorizontalBorder,
 .${className}-VerticalBorder {
   position: relative;
-  background: var(--color-panel-dark);
+  background: var(--color-border);
 }
 
 .${className}-VerticalBorder::before {

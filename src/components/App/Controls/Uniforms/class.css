@@ -26,7 +26,7 @@
   width: 0;
   height: 0;
   border: var(--arrow-size) solid transparent;
-  border-left-color: black;
+  border-left-color: currentColor;
   transform-origin: 25% 50%;
 }
 
@@ -44,7 +44,7 @@
 }
 
 .${className}\/instance\/Value-Attachment {
-  border: 1px solid black;
+  border: 1px solid currentColor;
   padding: 0.25em;
   margin-bottom: 0.25em;
 }
@@ -59,7 +59,7 @@
   box-sizing: border-box;
   width: 5em;
   padding: 0.25em;
-  border: 1px solid black;
+  border: 1px solid currentColor;
 }
 
 .${className}\/instance\/Value-SamplerImages {
@@ -112,7 +112,7 @@
   box-sizing: border-box;
   height: 5em;
   width: 5em;
-  border: 1px solid black;
+  border: 1px solid currentColor;
 }
 
 .${className}\/instance\/Value\/ImageUpload-Browse::before {

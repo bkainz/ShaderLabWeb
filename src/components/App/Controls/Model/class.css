@@ -41,7 +41,7 @@
   margin: 0.25em;
   box-sizing: border-box;
   padding: 0.25em;
-  border: 1px solid black;
+  border: 1px solid currentColor;
 }
 
 .${className}-FieldInput[type='number'] {

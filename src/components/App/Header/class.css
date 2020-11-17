@@ -3,11 +3,11 @@
   flex-flow: row;
   align-items: flex-end;
   padding: 0.5em;
-  background: black;
+  background: var(--color-panel-dark);
+  color: var(--color-panel-light);
 }
 
 .${className}-Title {
-  color: white;
   font-weight: 300;
   font-size: 2em;
 }
