@@ -28,7 +28,7 @@ function NumericValue(app, uniformName, name, type, pass) {
       this.inputEls[index].type = 'number'
       this.inputEls[index].value = roundValue(this.value[index])
       this.inputEls[index].step = inputStep
-      this.inputEls[index].addEventListener('input', e => {
+      this.inputEls[index].addEventListener('change', e => {
         this._value[index] = Number(this.inputEls[index].value)
         this.value = this._value
       })
@@ -36,7 +36,7 @@ function NumericValue(app, uniformName, name, type, pass) {
     }
   }
 
-  this.el.addEventListener('valueChangedThroughAttachment', ({detail: value}) => {
+  this.el.addEventListener('valueChanged', ({detail: value}) => {
     for (let idx = 0; idx < value.length; idx += 1)
       this.inputEls[idx].value = roundValue(value[idx])
   })

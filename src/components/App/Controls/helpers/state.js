@@ -40,13 +40,13 @@ export default {
       const config = fields[field]
 
       const els = Array.from(instance.el.querySelectorAll(`.${escapeCSS(instance.className)}-FieldInput.${field}`))
-      els.forEach(el => el.addEventListener('input', e => instance[field] = config.isArray ? els.map(el => el.value)
-                                                                                           : els[0].value))
+      els.forEach(el => el.addEventListener('change', e => instance[field] = config.isArray ? els.map(el => el.value)
+                                                                                            : els[0].value))
 
       instance.app.registerValue(config.name, config.type)
       instance.app.values[config.type][config.name].el.addEventListener('valueChanged', ({detail: value}) => {
         const valueByEl = Array.isArray(value) ? value : [value]
-        els.forEach((el, idx) => el.value = valueByEl[idx])
+        els.forEach((el, idx) => el.value = config.isNumeric ? Math.round(valueByEl[idx]*1000)/1000 : valueByEl[idx])
         config.onChange && config.onChange.call(instance)
       })
     }

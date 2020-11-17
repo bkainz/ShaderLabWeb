@@ -32,10 +32,7 @@ attach to: <select name="${this.id}-Attachment" class="${this.className}-Attachm
 </select>`.trim() : `
 <input type="hidden" name="${this.id}-Attachment" value="" class="${this.className}-Attachment">`.trim()
 
-  this._attachmentChangeListener = (({detail: value}) => {
-    this.value = value
-    this.el.dispatchEvent(new CustomEvent('valueChangedThroughAttachment', {detail: this.value}))
-  })
+  this._attachmentChangeListener = ({detail: value}) => this.value = value
   this.attachmentEl = this.el.querySelector(`.${escapeCSS(this.className)}-Attachment`)
   this.attachmentEl.addEventListener('change', e => this.attachment = this.attachmentEl.value)
   this.el.addEventListener('attachmentChanged', ({detail: attachment}) => this.attachmentEl.value = attachment)
