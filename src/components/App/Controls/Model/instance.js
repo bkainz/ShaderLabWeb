@@ -7,9 +7,9 @@ function updateModelMatrix() {
   const rotationAxis = this.rotationAxis || [0, 0, 1]
   const rotationAngle = this.rotationAngle || 0
   const scale = this.scale || [1, 1, 1]
-  const transform = M(R(rotationAngle, ...rotationAxis), S(...scale))
+  const transform = M(R(rotationAngle, rotationAxis), S(scale))
   this.app.values.mat3['Model Transform'].value = algebra.mat4ToMat3(transform)
-  this.app.values.mat4['Model Matrix'].value = M(T(...position), transform)
+  this.app.values.mat4['Model Matrix'].value = M(T(position), transform)
 }
 
 function Model(el, {className}) {

@@ -38,6 +38,12 @@ const algebra = {
     return algebra.over(v, algebra.length(v))
   },
 
+  Mv(m, v) {
+    const mv = []
+    for (let i = 0; i < v.length; i+=1) mv.push(algebra.dot(v, [m[i], m[i+4], m[i+8] , m[i+12]]))
+    return mv
+  },
+
   M(a, b) {
     const c00 = a[0]*b[0]  + a[4]*b[1]  + a[8] *b[2]  + a[12]*b[3] ,
           c01 = a[1]*b[0]  + a[5]*b[1]  + a[9] *b[2]  + a[13]*b[3] ,
@@ -106,8 +112,8 @@ const algebra = {
             i12, i13, i14, i15]
   },
 
-  R(angle, x, y, z) {
-    [x, y, z] = algebra.normalize([x, y, z])
+  R(angle, axis=[0,0,1]) {
+    const [x, y, z] = algebra.normalize(axis)
     const sin = Math.sin(angle/180*Math.PI), cos = Math.cos(angle/180*Math.PI)
     return [x*x*(1-cos) +   cos, y*x*(1-cos) + z*sin, z*x*(1-cos) - y*sin, 0,
             x*y*(1-cos) - z*sin, y*y*(1-cos) +   cos, z*y*(1-cos) + x*sin, 0,
@@ -115,14 +121,14 @@ const algebra = {
                               0,                   0,                   0, 1]
   },
 
-  T(x, y, z) {
+  T([x=0, y=0, z=0]) {
     return [1, 0, 0, 0,
             0, 1, 0, 0,
             0, 0, 1, 0,
             x, y, z, 1]
   },
 
-  S(x, y, z) {
+  S([x=1, y=1, z=1]) {
     return [x, 0, 0, 0,
             0, y, 0, 0,
             0, 0, z, 0,

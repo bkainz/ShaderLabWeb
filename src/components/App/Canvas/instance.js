@@ -1,4 +1,6 @@
 import Scene from './classes/Scene'
+import CameraRotation from './classes/CameraRotation'
+import CameraDolly from './classes/CameraDolly'
 import geometryHelper from '../../../helpers/geometry'
 
 function Canvas(el, {props}) {
@@ -7,6 +9,8 @@ function Canvas(el, {props}) {
   this.app = el.closest('.App').__component__
   this.app.canvas = this
   this.scene = new Scene(this, props.passes)
+  this.cameraRotation = new CameraRotation(this)
+  this.cameraDolly = new CameraDolly(this)
 }
 
 Canvas.prototype = {
