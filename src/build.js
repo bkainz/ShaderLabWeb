@@ -15,6 +15,10 @@ fs.mkdirSync(publicDir)
 
 fs.symlinkSync(path.join(__rootdir, 'objects'), path.join(publicDir, 'objects'))
 
+fs.mkdirSync(path.join(publicDir, 'monaco-editor'))
+fs.symlinkSync(path.join(__rootdir, 'node_modules/monaco-editor/min'), path.join(publicDir, 'monaco-editor/min'))
+fs.symlinkSync(path.join(__rootdir, 'node_modules/monaco-editor/min-maps'), path.join(publicDir, 'monaco-editor/min-maps'))
+
 const body = ReactDomServer.renderToStaticMarkup(<App/>)
 
 fs.writeFileSync(path.join(publicDir, 'index.html'), `

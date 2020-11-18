@@ -6,7 +6,7 @@ export default function(props) {
   const shaderId = [props.pass, props.type].filter(Boolean).join('/')
 
   return <div className={className} id={id}>
-           <textarea className={className+'-Source'} name={shaderId+'-source'}/>
+           <div className={className+'-Source'} name={shaderId+'-source'}/>
            <div className={className+'-Controls'}>
              <label>
                <input className={className+'-isLinked'} type="checkbox" name={shaderId+'-isLinked'} defaultChecked={true}/> Link to program
