@@ -57,9 +57,6 @@ Canvas.prototype = {
   },
 
   updateGeometry(pass, geometry) {
-    const scope = `<hr data-text="${this.scene.passByKey[pass].name}: Load Geometry">`
-    const message = geometry.path.split('/').pop()
-    this.app.log.append(scope, message)
     this.scene.passByKey[pass].updateGeometry(geometry)
   },
 
