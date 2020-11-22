@@ -32,7 +32,10 @@ function SamplerValue(app, uniformName, name, type, pass) {
       this.value = this.app.values[this.type][attachment].value
     } else {
       const value = {}
-      await Promise.all(Object.keys(this.images).map(async target => value[target] = await this.images[target].value))
+      await Promise.all(Object.keys(this.images).map(async target => {
+        const image = await this.images[target].imageEl
+        value[target] = image.getAttribute('src') ? image : undefined
+      }))
       this.value = value
     }
   })
