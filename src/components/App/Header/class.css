@@ -1,10 +1,26 @@
 .${className} {
   display: flex;
   flex-flow: row;
-  align-items: flex-end;
+  align-items: center;
   padding: 0.5em;
+  height: 3em;
   background: var(--color-panel-dark);
   color: var(--color-panel-light);
+}
+
+.${className}-Left {
+  flex: 1 1 0;
+  display: flex;
+  flex-flow: row;
+  align-items: flex-end;
+}
+
+.${className}-Right {
+  flex: 1 1 0;
+  display: flex;
+  flex-flow: column;
+  align-items: flex-end;
+  height: 100%;
 }
 
 .${className}-Title {
@@ -26,4 +42,8 @@
 
 .${className}-Button + .${className}-Button {
   margin-left: 0.5em;
+}
+
+.${className}-Logo {
+  height: 100%;
 }

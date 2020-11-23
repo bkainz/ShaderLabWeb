@@ -11,7 +11,7 @@ export default function() {
     passes: {
       base: {
         name: 'Base Pass',
-        geometry: 'objects/teapot.obj',
+        geometry: 'assets/teapot.obj',
         shaders: {
           vertex: {
             name: 'Vertex Shader'

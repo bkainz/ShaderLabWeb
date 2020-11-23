@@ -13,7 +13,7 @@ const publicDir = path.join(__rootdir, 'public')
 fs.existsSync(publicDir) && fs.rmdirSync(publicDir, {recursive: true})
 fs.mkdirSync(publicDir)
 
-fs.symlinkSync(path.join(__rootdir, 'objects'), path.join(publicDir, 'objects'))
+fs.symlinkSync(path.join(__rootdir, 'assets'), path.join(publicDir, 'assets'))
 
 fs.mkdirSync(path.join(publicDir, 'monaco-editor'))
 fs.symlinkSync(path.join(__rootdir, 'node_modules/monaco-editor/min'), path.join(publicDir, 'monaco-editor/min'))
