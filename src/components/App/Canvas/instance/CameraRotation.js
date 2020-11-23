@@ -1,6 +1,5 @@
-import camera from '../../../../helpers/camera'
 import algebra from '../../../../helpers/algebra'
-const {minus, plus, dot, cross, R, Mv} = algebra
+const {minus, plus, length, cross, R, Mv} = algebra
 
 const EVENTS = {
   start: ['mousedown'],
@@ -19,8 +18,6 @@ function CameraRotation(canvas) {
 
   this.radius = Math.min(this.canvas.el.clientWidth, this.canvas.el.clientHeight, 500)
   this.event = null
-  this.startPosition = null
-  this.startTarget = null
 }
 
 CameraRotation.prototype = {
@@ -31,34 +28,34 @@ CameraRotation.prototype = {
     EVENTS.update.forEach(event => this.canvas.el.addEventListener(event, this.update))
     EVENTS.end.forEach(event => this.canvas.el.addEventListener(event, this.end))
     this.event = event
-    this.startPosition = this.canvas.app.values.vec3['Camera Position'].value
-    this.startTarget = this.canvas.app.values.vec3['Camera Target'].value
   },
 
   update(event) {
     event.preventDefault()
 
-    const dx = +(event.clientX - this.event.clientX)
-    const dy = -(event.clientY - this.event.clientY) // origin of html at top left, origin of webl at bottom left
+    const dClientX = +(event.clientX - this.event.clientX)
+    const dClientY = -(event.clientY - this.event.clientY) // origin of html at top left, origin of webl at bottom left
+    this.event = event
 
-    let targetToPosition = minus(this.startPosition, this.startTarget)
-    if (dx || dy) {
-      const phi = dx/this.radius * Math.PI
-      const theta = dy/this.radius * Math.PI
+    const target = this.canvas.app.values.vec3['Camera Target'].value
+    const position = this.canvas.app.values.vec3['Camera Position'].value
 
-      const startV = [0, 0, 1]
-      const endV = [Math.sin(phi),
-                    Math.sin(theta),
-                    Math.cos(theta)*Math.cos(phi)]
+    let targetToPosition = minus(position, target)
+    if (dClientX || dClientY) {
+      // do not rotate beyond the poles
+      const dThetaMin = -Math.atan2(length([targetToPosition[0], targetToPosition[2]]), targetToPosition[1])/Math.PI * 180
+      const dThetaMax = 180+dThetaMin
 
-      const axis = cross(startV, endV)
-      const angle = Math.acos(dot(startV, endV)) * 180/Math.PI
-      const cameraTransform = camera.camera(this.startPosition, this.startTarget, [0, 1, 0])
-      const rotationMatrix = R(-angle, Mv(cameraTransform, axis))
-      targetToPosition = Mv(rotationMatrix, targetToPosition)
+      const dPhi = dClientX/this.radius * 180
+      const dTheta = Math.max(dThetaMin+0.01, Math.min(dClientY/this.radius * 180, dThetaMax-0.01))
+
+      const Rt = R(-dTheta, cross(targetToPosition, [0, 1, 0]))
+      const Rp = R(-dPhi, [0, 1, 0])
+
+      targetToPosition = Mv(Rp, Mv(Rt, targetToPosition))
     }
 
-    this.canvas.app.values.vec3['Camera Position'].value = plus(this.startTarget, targetToPosition)
+    this.canvas.app.values.vec3['Camera Position'].value = plus(target, targetToPosition)
   },
 
   end(event) {
