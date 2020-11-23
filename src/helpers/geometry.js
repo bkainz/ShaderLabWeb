@@ -5,9 +5,19 @@ export default {
   void: {path: 'void',
          data: new Float32Array([]),
          elements: [],
+         type: 'TRIANGLES',
          attributes: {vertex: {count: 1, offset: 0, stride: 0},
                       normal: {count: 1, offset: 0, stride: 0},
                       tCoord: {count: 1, offset: 0, stride: 0}}},
+  origin: {path: 'origin',
+           data: new Float32Array([
+                  0, 0, 0,
+                  1, 0, 0,
+                  0, 1, 0,
+                  0, 0, 1]),
+           elements: [0, 1, 0, 2, 0, 3],
+           type: 'LINES',
+           attributes: {vertex: {count: 3, offset: 0, stride: 0}}},
   quad: (function() {
     const size = {v: 2, n: 3, t: 2}
     const stride = (size.v+size.n+size.t)*4
@@ -18,6 +28,7 @@ export default {
                    +1, +1,  0, 0, 1,  1, 1,   // top right
                    -1, +1,  0, 0, 1,  0, 1]), // top left
             elements: [0, 1, 2, 2, 3, 0],
+            type: 'TRIANGLES',
             attributes: {vertex: {count: size.v, offset: 0, stride: stride},
                          normal: {count: size.n, offset: size.v*4, stride},
                          tCoord: {count: size.t, offset: (size.v+size.n)*4, stride}}}
@@ -61,6 +72,7 @@ export default {
     return {path,
             data: new Float32Array(data),
             elements,
+            type: 'TRIANGLES',
             attributes: {vertex: {count: size.v, offset: 0, stride},
                          normal: {count: size.n, offset: size.v*4, stride},
                          tCoord: {count: size.t, offset: (size.v+size.n)*4, stride}}}

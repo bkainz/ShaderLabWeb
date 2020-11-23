@@ -5,6 +5,7 @@ import ProgramModel from './instance/ProgramModel'
 import CameraRotation from './instance/CameraRotation'
 import CameraDolly from './instance/CameraDolly'
 import geometryHelper from '../../../helpers/geometry'
+import algebra from '../../../helpers/algebra'
 
 function Canvas(el, {props}) {
   this.el = el
@@ -45,6 +46,36 @@ function Canvas(el, {props}) {
 
   this.quad = new ProgramModel(quadModel, quadProgram)
   this.quad.updateUniform('sampler2D', 'image', this.passes[this.passes.length-1].framebuffer.attachments.color)
+
+  const originProgram = new Program(this)
+  originProgram.updateShader('vertex', `
+    attribute vec3 vertex_worldSpace;
+    
+    uniform mat4 mMatrix;
+    uniform mat4 vMatrix;
+    uniform mat4 pMatrix;
+    
+    varying vec3 fragment_worldSpace;
+    
+    void main() {
+      gl_Position = pMatrix * vMatrix * mMatrix * vec4(vertex_worldSpace, 1);
+      fragment_worldSpace = vertex_worldSpace;
+    }`, true)
+  originProgram.updateShader('fragment', `
+    precision mediump float;
+    
+    varying vec3 fragment_worldSpace;
+    
+    void main() {
+      gl_FragColor = vec4(step(0.0001, fragment_worldSpace), 1);
+    }`, true)
+  originProgram.relink()
+
+  const originModel = new Model(this)
+  originModel.updateVertices(geometryHelper.origin)
+
+  this.origin = new ProgramModel(originModel, originProgram)
+  this.origin.updateUniform('mat4', 'mMatrix', algebra.S([5, 5, 5]))
 }
 
 Canvas.prototype = {
@@ -73,6 +104,16 @@ Canvas.prototype = {
     basePass.programModel.frontFace = this.app.values.config['Front Face'].value
     this.app.values.config['Front Face'].el.addEventListener('valueChanged', ({detail: frontFace}) => {
       basePass.programModel.frontFace = frontFace
+    })
+
+    this.origin.updateUniform('mat4', 'vMatrix', this.app.values.mat4['View Matrix'].value)
+    this.app.values.mat4['View Matrix'].el.addEventListener('valueChanged', ({detail: value}) => {
+      this.origin.updateUniform('mat4', 'vMatrix', value)
+    })
+
+    this.origin.updateUniform('mat4', 'pMatrix', this.app.values.mat4['Projection Matrix'].value)
+    this.app.values.mat4['Projection Matrix'].el.addEventListener('valueChanged', ({detail: value}) => {
+      this.origin.updateUniform('mat4', 'pMatrix', value)
     })
   },
 
@@ -106,6 +147,7 @@ Canvas.prototype = {
     this.webGL.clearColor(0, 0, 0, 1)
     this.webGL.clear(this.webGL.COLOR_BUFFER_BIT | this.webGL.DEPTH_BUFFER_BIT)
     this.quad.render()
+    this.app.values.config['Show World Coordinates'].value && this.origin.render()
   }
 }
 

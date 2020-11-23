@@ -26,7 +26,8 @@ const STATE = {
   scale: {type: 'vec3',  name: 'Model Scale', onChange: updateModelMatrix},
   depthTest: {type: 'config', name: 'Depth Test'},
   faceCulling: {type: 'config', name: 'Face Culling'},
-  frontFace: {type: 'config', name: 'Front Face'}
+  frontFace: {type: 'config', name: 'Front Face'},
+  showWorldCoordinates: {type: 'config', name: 'Show World Coordinates'}
 }
 
 Model.prototype = {

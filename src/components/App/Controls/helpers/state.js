@@ -40,15 +40,25 @@ export default {
       const config = fields[field]
 
       const els = Array.from(instance.el.querySelectorAll(`.${escapeCSS(instance.className)}-FieldInput.${field}`))
-      els.forEach(el => el.addEventListener('change', e => instance[field] = config.isArray ? els.map(el => el.value)
-                                                                                            : els[0].value))
+      els.forEach(el => el.addEventListener('change', e => instance[field] = config.isArray ? els.map(el => getInputValue(el))
+                                                                                            : getInputValue(els[0])))
 
       instance.app.registerValue(config.name, config.type)
       instance.app.values[config.type][config.name].el.addEventListener('valueChanged', ({detail: value}) => {
         const valueByEl = Array.isArray(value) ? value : [value]
-        els.forEach((el, idx) => el.value = config.isNumeric ? Math.round(valueByEl[idx]*1000)/1000 : valueByEl[idx])
+        els.forEach((el, idx) => setInputValue(el, config.isNumeric ? Math.round(valueByEl[idx]*1000)/1000 : valueByEl[idx]))
         config.onChange && config.onChange.call(instance)
       })
     }
   }
+}
+
+function getInputValue(inputEl) {
+  return inputEl.type === 'radio' || inputEl.type === 'checkbox' ? inputEl.checked
+                                                                 : inputEl.value
+}
+
+function setInputValue(inputEl, value) {
+  return inputEl.type === 'radio' || inputEl.type === 'checkbox' ? inputEl.checked = Boolean(value)
+                                                                 : inputEl.value = value
 }

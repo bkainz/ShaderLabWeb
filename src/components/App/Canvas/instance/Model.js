@@ -5,15 +5,16 @@ function Model(canvas) {
   this.webGL = canvas.webGL
   this.elementBuffer = this.webGL.createBuffer()
   this.elementCount = 0
-  this.elementType = this.webGL.getExtension('OES_element_index_uint') ? this.webGL.UNSIGNED_INT
-                                                                       : this.webGL.UNSIGNED_SHORT
+  this.elementType = this.webGL.TRIANGLES
+  this.elementDataType = this.webGL.getExtension('OES_element_index_uint') ? this.webGL.UNSIGNED_INT
+                                                                           : this.webGL.UNSIGNED_SHORT
   this.dataBuffer = this.webGL.createBuffer()
   this.attributes = {vertex_worldSpace: {count: 1, offset: 0, stride: 0}}
   this.updateVertices(geometryHelper.void)
 }
 
 Model.prototype = {
-  updateVertices({data, elements, attributes}) {
+  updateVertices({data, elements, type, attributes}) {
     const IndexArrayType = this.webGL.getExtension('OES_element_index_uint') ? Uint32Array : Uint16Array
     this.webGL.bindBuffer(this.webGL.ELEMENT_ARRAY_BUFFER, this.elementBuffer)
     this.webGL.bufferData(this.webGL.ELEMENT_ARRAY_BUFFER, new IndexArrayType(elements), this.webGL.STATIC_DRAW)
@@ -23,6 +24,7 @@ Model.prototype = {
     this.webGL.bufferData(this.webGL.ARRAY_BUFFER, data, this.webGL.STATIC_DRAW)
     this.webGL.bindBuffer(this.webGL.ARRAY_BUFFER, null)
 
+    this.elementType = this.webGL[type]
     this.elementCount = elements.length
     this.attributes = {vertex_worldSpace: attributes.vertex,
                        normal_worldSpace: attributes.normal,
@@ -40,7 +42,7 @@ Model.prototype = {
     }
     this.webGL.bindBuffer(this.webGL.ELEMENT_ARRAY_BUFFER, this.elementBuffer)
 
-    this.webGL.drawElements(this.webGL.TRIANGLES, this.elementCount, this.elementType, 0)
+    this.webGL.drawElements(this.elementType, this.elementCount, this.elementDataType, 0)
 
     this.webGL.bindBuffer(this.webGL.ELEMENT_ARRAY_BUFFER, null)
     for (const name in this.attributes) {

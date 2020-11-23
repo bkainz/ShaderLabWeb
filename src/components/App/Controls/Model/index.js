@@ -100,6 +100,14 @@ export default function(props) {
                    </select>
                  </div>
                </div>
+               <div className={className+'-Field showWorldCoordinates'}>
+                 <div className={className+'-FieldLabel'}>
+                   Show World Coordinates:
+                 </div>
+                 <div className={className+'-FieldValue'}>
+                   <input type='checkbox' className={className+'-FieldInput showWorldCoordinates'}/>
+                 </div>
+               </div>
              </div>
            </section>
          </div>
