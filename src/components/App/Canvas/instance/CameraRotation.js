@@ -40,20 +40,25 @@ CameraRotation.prototype = {
 
     const dx = +(event.clientX - this.event.clientX)
     const dy = -(event.clientY - this.event.clientY) // origin of html at top left, origin of webl at bottom left
-    const phi = dx/this.radius * Math.PI
-    const theta = dy/this.radius * Math.PI
 
-    const startV = [0, 0, 1]
-    const endV = [Math.sin(phi),
-                  Math.sin(theta),
-                  Math.cos(theta)*Math.cos(phi)]
+    let targetToPosition = minus(this.startPosition, this.startTarget)
+    if (dx || dy) {
+      const phi = dx/this.radius * Math.PI
+      const theta = dy/this.radius * Math.PI
 
-    const axis = cross(startV, endV)
-    const angle = Math.acos(dot(startV, endV)) * 180/Math.PI
-    const cameraTransform = camera.camera(this.startPosition, this.startTarget, [0, 1, 0])
-    const rotationMatrix = R(-angle, Mv(cameraTransform, axis))
-    const targetToPosition = minus(this.startPosition, this.startTarget)
-    this.canvas.app.values.vec3['Camera Position'].value = plus(this.startTarget, Mv(rotationMatrix, targetToPosition))
+      const startV = [0, 0, 1]
+      const endV = [Math.sin(phi),
+                    Math.sin(theta),
+                    Math.cos(theta)*Math.cos(phi)]
+
+      const axis = cross(startV, endV)
+      const angle = Math.acos(dot(startV, endV)) * 180/Math.PI
+      const cameraTransform = camera.camera(this.startPosition, this.startTarget, [0, 1, 0])
+      const rotationMatrix = R(-angle, Mv(cameraTransform, axis))
+      targetToPosition = Mv(rotationMatrix, targetToPosition)
+    }
+
+    this.canvas.app.values.vec3['Camera Position'].value = plus(this.startTarget, targetToPosition)
   },
 
   end(event) {
