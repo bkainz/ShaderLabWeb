@@ -5,7 +5,9 @@ export default {
   void: {path: 'void',
          data: new Float32Array([]),
          elements: [],
-         attributes: {}},
+         attributes: {vertex: {count: 1, offset: 0, stride: 0},
+                      normal: {count: 1, offset: 0, stride: 0},
+                      tCoord: {count: 1, offset: 0, stride: 0}}},
   quad: (function() {
     const size = {v: 2, n: 3, t: 2}
     const stride = (size.v+size.n+size.t)*4

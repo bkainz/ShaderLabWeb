@@ -2,7 +2,7 @@ import Value from './Value'
 import NumericValue from './NumericValue'
 import SamplerValue from './SamplerValue'
 
-function CollectionValue(app, uniformName, name, type, pass) {
+function CollectionValue(app, uniformName, name, type, program) {
   Value.call(this, app, uniformName, name, type, [])
 
   this.fields = {}
@@ -10,7 +10,7 @@ function CollectionValue(app, uniformName, name, type, pass) {
   for (const field of type.fields) {
     if (field instanceof Value) {
       this.fields[field.name] = field
-      field.type.fields || pass.updateUniform(field.type, field.name, field.value)
+      field.value = field.value
     }
     else {
       const Value = field.type.fields                       ? CollectionValue
@@ -19,7 +19,7 @@ function CollectionValue(app, uniformName, name, type, pass) {
                   :                                           undefined
       const fieldUniformName = /^\d+$/.test(field.name) ? `${uniformName ? uniformName+'[' : ''}${field.name}${uniformName ? ']' : ''}`
                                                         : `${uniformName ? uniformName+'.' : ''}${field.name}`
-      this.fields[field.name] = new Value(this.app, fieldUniformName, field.name, field.type, pass)
+      this.fields[field.name] = new Value(this.app, fieldUniformName, field.name, field.type, program)
     }
     this.valueEl.appendChild(this.fields[field.name].el)
   }

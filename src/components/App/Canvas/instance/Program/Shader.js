@@ -1,9 +1,8 @@
 import GLSLParser from './Shader/GLSLParser'
 
-function Shader(pass, type, name, source, isLinked) {
-  this.pass = pass
+function Shader(program, type, source, isLinked) {
+  this.program = program
   this.type = type
-  this.name = name
   this.source = source
   this.isLinked = isLinked
   this.constInts = GLSLParser.parseConstInts(this.source)
@@ -14,7 +13,7 @@ function Shader(pass, type, name, source, isLinked) {
 
 Shader.prototype = {
   attach() {
-    const webGl = this.pass.webGL
+    const webGl = this.program.webGL
     this.webGlShader = webGl.createShader(webGl[this.type.toUpperCase()+'_SHADER'])
     webGl.shaderSource(this.webGlShader, this.source)
     webGl.compileShader(this.webGlShader)
@@ -25,15 +24,15 @@ Shader.prototype = {
       return message
     }
     else {
-      webGl.attachShader(this.pass.program, this.webGlShader)
+      webGl.attachShader(this.program.webGlProgram, this.webGlShader)
       return 'Compilation successful'
     }
   },
 
   detach() {
     if (!this.webGlShader) return
-    this.pass.webGL.detachShader(this.pass.program, this.webGlShader)
-    this.pass.webGL.deleteShader(this.webGlShader)
+    this.program.webGL.detachShader(this.program.webGlProgram, this.webGlShader)
+    this.program.webGL.deleteShader(this.webGlShader)
     this.webGlShader = null
   }
 }

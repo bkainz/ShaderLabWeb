@@ -66,7 +66,7 @@ Value.prototype = {
     this._value = value
     this.el.dispatchEvent(new CustomEvent('valueChanged', {detail: value}))
 
-    const detail = {name: this.uniformName, type: this.type, value, pass: this.pass}
+    const detail = {pass: this.pass, uniform: {name: this.uniformName, type: this.type, value}}
     this.app.el.dispatchEvent(new CustomEvent('uniformChanged', {detail}))
   },
 

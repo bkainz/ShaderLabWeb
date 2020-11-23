@@ -1,6 +1,9 @@
-import Scene from './classes/Scene'
-import CameraRotation from './classes/CameraRotation'
-import CameraDolly from './classes/CameraDolly'
+import Pass from './instance/Pass'
+import Program from './instance/Program'
+import Model from './instance/Model'
+import ProgramModel from './instance/ProgramModel'
+import CameraRotation from './instance/CameraRotation'
+import CameraDolly from './instance/CameraDolly'
 import geometryHelper from '../../../helpers/geometry'
 
 function Canvas(el, {props}) {
@@ -8,37 +11,68 @@ function Canvas(el, {props}) {
   this.props = props
   this.app = el.closest('.App').__component__
   this.app.canvas = this
-  this.scene = new Scene(this, props.passes)
   this.cameraRotation = new CameraRotation(this)
   this.cameraDolly = new CameraDolly(this)
+
+  this.webGL = el.getContext('webgl')
+
+  this.passByKey = {}
+  for (const key in props.passes) this.passByKey[key] = new Pass(this, key, props.passes[key].name)
+  this.passes = Object.values(this.passByKey)
+
+  const quadProgram = new Program(this)
+  quadProgram.updateShader('vertex', `
+    attribute vec3 vertex_worldSpace;
+    attribute vec2 textureCoordinate_input;
+    varying vec2 uvs;
+    
+    void main() {
+      gl_Position = vec4(vertex_worldSpace, 1.0);
+      uvs = textureCoordinate_input;
+    }`, true)
+  quadProgram.updateShader('fragment', `
+    precision mediump float;
+    uniform sampler2D image;
+    varying vec2 uvs;
+    
+    void main() {
+      gl_FragColor = texture2D(image, uvs.st);
+    }`, true)
+  quadProgram.relink()
+
+  const quadModel = new Model(this)
+  quadModel.updateVertices(geometryHelper.quad)
+
+  this.quad = new ProgramModel(quadModel, quadProgram)
+  this.quad.updateUniform('sampler2D', 'image', this.passes[this.passes.length-1].framebuffer.attachments.color)
 }
 
 Canvas.prototype = {
   initialize() {
-    const pass = this.scene.passByKey.base
-    for (const bufferKey in pass.attachments) {
-      this.app.registerValue(pass.name+' '+bufferKey, 'sampler2D')
-      this.app.values.sampler2D[pass.name+' '+bufferKey].value = pass.attachments[bufferKey]
+    Object.keys(this.passByKey).forEach(async pass => {
+      const geometry = await geometryHelper.load(this.props.passes[pass].geometry)
+      this.app.el.dispatchEvent(new CustomEvent('geometryChanged', {detail: {pass, geometry}}))
+    })
+
+    const basePass = this.passByKey.base
+    for (const bufferKey in basePass.framebuffer.attachments) {
+      this.app.registerValue(basePass.name+' '+bufferKey, 'sampler2D')
+      this.app.values.sampler2D[basePass.name+' '+bufferKey].value = basePass.framebuffer.attachments[bufferKey]
     }
 
-    this.scene.passes.forEach(async pass => {
-      const geometry = await geometryHelper.load(this.props.passes[pass.key].geometry)
-      this.app.el.dispatchEvent(new CustomEvent('geometryChanged', {detail: {pass: pass.key, geometry}}))
-    })
-
-    pass.config.depthTest = this.app.values.config['Depth Test'].value
+    basePass.programModel.depthTest = this.app.values.config['Depth Test'].value
     this.app.values.config['Depth Test'].el.addEventListener('valueChanged', ({detail: depthTest}) => {
-      pass.config.depthTest = depthTest
+      basePass.programModel.depthTest = depthTest
     })
 
-    pass.config.faceCull = this.app.values.config['Face Culling'].value
+    basePass.programModel.faceCull = this.app.values.config['Face Culling'].value
     this.app.values.config['Face Culling'].el.addEventListener('valueChanged', ({detail: faceCull}) => {
-      pass.config.faceCull = faceCull
+      basePass.programModel.faceCull = faceCull
     })
 
-    pass.config.frontFace = this.app.values.config['Front Face'].value
+    basePass.programModel.frontFace = this.app.values.config['Front Face'].value
     this.app.values.config['Front Face'].el.addEventListener('valueChanged', ({detail: frontFace}) => {
-      pass.config.frontFace = frontFace
+      basePass.programModel.frontFace = frontFace
     })
   },
 
@@ -47,27 +81,31 @@ Canvas.prototype = {
   },
 
   updateShaders(pass, shaders) {
-    this.app.log.append(`<hr data-text="${this.scene.passByKey[pass].name}: Compile & Link Shaders">`, '')
-    shaders.forEach(shader => this.scene.passByKey[pass].updateShader(shader))
-    this.scene.passByKey[pass].relink()
+    this.passByKey[pass].updateShaders(shaders)
   },
 
-  updateUniform(uniform) {
-    uniform.pass.updateUniform(uniform.type, uniform.name, uniform.value)
+  updateModel(pass, geometry) {
+    this.passByKey[pass].updateModel(geometry)
   },
 
-  updateGeometry(pass, geometry) {
-    this.scene.passByKey[pass].updateGeometry(geometry)
+  updateUniform(pass, uniform) {
+    this.passByKey[pass].updateUniform(uniform)
   },
 
   updateViewport(width, height) {
     this.el.width = width
     this.el.height = height
-    this.scene.updateViewport(width, height)
+    this.webGL.viewport(0, 0, width, height)
+    this.passes.forEach(pass => pass.framebuffer.updateViewport(width, height))
   },
 
   render() {
-    this.scene.draw()
+    this.passes.forEach(pass => pass.render())
+
+    this.webGL.bindFramebuffer(this.webGL.FRAMEBUFFER, null)
+    this.webGL.clearColor(0, 0, 0, 1)
+    this.webGL.clear(this.webGL.COLOR_BUFFER_BIT | this.webGL.DEPTH_BUFFER_BIT)
+    this.quad.render()
   }
 }
 
