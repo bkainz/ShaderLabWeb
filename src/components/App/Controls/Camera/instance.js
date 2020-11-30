@@ -1,11 +1,15 @@
 import escapeCSS from '../../../../helpers/escapeCSS'
 import camera from '../../../../helpers/camera'
+import algebra from '../../../../helpers/algebra'
 import state from '../helpers/state'
 
 function updateViewMatrix() {
   const position = this.position || [0, 0, 0]
   const target = this.target || [0, 0, 0]
-  this.app.values.mat4['View Matrix'].value = camera.viewMatrix(position, target, [0, 1, 0])
+  const cameraMatrix = camera.camera(position, target, [0, 1, 0])
+  this.app.values.mat4['Camera Matrix'].value = cameraMatrix
+  this.app.values.mat3['Camera Rotation'].value = algebra.mat4ToMat3(cameraMatrix)
+  this.app.values.mat4['View Matrix'].value = algebra.I(cameraMatrix)
 }
 
 function updateProjectionMatrix() {
@@ -53,6 +57,8 @@ Camera.prototype = {
       this.height = height
     })
 
+    this.app.registerValue('Camera Matrix', 'mat4')
+    this.app.registerValue('Camera Rotation', 'mat3')
     this.app.registerValue('View Matrix', 'mat4')
     this.app.registerValue('Projection Matrix', 'mat4')
   },
