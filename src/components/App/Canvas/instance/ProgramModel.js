@@ -20,20 +20,22 @@ ProgramModel.prototype = {
     switch (type) {
       case 'int':
       case 'bool':
-      case 'ivec2':
-      case 'bvec2':
-      case 'ivec3':
-      case 'bvec3':
-      case 'ivec4':
-      case 'bvec4':
       case 'float':
+        this.uniforms[name] = {type, value: (Array.isArray(value) ? value : [value]).map(Number)}
+        break
+      case 'ivec2':
+      case 'ivec3':
+      case 'ivec4':
+      case 'bvec2':
+      case 'bvec3':
+      case 'bvec4':
       case 'vec2':
       case 'vec3':
       case 'vec4':
       case 'mat2':
       case 'mat3':
       case 'mat4':
-        this.uniforms[name] = {type, value}
+        this.uniforms[name] = {type, value: value.map(Number)}
         break
       case 'sampler2D':
       case 'samplerCube':
@@ -112,18 +114,18 @@ ProgramModel.prototype = {
       switch (type) {
         case 'int':
         case 'bool':
-          this.webGL.uniform1i(location, value)
+          this.webGL.uniform1iv(location, value)
           break
         case 'ivec2':
-        case 'bvec2':
         case 'ivec3':
-        case 'bvec3':
         case 'ivec4':
+        case 'bvec2':
+        case 'bvec3':
         case 'bvec4':
           this.webGL[`uniform${type[4]}iv`](location, value)
           break
         case 'float':
-          this.webGL.uniform1f(location, value)
+          this.webGL.uniform1fv(location, value)
           break
         case 'vec2':
         case 'vec3':

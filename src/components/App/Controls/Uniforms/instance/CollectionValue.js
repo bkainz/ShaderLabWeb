@@ -1,5 +1,6 @@
 import Value from './Value'
 import NumericValue from './NumericValue'
+import BooleanValue from './BooleanValue'
 import SamplerValue from './SamplerValue'
 
 function CollectionValue(app, uniformName, name, type, program) {
@@ -15,6 +16,7 @@ function CollectionValue(app, uniformName, name, type, program) {
     else {
       const Value = field.type.fields                       ? CollectionValue
                   : NumericValue.DEFAULT_VALUES[field.type] ? NumericValue
+                  : BooleanValue.DEFAULT_VALUES[field.type] ? BooleanValue
                   : SamplerValue.DEFAULT_VALUES[field.type] ? SamplerValue
                   :                                           undefined
       const fieldUniformName = /^\d+$/.test(field.name) ? `${uniformName ? uniformName+'[' : ''}${field.name}${uniformName ? ']' : ''}`

@@ -106,12 +106,10 @@ Canvas.prototype = {
       basePass.programModel.frontFace = frontFace
     })
 
-    this.origin.updateUniform('mat4', 'vMatrix', this.app.values.mat4['View Matrix'].value)
     this.app.values.mat4['View Matrix'].el.addEventListener('valueChanged', ({detail: value}) => {
       this.origin.updateUniform('mat4', 'vMatrix', value)
     })
 
-    this.origin.updateUniform('mat4', 'pMatrix', this.app.values.mat4['Projection Matrix'].value)
     this.app.values.mat4['Projection Matrix'].el.addEventListener('valueChanged', ({detail: value}) => {
       this.origin.updateUniform('mat4', 'pMatrix', value)
     })
