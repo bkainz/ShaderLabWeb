@@ -55,8 +55,8 @@ ProgramModel.prototype = {
           let isPow2 = true
           for (const target in value) {
             const image = value[target]
-            const width = image instanceof Image ? image.width : 1
-            const height = image instanceof Image ? image.height : 1
+            const width = image instanceof Image ? image.naturalWidth : 1
+            const height = image instanceof Image ? image.naturalHeight : 1
             isPow2 = isPow2 && isPowerOf2(width) && isPowerOf2(height)
             if (image instanceof Image)
               this.webGL.texImage2D(this.webGL[target], 0, this.webGL.RGBA,
@@ -70,6 +70,8 @@ ProgramModel.prototype = {
           if (isPow2) {
             this.webGL.generateMipmap(target)
             this.webGL.texParameteri(target, this.webGL.TEXTURE_MIN_FILTER, this.webGL.LINEAR_MIPMAP_LINEAR)
+            this.webGL.texParameteri(target, this.webGL.TEXTURE_WRAP_S, this.webGL.REPEAT)
+            this.webGL.texParameteri(target, this.webGL.TEXTURE_WRAP_T, this.webGL.REPEAT)
           } else {
             this.webGL.texParameteri(target, this.webGL.TEXTURE_MIN_FILTER, this.webGL.LINEAR)
             this.webGL.texParameteri(target, this.webGL.TEXTURE_WRAP_S, this.webGL.CLAMP_TO_EDGE)
