@@ -4,7 +4,7 @@ import Model from './instance/Model'
 import ProgramModel from './instance/ProgramModel'
 import CameraRotation from './instance/CameraRotation'
 import CameraDolly from './instance/CameraDolly'
-import geometryHelper from '../../../helpers/geometry'
+import meshHelper from '../../../helpers/mesh'
 import algebra from '../../../helpers/algebra'
 
 function Canvas(el, {props}) {
@@ -42,7 +42,7 @@ function Canvas(el, {props}) {
   quadProgram.relink()
 
   const quadModel = new Model(this)
-  quadModel.updateVertices(geometryHelper.quad)
+  quadModel.updateMesh(meshHelper.quad)
 
   this.quad = new ProgramModel(quadModel, quadProgram)
   this.quad.updateUniform('sampler2D', 'image', this.passes[this.passes.length-1].framebuffer.attachments.color)
@@ -72,7 +72,7 @@ function Canvas(el, {props}) {
   originProgram.relink()
 
   const originModel = new Model(this)
-  originModel.updateVertices(geometryHelper.origin)
+  originModel.updateMesh(meshHelper.origin)
 
   this.origin = new ProgramModel(originModel, originProgram)
   this.origin.updateUniform('mat4', 'mMatrix', algebra.S([5, 5, 5]))
@@ -81,8 +81,8 @@ function Canvas(el, {props}) {
 Canvas.prototype = {
   initialize() {
     Object.keys(this.passByKey).forEach(async pass => {
-      const geometry = await geometryHelper.load(this.props.passes[pass].geometry)
-      this.app.el.dispatchEvent(new CustomEvent('geometryChanged', {detail: {pass, geometry}}))
+      const mesh = await meshHelper.load(this.props.passes[pass].mesh)
+      this.app.el.dispatchEvent(new CustomEvent('meshChanged', {detail: {pass, mesh}}))
     })
 
     const basePass = this.passByKey.base
@@ -123,8 +123,8 @@ Canvas.prototype = {
     this.passByKey[pass].updateShaders(shaders)
   },
 
-  updateModel(pass, geometry) {
-    this.passByKey[pass].updateModel(geometry)
+  updateModel(pass, mesh) {
+    this.passByKey[pass].updateModel(mesh)
   },
 
   updateUniform(pass, uniform) {

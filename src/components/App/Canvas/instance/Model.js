@@ -1,4 +1,4 @@
-import geometryHelper from '../../../../helpers/geometry'
+import meshHelper from '../../../../helpers/mesh'
 
 function Model(canvas) {
   this.canvas = canvas
@@ -10,11 +10,11 @@ function Model(canvas) {
                                                                            : this.webGL.UNSIGNED_SHORT
   this.dataBuffer = this.webGL.createBuffer()
   this.attributes = {vertex_worldSpace: {count: 1, offset: 0, stride: 0}}
-  this.updateVertices(geometryHelper.void)
+  this.updateMesh(meshHelper.void)
 }
 
 Model.prototype = {
-  updateVertices({data, elements, type, attributes}) {
+  updateMesh({data, elements, type, attributes}) {
     const IndexArrayType = this.webGL.getExtension('OES_element_index_uint') ? Uint32Array : Uint16Array
     this.webGL.bindBuffer(this.webGL.ELEMENT_ARRAY_BUFFER, this.elementBuffer)
     this.webGL.bufferData(this.webGL.ELEMENT_ARRAY_BUFFER, new IndexArrayType(elements), this.webGL.STATIC_DRAW)

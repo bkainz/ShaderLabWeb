@@ -33,8 +33,8 @@ App.prototype = {
       this.canvas.updateUniform(pass, uniform)
     })
 
-    this.el.addEventListener('geometryChanged', ({detail: {pass, geometry}}) => {
-      this.canvas.updateModel(pass, geometry)
+    this.el.addEventListener('meshChanged', ({detail: {pass, mesh}}) => {
+      this.canvas.updateModel(pass, mesh)
     })
 
     this.el.addEventListener('viewportChanged', ({detail: {width, height}}) => {

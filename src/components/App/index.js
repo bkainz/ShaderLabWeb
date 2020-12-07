@@ -11,7 +11,7 @@ export default function() {
     passes: {
       base: {
         name: 'Base Pass',
-        geometry: 'assets/teapot.obj',
+        mesh: 'assets/teapot.obj',
         shaders: {
           vertex: {
             name: 'Vertex Shader'
@@ -23,7 +23,7 @@ export default function() {
       },
       R2T: {
         name: 'R2T Pass',
-        geometry: 'quad',
+        mesh: 'quad',
         shaders: {
           vertex: {
             name: 'R2T Vertex Shader'

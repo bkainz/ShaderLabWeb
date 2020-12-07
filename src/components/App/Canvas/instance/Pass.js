@@ -32,8 +32,8 @@ Pass.prototype = {
     }
   },
 
-  updateModel(geometry) {
-    this.programModel.model.updateVertices(geometry)
+  updateModel(mesh) {
+    this.programModel.model.updateMesh(mesh)
   },
 
   updateUniform(uniform) {
