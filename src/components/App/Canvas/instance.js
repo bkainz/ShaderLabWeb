@@ -4,7 +4,7 @@ import Model from './instance/Model'
 import ProgramModel from './instance/ProgramModel'
 import CameraRotation from './instance/CameraRotation'
 import CameraDolly from './instance/CameraDolly'
-import meshHelper from '../../../helpers/mesh'
+import loadMesh from '../../../helpers/loadMesh'
 import algebra from '../../../helpers/algebra'
 
 function Canvas(el, {props}) {
@@ -42,7 +42,7 @@ function Canvas(el, {props}) {
   quadProgram.relink()
 
   const quadModel = new Model(this)
-  quadModel.updateMesh(meshHelper.quad)
+  quadModel.updateMesh(loadMesh('quad'))
 
   this.quad = new ProgramModel(quadModel, quadProgram)
   this.quad.updateUniform('sampler2D', 'image', this.passes[this.passes.length-1].framebuffer.attachments.color)
@@ -72,7 +72,7 @@ function Canvas(el, {props}) {
   originProgram.relink()
 
   const originModel = new Model(this)
-  originModel.updateMesh(meshHelper.origin)
+  originModel.updateMesh(loadMesh('origin'))
 
   this.origin = new ProgramModel(originModel, originProgram)
   this.origin.updateUniform('mat4', 'mMatrix', algebra.S([5, 5, 5]))
@@ -81,7 +81,7 @@ function Canvas(el, {props}) {
 Canvas.prototype = {
   initialize() {
     Object.keys(this.passByKey).forEach(async pass => {
-      const mesh = await meshHelper.load(this.props.passes[pass].mesh)
+      const mesh = await loadMesh(this.props.passes[pass].mesh)
       this.app.el.dispatchEvent(new CustomEvent('meshChanged', {detail: {pass, mesh}}))
     })
 

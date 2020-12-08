@@ -1,4 +1,4 @@
-import meshHelper from '../../../../helpers/mesh'
+import loadMesh from '../../../../helpers/loadMesh'
 
 function Model(canvas) {
   this.canvas = canvas
@@ -9,8 +9,8 @@ function Model(canvas) {
   this.elementDataType = this.webGL.getExtension('OES_element_index_uint') ? this.webGL.UNSIGNED_INT
                                                                            : this.webGL.UNSIGNED_SHORT
   this.dataBuffer = this.webGL.createBuffer()
-  this.attributes = {vertex_worldSpace: {count: 1, offset: 0, stride: 0}}
-  this.updateMesh(meshHelper.void)
+  this.attributes = null
+  this.updateMesh(loadMesh('void'))
 }
 
 Model.prototype = {
@@ -26,9 +26,10 @@ Model.prototype = {
 
     this.elementType = this.webGL[type]
     this.elementCount = elements.length
-    this.attributes = {vertex_worldSpace: attributes.vertex,
-                       normal_worldSpace: attributes.normal,
-                       textureCoordinate_input: attributes.tCoord}
+    this.attributes = {}
+    if (attributes.vertex) this.attributes.vertex_worldSpace = attributes.vertex
+    if (attributes.normal) this.attributes.normal_worldSpace = attributes.normal
+    if (attributes.tCoord) this.attributes.textureCoordinate_input = attributes.tCoord
   },
 
   renderWith(program) {
