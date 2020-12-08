@@ -31,6 +31,47 @@ const meshes = {
          elements: [0, 1, 2, 2, 3, 0],
          type: 'TRIANGLES',
          attributes: attributesConfig(2, 3, 2)},
+  cube: {name: 'cube',
+         data: new Float32Array([
+                 // +z face
+                 -1, -1, +1,  0, 0, +1,  0.25, 0.50, // bottom left (facing along -z, +y is up)
+                 +1, -1, +1,  0, 0, +1,  0.50, 0.50, // bottom right
+                 +1, +1, +1,  0, 0, +1,  0.50, 0.25, // top right
+                 -1, +1, +1,  0, 0, +1,  0.25, 0.25, // top left
+                 // -z face
+                 +1, -1, -1,  0, 0, -1,  0.75, 0.50, // bottom left (facing along +z, +y is up)
+                 -1, -1, -1,  0, 0, -1,  1.00, 0.50, // bottom right
+                 -1, +1, -1,  0, 0, -1,  1.00, 0.25, // top right
+                 +1, +1, -1,  0, 0, -1,  0.75, 0.25, // top left
+                 // +y face
+                 -1, +1, +1,  0, +1, 0,  0.25, 0.25, // bottom left (facing along -y, -z is up)
+                 +1, +1, +1,  0, +1, 0,  0.50, 0.25, // bottom right
+                 +1, +1, -1,  0, +1, 0,  0.50, 0.00, // top right
+                 -1, +1, -1,  0, +1, 0,  0.25, 0.00, // top left
+                 // -y face
+                 -1, -1, -1,  0, -1, 0,  0.25, 0.75, // bottom left (facing along +y, +z is up)
+                 +1, -1, -1,  0, -1, 0,  0.50, 0.75, // bottom right
+                 +1, -1, +1,  0, -1, 0,  0.50, 0.50, // top right
+                 -1, -1, +1,  0, -1, 0,  0.25, 0.50, // top left
+                 // +x face
+                 +1, -1, +1,  +1, 0, 0,  0.50, 0.50, // bottom left (facing along -x, +y is up)
+                 +1, -1, -1,  +1, 0, 0,  0.75, 0.50, // bottom right
+                 +1, +1, -1,  +1, 0, 0,  0.75, 0.25, // top right
+                 +1, +1, +1,  +1, 0, 0,  0.50, 0.25, // top left
+                 // -x face
+                 -1, -1, -1,  -1, 0, 0,  0.00, 0.50, // bottom left (facing along +x, +y is up)
+                 -1, -1, +1,  -1, 0, 0,  0.25, 0.50, // bottom right
+                 -1, +1, +1,  -1, 0, 0,  0.25, 0.25, // top right
+                 -1, +1, -1,  -1, 0, 0,  0.00, 0.25  // top left
+               ]),
+         elements: [ 0,  1,  2,  2,  3,  0,  // +z face
+                     4,  5,  6,  6,  7,  4,  // -z face
+                     8,  9, 10, 10, 11,  8,  // +y face
+                    12, 13, 14, 14, 15, 12,  // -y face
+                    16, 17, 18, 18, 19, 16,  // +x face
+                    20, 21, 22, 22, 23, 20], // -x face
+         type: 'TRIANGLES',
+         attributes: attributesConfig(3, 3, 2)},
   get teapot() {
     const path = new URL('assets/teapot.obj', document.baseURI).href
     return fetch(path).then(response => response.text()).then(content => parseWavefront(path, content))

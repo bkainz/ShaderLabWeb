@@ -46,8 +46,8 @@ export default {
       instance.app.registerValue(config.name, config.type)
       instance.app.values[config.type][config.name].el.addEventListener('valueChanged', ({detail: value}) => {
         const valueByEl = Array.isArray(value) ? value : [value]
-        els.forEach((el, idx) => setInputValue(el, config.isNumeric ? Math.round(valueByEl[idx]*1000)/1000 : valueByEl[idx]))
-        config.onChange && config.onChange.call(instance)
+        els.forEach((el, idx) => setInputValue(el, config.isNumeric ? Math.round(valueByEl[idx]*1000)/1000 : valueByEl[idx] || ''))
+        config.onChange && config.onChange.call(instance, value)
       })
     }
   }

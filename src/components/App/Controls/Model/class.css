@@ -17,6 +17,7 @@
 
 .${className}-Field {
   display: flex;
+  align-items: baseline;
 }
 
 .${className}-Field + .${className}-Field {
@@ -34,6 +35,7 @@
 
 .${className}-FieldValue {
   display: flex;
+  align-items: center;
   margin: -0.25em;
 }
 
@@ -46,4 +48,8 @@
 
 .${className}-FieldInput[type='number'] {
   width: 5em;
+}
+
+.${className}-MeshFile {
+  display: none
 }

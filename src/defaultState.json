@@ -2,13 +2,14 @@
   "camera": {
     "position": [0,0,40],
     "target": [0,0,0],
-    "nearClipping": 0.001,
-    "farClipping": 10000,
+    "nearClipping": 0.1,
+    "farClipping": 1000,
     "projection": "Perspective",
     "perspectiveFov": 45,
     "orthographicFov": 30
   },
   "model": {
+    "mesh": "teapot",
     "position": [0,-8,0],
     "rotationAxis": [1,0,0],
     "rotationAngle": -90,

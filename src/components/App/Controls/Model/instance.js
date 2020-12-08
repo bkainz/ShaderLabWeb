@@ -1,6 +1,39 @@
 import state from '../helpers/state'
 import algebra from '../../../../helpers/algebra'
+import loadMesh from '../../../../helpers/loadMesh'
+import escapeCSS from '../../../../helpers/escapeCSS'
 const {M, T, R, S} = algebra
+
+function Model(el, {className}) {
+  this.el = el
+  this.className = className
+  this.app = el.closest('.App').__component__
+  this.app.model = this
+
+  this.meshNameEl = this.el.querySelector(`.${escapeCSS(this.className)}-MeshName`)
+  this.meshNameEl.addEventListener('change', e => {
+    this.mesh = this.meshNameEl.value === 'file' ? this.meshFile
+                                                 : this.meshNameEl.value
+  })
+
+  this.meshFile = {name: '', content: ''}
+  this.meshFileLoaded = false
+  this.meshFileEl = this.el.querySelector(`.${escapeCSS(this.className)}-MeshFile`)
+  this.meshFileEl.addEventListener('change', e => {
+    const reader = new FileReader()
+    reader.readAsText(this.meshFileEl.files[0])
+    reader.onloadend = () => {
+      this.meshFile = {name: this.meshFileEl.files[0].name, content: reader.result}
+      this.meshFileLoaded = false
+      if (this.meshNameEl.value === 'file') this.mesh = this.meshFile
+    }
+  })
+
+  this.vertexCountEl = this.el.querySelector(`.${escapeCSS(this.className)}-VertexCount`)
+  this.vertexTypeEl = this.el.querySelector(`.${escapeCSS(this.className)}-VertexType`)
+  this.normalTypeEl = this.el.querySelector(`.${escapeCSS(this.className)}-NormalType`)
+  this.tCoordTypeEl = this.el.querySelector(`.${escapeCSS(this.className)}-TCoordType`)
+}
 
 function updateModelMatrix() {
   const position = this.position || [0, 0, 0]
@@ -12,14 +45,51 @@ function updateModelMatrix() {
   this.app.values.mat4['Model Matrix'].value = M(T(position), transform)
 }
 
-function Model(el, {className}) {
-  this.el = el
-  this.className = className
-  this.app = el.closest('.App').__component__
-  this.app.model = this
-}
-
 const STATE = {
+  mesh: {type: 'custom', name: 'Model Mesh',
+    async onChange(value) {
+      const name = typeof value === 'object' && value ? value.name : value || 'teapot'
+      const content = typeof value === 'object' && value ? value.content : undefined
+
+      this.vertexCountEl.innerText = 'loading…'
+      this.vertexTypeEl.innerText = '…'
+      this.normalTypeEl.innerText = '…'
+      this.tCoordTypeEl.innerText = '…'
+
+      let mesh
+      if (content !== undefined) {
+        this.meshNameEl.value = 'file'
+        this.meshFileEl.style.display = 'block'
+
+        const dataTransfer = new DataTransfer()
+        content && dataTransfer.items.add(new File([content], name))
+        this.meshFileEl.files = dataTransfer.files
+
+        if (!this.meshFileLoaded || value !== this.meshFile)
+          this.meshFileLoaded = await new Promise(resolve => {
+                                  requestAnimationFrame(() => { // Give loading feedback time to display
+                                    requestAnimationFrame(async() => {
+                                      resolve(await loadMesh(name, content))
+                                    })
+                                  })
+                                })
+        mesh = this.meshFileLoaded
+      }
+      else {
+        this.meshNameEl.value = name
+        this.meshFileEl.style.display = ''
+        mesh = await loadMesh(name)
+      }
+
+      this.vertexCountEl.innerText = mesh.elements.length
+      'vertex normal tCoord'.split(' ').forEach(attr => {
+        const count = mesh.attributes[attr] ? mesh.attributes[attr].count : 0
+        this[attr+'TypeEl'].innerText = count < 1 ? 'no'
+                                      : count < 2 ? 'float'
+                                      :             'vec'+count
+      })
+      this.app.el.dispatchEvent(new CustomEvent('meshChanged', {detail: {pass: 'base', mesh}}))
+    }},
   position: {type: 'vec3', name: 'Model Position', onChange: updateModelMatrix},
   rotationAxis: {type: 'vec3', name: 'Model Rotation Axis', onChange: updateModelMatrix},
   rotationAngle: {type: 'float', name: 'Model Rotation Angle', onChange: updateModelMatrix},
@@ -35,6 +105,7 @@ Model.prototype = {
     state.initializeForInstance(this, STATE)
     this.app.registerValue('Model Transform', 'mat3')
     this.app.registerValue('Model Matrix', 'mat4')
+    this.meshFileEl.files[0] && this.meshFileEl.dispatchEvent(new Event('change'))
   }
 }
 

@@ -7,6 +7,32 @@ export default function(props) {
   return <div className={className} id={id}>
            <section className={className+'/Section'}>
              <header className={className+'/Section-Name'}>
+               Mesh
+             </header>
+             <div className={className+'/Section-Content'}>
+               <div className={className+'-FieldValue'}>
+                 <select className={className+'-FieldInput '+className+'-MeshName'}>
+                   <option value="teapot" selected={true}>Teapot</option>
+                   <option value="cube">Cube</option>
+                   <option value="file">.obj File</option>
+                 </select>
+                 <input type="file" className={className+'-MeshFile'}/>
+               </div>
+               <p className={className+'/Section-ContentInfo vertex-count'}>
+                 Vertices: <span className={className+'-VertexCount'}>0</span>
+               </p>
+               <div className={className+'/Section-ContentInfo attributes'}>
+                 <div style={{display: 'inline-block', verticalAlign: 'top'}}>Attributes:&nbsp;</div>
+                 <ul style={{display: 'inline-block'}}>
+                   <li><span className={className+'-VertexType'}>float</span> vertex_worldSpace</li>
+                   <li><span className={className+'-NormalType'}>no</span> normal_worldSpace</li>
+                   <li><span className={className+'-TCoordType'}>no</span> textureCoordinate_input</li>
+                 </ul>
+               </div>
+             </div>
+           </section>
+           <section className={className+'/Section'}>
+             <header className={className+'/Section-Name'}>
                Position & Transform
              </header>
              <div className={className+'/Section-Content'}>
