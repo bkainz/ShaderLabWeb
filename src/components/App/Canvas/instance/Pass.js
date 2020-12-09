@@ -41,7 +41,8 @@ Pass.prototype = {
   },
 
   render() {
-    this.framebuffer.render(this.programModel)
+    this.framebuffer.startRender()
+    this.programModel.render()
   }
 }
 
