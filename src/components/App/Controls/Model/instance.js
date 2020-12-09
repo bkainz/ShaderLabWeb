@@ -97,7 +97,8 @@ const STATE = {
   depthTest: {type: 'config', name: 'Depth Test'},
   faceCulling: {type: 'config', name: 'Face Culling'},
   frontFace: {type: 'config', name: 'Front Face'},
-  showWorldCoordinates: {type: 'config', name: 'Show World Coordinates'}
+  showWorldCoordinates: {type: 'config', name: 'Show World Coordinates'},
+  showWireframe: {type: 'config', name: 'Show Wireframe'}
 }
 
 Model.prototype = {

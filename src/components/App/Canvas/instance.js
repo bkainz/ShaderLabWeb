@@ -17,9 +17,11 @@ function Canvas(el) {
   this.webGL = el.getContext('webgl', {alpha: false})
   this.webGL.enable(this.webGL.BLEND)
   this.webGL.blendFunc(this.webGL.SRC_ALPHA, this.webGL.ONE_MINUS_SRC_ALPHA);
+  this.webGL.getExtension('OES_standard_derivatives')
 
   this.userFramebuffers = {}
   this.userProgrammedMeshes = {}
+  this.modelProgramId = null
 
   const quadProgram = new Program(this.webGL, 'quad')
   quadProgram.updateShader('vertex', `
@@ -98,6 +100,9 @@ Canvas.prototype = {
       const programmedMesh = new ProgrammedMesh(new Mesh(this.webGL), new Program(this.webGL, programId))
 
       if (!Object.keys(this.userProgrammedMeshes).length) {
+        this.modelProgramId = programId
+        this.wireframeRenderer = new ProgrammedMesh(programmedMesh.mesh, new Program(this.webGL, 'wireframe'))
+
         for (const attachment in framebuffer.attachments) {
           const attachmentId = programmedMesh.program.name+' '+attachment
           this.app.registerValue(attachmentId, 'sampler2D')
@@ -106,14 +111,17 @@ Canvas.prototype = {
 
         this.app.values.config['Depth Test'].el.addEventListener('valueChanged', ({detail: value}) => {
           programmedMesh.depthTest = value
+          this.wireframeRenderer.depthTest = value
         })
 
         this.app.values.config['Face Culling'].el.addEventListener('valueChanged', ({detail: value}) => {
           programmedMesh.faceCull = value
+          this.wireframeRenderer.faceCull = value
         })
 
         this.app.values.config['Front Face'].el.addEventListener('valueChanged', ({detail: value}) => {
           programmedMesh.frontFace = value
+          this.wireframeRenderer.frontFace = value
         })
       }
       else {
@@ -137,6 +145,35 @@ Canvas.prototype = {
     const linkMessage = program.relink()
 
     if (!linkMessage) {
+      if (programId === this.modelProgramId) {
+        const vertexSource = `
+          attribute vec3 vertex_barycentric;
+          varying vec3 fragment_barycentric;
+
+          ${program.shaders.vertex.source.replace(/gl_Position\s*=\s*[^;]+;/, `
+          $&
+          fragment_barycentric = vertex_barycentric;`)}`.replace(/\n {8}/g, '\n')
+        this.wireframeRenderer.program.updateShader('vertex', vertexSource, true)
+
+        const fragmentSource = `
+          #extension GL_OES_standard_derivatives : enable
+          precision mediump float;
+          varying vec3 fragment_barycentric;
+
+          vec4 blendWireframe(vec4 fragColor) {
+            vec3 w = fwidth(fragment_barycentric);
+            vec3 d = step(w*0.5, fragment_barycentric);
+            float dEdge = min(min(d.x, d.y), d.z);
+            return mix(vec4(1.0), fragColor, dEdge);
+          }
+
+          void main() {
+            gl_FragColor = blendWireframe(vec4(0.0));
+          }`.replace(/\n {8}/g, '\n')
+        this.wireframeRenderer.program.updateShader('fragment', fragmentSource, true)
+        this.wireframeRenderer.program.relink()
+      }
+
       this.userProgrammedMeshes[programId].reset()
       this.app.el.dispatchEvent(new CustomEvent('userProgramUpdated', {detail: program}))
     }
@@ -147,10 +184,12 @@ Canvas.prototype = {
 
   updateMesh(programId, mesh) {
     this.userProgrammedMeshes[programId].mesh.update(mesh)
+    programId === this.modelProgramId && this.wireframeRenderer.mesh.update(mesh)
   },
 
   updateUniform(programId, uniform) {
     this.userProgrammedMeshes[programId].updateUniform(uniform.type, uniform.name, uniform.value)
+    programId === this.modelProgramId && this.wireframeRenderer.updateUniform(uniform.type, uniform.name, uniform.value)
   },
 
   updateViewport(width, height) {
@@ -164,6 +203,12 @@ Canvas.prototype = {
     for (const programId in this.userProgrammedMeshes) {
       this.userFramebuffers[programId].startRender()
       this.userProgrammedMeshes[programId].render()
+      if (programId === this.modelProgramId && this.app.values.config['Show Wireframe'].value) {
+        this.webGL.enable(this.webGL.POLYGON_OFFSET_FILL)
+        this.webGL.polygonOffset(-1, -1)
+        this.wireframeRenderer.render()
+        this.webGL.disable(this.webGL.POLYGON_OFFSET_FILL)
+      }
       this.userFramebuffers[programId].endRender()
     }
 

@@ -32,6 +32,7 @@ Mesh.prototype = {
     if (attributes.vertex) this.attributes.vertex_worldSpace = attributes.vertex
     if (attributes.normal) this.attributes.normal_worldSpace = attributes.normal
     if (attributes.tCoord) this.attributes.textureCoordinate_input = attributes.tCoord
+    if (attributes.bCoord) this.attributes.vertex_barycentric = attributes.bCoord
   },
 
   renderWith(program) {

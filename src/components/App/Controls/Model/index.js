@@ -126,6 +126,14 @@ export default function(props) {
                    </select>
                  </div>
                </div>
+               <div className={className+'-Field showWireframe'}>
+                 <div className={className+'-FieldLabel'}>
+                   Show Wireframe:
+                 </div>
+                 <div className={className+'-FieldValue'}>
+                   <input type='checkbox' className={className+'-FieldInput showWireframe'}/>
+                 </div>
+               </div>
                <div className={className+'-Field showWorldCoordinates'}>
                  <div className={className+'-FieldLabel'}>
                    Show World Coordinates:
