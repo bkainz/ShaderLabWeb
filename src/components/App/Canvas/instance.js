@@ -15,7 +15,9 @@ function Canvas(el, {props}) {
   this.cameraRotation = new CameraRotation(this)
   this.cameraDolly = new CameraDolly(this)
 
-  this.webGL = el.getContext('webgl')
+  this.webGL = el.getContext('webgl', {alpha: false})
+  this.webGL.enable(this.webGL.BLEND)
+  this.webGL.blendFunc(this.webGL.SRC_ALPHA, this.webGL.ONE_MINUS_SRC_ALPHA);
 
   this.passByKey = {}
   for (const key in props.passes) this.passByKey[key] = new Pass(this, key, props.passes[key].name)

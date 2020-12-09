@@ -60,7 +60,7 @@ Framebuffer.prototype = {
 
   render(model) {
     this.webGL.bindFramebuffer(this.webGL.FRAMEBUFFER, this.framebuffer)
-    this.webGL.clearColor(0, 0, 0, 0)
+    this.webGL.clearColor(0, 0, 0, 1)
     this.webGL.clear(this.webGL.COLOR_BUFFER_BIT | this.webGL.DEPTH_BUFFER_BIT)
 
     model.render()
