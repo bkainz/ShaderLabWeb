@@ -1,7 +1,7 @@
-import Pass from './instance/Pass'
+import Framebuffer from './instance/Framebuffer'
+import Mesh from './instance/Mesh'
 import Program from './instance/Program'
-import Model from './instance/Model'
-import ProgramModel from './instance/ProgramModel'
+import ProgrammedMesh from './instance/ProgrammedMesh'
 import CameraRotation from './instance/CameraRotation'
 import CameraDolly from './instance/CameraDolly'
 import loadMesh from '../../../helpers/loadMesh'
@@ -19,11 +19,16 @@ function Canvas(el, {props}) {
   this.webGL.enable(this.webGL.BLEND)
   this.webGL.blendFunc(this.webGL.SRC_ALPHA, this.webGL.ONE_MINUS_SRC_ALPHA);
 
-  this.passByKey = {}
-  for (const key in props.passes) this.passByKey[key] = new Pass(this, key, props.passes[key].name)
-  this.passes = Object.values(this.passByKey)
+  this.framebuffers = {}
+  this.userProgrammedMeshes = {}
+  for (const id of props.passes) {
+    this.firstPass = this.firstPass || id
+    this.lastPass = id
+    this.framebuffers[id] = new Framebuffer(this.webGL)
+    this.userProgrammedMeshes[id] = new ProgrammedMesh(new Mesh(this.webGL), new Program(this.webGL, id))
+  }
 
-  const quadProgram = new Program(this)
+  const quadProgram = new Program(this.webGL, 'quad')
   quadProgram.updateShader('vertex', `
     attribute vec3 vertex_worldSpace;
     attribute vec2 textureCoordinate_input;
@@ -43,13 +48,13 @@ function Canvas(el, {props}) {
     }`, true)
   quadProgram.relink()
 
-  const quadModel = new Model(this)
-  quadModel.updateMesh(loadMesh('quad'))
+  const quadMesh = new Mesh(this.webGL)
+  quadMesh.update(loadMesh('quad'))
 
-  this.quad = new ProgramModel(quadModel, quadProgram)
-  this.quad.updateUniform('sampler2D', 'image', this.passes[this.passes.length-1].framebuffer.attachments.color)
+  this.quad = new ProgrammedMesh(quadMesh, quadProgram)
+  this.quad.updateUniform('sampler2D', 'image', this.framebuffers[this.lastPass].attachments.color)
 
-  const originProgram = new Program(this)
+  const originProgram = new Program(this.webGL, 'origin')
   originProgram.updateShader('vertex', `
     attribute vec3 vertex_worldSpace;
     
@@ -73,39 +78,37 @@ function Canvas(el, {props}) {
     }`, true)
   originProgram.relink()
 
-  const originModel = new Model(this)
-  originModel.updateMesh(loadMesh('origin'))
+  const originMesh = new Mesh(this.webGL)
+  originMesh.update(loadMesh('origin'))
 
-  this.origin = new ProgramModel(originModel, originProgram)
+  this.origin = new ProgrammedMesh(originMesh, originProgram)
   this.origin.updateUniform('mat4', 'mMatrix', algebra.S([5, 5, 5]))
 }
 
 Canvas.prototype = {
   initialize() {
-    Object.keys(this.passByKey).forEach(async pass => {
-      const mesh = await loadMesh(this.props.passes[pass].mesh)
-      this.app.el.dispatchEvent(new CustomEvent('meshChanged', {detail: {pass, mesh}}))
-    })
+    const firstFramebuffer = this.framebuffers[this.firstPass]
+    const firstProgrammedMesh = this.userProgrammedMeshes[this.firstPass]
 
-    const basePass = this.passByKey.base
-    for (const bufferKey in basePass.framebuffer.attachments) {
-      this.app.registerValue(basePass.name+' '+bufferKey, 'sampler2D')
-      this.app.values.sampler2D[basePass.name+' '+bufferKey].value = basePass.framebuffer.attachments[bufferKey]
+    for (const attachment in firstFramebuffer.attachments) {
+      const attachmentId = firstProgrammedMesh.program.name+' '+attachment
+      this.app.registerValue(attachmentId, 'sampler2D')
+      this.app.values.sampler2D[attachmentId].value = firstFramebuffer.attachments[attachment]
     }
 
-    basePass.programModel.depthTest = this.app.values.config['Depth Test'].value
+    firstProgrammedMesh.depthTest = this.app.values.config['Depth Test'].value
     this.app.values.config['Depth Test'].el.addEventListener('valueChanged', ({detail: depthTest}) => {
-      basePass.programModel.depthTest = depthTest
+      firstProgrammedMesh.depthTest = depthTest
     })
 
-    basePass.programModel.faceCull = this.app.values.config['Face Culling'].value
+    firstProgrammedMesh.faceCull = this.app.values.config['Face Culling'].value
     this.app.values.config['Face Culling'].el.addEventListener('valueChanged', ({detail: faceCull}) => {
-      basePass.programModel.faceCull = faceCull
+      firstProgrammedMesh.faceCull = faceCull
     })
 
-    basePass.programModel.frontFace = this.app.values.config['Front Face'].value
+    firstProgrammedMesh.frontFace = this.app.values.config['Front Face'].value
     this.app.values.config['Front Face'].el.addEventListener('valueChanged', ({detail: frontFace}) => {
-      basePass.programModel.frontFace = frontFace
+      firstProgrammedMesh.frontFace = frontFace
     })
 
     this.app.values.mat4['View Matrix'].el.addEventListener('valueChanged', ({detail: value}) => {
@@ -115,33 +118,55 @@ Canvas.prototype = {
     this.app.values.mat4['Projection Matrix'].el.addEventListener('valueChanged', ({detail: value}) => {
       this.origin.updateUniform('mat4', 'pMatrix', value)
     })
+
+    this.userProgrammedMeshes[this.lastPass].mesh.update(loadMesh('quad'))
   },
 
   get size() {
     return {width: this.el.offsetWidth, height: this.el.offsetHeight}
   },
 
-  updateShaders(pass, shaders) {
-    this.passByKey[pass].updateShaders(shaders)
+  updateProgram(programId, shaders) {
+    const program = this.userProgrammedMeshes[programId].program
+    this.app.log.append(`<hr data-text="${program.name}: Compile & Link Shaders">`, '')
+
+    shaders.forEach(shader => {
+      const compileMessage = program.updateShader(shader.type, shader.source, shader.isLinked)
+      this.app.log.append(shader.name, compileMessage)
+    })
+
+    const linkMessage = program.relink()
+
+    if (!linkMessage) {
+      this.userProgrammedMeshes[programId].reset()
+      this.app.el.dispatchEvent(new CustomEvent('userProgramUpdated', {detail: program}))
+    }
+
+    this.app.log.append(program.name, linkMessage ? 'Linking failed: '+linkMessage
+                                                  : 'Linking successful')
   },
 
-  updateModel(pass, mesh) {
-    this.passByKey[pass].updateModel(mesh)
+  updateMesh(programId, mesh) {
+    this.userProgrammedMeshes[programId].mesh.update(mesh)
   },
 
-  updateUniform(pass, uniform) {
-    this.passByKey[pass].updateUniform(uniform)
+  updateUniform(programId, uniform) {
+    this.userProgrammedMeshes[programId].updateUniform(uniform.type, uniform.name, uniform.value)
   },
 
   updateViewport(width, height) {
     this.el.width = width
     this.el.height = height
     this.webGL.viewport(0, 0, width, height)
-    this.passes.forEach(pass => pass.framebuffer.updateViewport(width, height))
+    for (const id in this.framebuffers) this.framebuffers[id].updateViewport(width, height)
   },
 
   render() {
-    this.passes.forEach(pass => pass.render())
+    for (const id of this.props.passes) {
+      this.framebuffers[id].startRender()
+      this.userProgrammedMeshes[id].render()
+      this.framebuffers[id].endRender()
+    }
 
     this.webGL.bindFramebuffer(this.webGL.FRAMEBUFFER, null)
     this.webGL.clearColor(0, 0, 0, 1)

@@ -1,21 +1,20 @@
-function ProgramModel(model, program) {
-  this.model = model
+function ProgrammedMesh(mesh, program) {
   this.program = program
+  this.mesh = mesh
   this.webGL = program.webGL
 
-  this.uniforms = {}
-  this.textures = []
+  this.reset()
   this.depthTest = ''
   this.faceCull = ''
   this.frontFace = 'CCW'
-
-  program.el.addEventListener('linking', e => {
-    this.uniforms = {}
-    this.textures = []
-  })
 }
 
-ProgramModel.prototype = {
+ProgrammedMesh.prototype = {
+  reset() {
+    this.uniforms = {}
+    this.textures = []
+  },
+
   updateUniform(type, name, value) {
     switch (type) {
       case 'int':
@@ -153,7 +152,7 @@ ProgramModel.prototype = {
       }
     }
 
-    this.model.renderWith(this.program)
+    this.mesh.renderWith(this.program)
 
     for (const name in this.uniforms) {
       const {type, value} = this.uniforms[name]
@@ -191,4 +190,4 @@ ProgramModel.prototype = {
   }
 }
 
-export default ProgramModel
+export default ProgrammedMesh

@@ -1,8 +1,10 @@
 import loadMesh from '../../../../helpers/loadMesh'
 
-function Model(canvas) {
-  this.canvas = canvas
-  this.webGL = canvas.webGL
+let lastMeshId = 0
+
+function Mesh(webGL) {
+  this.id = lastMeshId += 1
+  this.webGL = webGL
   this.elementBuffer = this.webGL.createBuffer()
   this.elementCount = 0
   this.elementType = this.webGL.TRIANGLES
@@ -10,11 +12,11 @@ function Model(canvas) {
                                                                            : this.webGL.UNSIGNED_SHORT
   this.dataBuffer = this.webGL.createBuffer()
   this.attributes = null
-  this.updateMesh(loadMesh('void'))
+  this.update(loadMesh('void'))
 }
 
-Model.prototype = {
-  updateMesh({data, elements, type, attributes}) {
+Mesh.prototype = {
+  update({data, elements, type, attributes}) {
     const IndexArrayType = this.webGL.getExtension('OES_element_index_uint') ? Uint32Array : Uint16Array
     this.webGL.bindBuffer(this.webGL.ELEMENT_ARRAY_BUFFER, this.elementBuffer)
     this.webGL.bufferData(this.webGL.ELEMENT_ARRAY_BUFFER, new IndexArrayType(elements), this.webGL.STATIC_DRAW)
@@ -55,4 +57,4 @@ Model.prototype = {
   }
 }
 
-export default Model
+export default Mesh

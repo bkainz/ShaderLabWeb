@@ -8,10 +8,10 @@ export default function(props) {
 
   return <form className={className} id={id}>
            <div className={className+'-Shaders'}>
-             <Tabs tabs={Object.keys(props.passes).flatMap(passKey => {
-               return Object.keys(props.passes[passKey].shaders).map(shaderKey => {
-                 const shader = props.passes[passKey].shaders[shaderKey]
-                 return {label: shader.name, content: <Shader pass={passKey} type={shaderKey} name={shader.name}/>}
+             <Tabs tabs={props.passes.flatMap(passKey => {
+               return 'vertex fragment'.split(' ').map(shaderType => {
+                 const label = (passKey === 'base' ? '' : passKey+' ')+shaderType[0].toUpperCase()+shaderType.slice(1)+' Shader'
+                 return {label, content: <Shader pass={passKey} type={shaderType} name={label}/>}
                })
              })}/>
            </div>

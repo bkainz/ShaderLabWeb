@@ -1,12 +1,11 @@
 import Shader from './Program/Shader'
 
-function Program(canvas) {
-  this.canvas = canvas
-  this.webGL = canvas.webGL
+function Program(webGL, id) {
+  this.webGL = webGL
+  this.id = id
   this.webGlProgram = this.webGL.createProgram()
+  this.name = this.id[0].toUpperCase()+this.id.slice(1)+' Pass'
   this.shaders = {}
-
-  this.el = document.createElement('div')
 }
 
 Program.prototype = {
@@ -30,7 +29,6 @@ Program.prototype = {
 
   relink() {
     if (!('fragment' in this.shaders && 'vertex' in this.shaders)) return
-    this.el.dispatchEvent(new CustomEvent('linking', {detail: this}))
     this.webGL.linkProgram(this.webGlProgram)
     return this.webGL.getProgramInfoLog(this.webGlProgram)
   }

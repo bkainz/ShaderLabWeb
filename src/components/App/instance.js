@@ -26,7 +26,7 @@ function App(el, {className}) {
 App.prototype = {
   initialize() {
     this.el.addEventListener('shadersChanged', ({detail: {pass, shaders}}) => {
-      this.canvas.updateShaders(pass, shaders)
+      this.canvas.updateProgram(pass, shaders)
     })
 
     this.el.addEventListener('uniformChanged', ({detail: {pass, uniform}}) => {
@@ -34,7 +34,7 @@ App.prototype = {
     })
 
     this.el.addEventListener('meshChanged', ({detail: {pass, mesh}}) => {
-      this.canvas.updateModel(pass, mesh)
+      this.canvas.updateMesh(pass, mesh)
     })
 
     this.el.addEventListener('viewportChanged', ({detail: {width, height}}) => {
@@ -101,8 +101,8 @@ App.prototype = {
   get state() {
     return {camera: this.camera.state,
             model: this.model.state,
-            uniforms: this.uniforms.state,
-            editor: this.editor.state}
+            editor: this.editor.state,
+            uniforms: this.uniforms.state}
   },
 
   set state(state) {

@@ -7,34 +7,7 @@ import Initializer from './Initializer'
 import Header from './Header'
 
 export default function() {
-  const props = {
-    passes: {
-      base: {
-        name: 'Base Pass',
-        mesh: 'teapot',
-        shaders: {
-          vertex: {
-            name: 'Vertex Shader'
-          },
-          fragment: {
-            name: 'Fragment Shader'
-          }
-        }
-      },
-      R2T: {
-        name: 'R2T Pass',
-        mesh: 'quad',
-        shaders: {
-          vertex: {
-            name: 'R2T Vertex Shader'
-          },
-          fragment: {
-            name: 'R2T Fragment Shader'
-          }
-        }
-      }
-    }
-  }
+  const props = {passes: 'base R2T'.split(' ')}
   const {className, id} = compReg.register(import.meta.url, props)
 
   return <body className={className} id={id}>
