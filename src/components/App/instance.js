@@ -99,16 +99,16 @@ App.prototype = {
   },
 
   get state() {
-    return {camera: this.camera.state,
+    return {editor: this.editor.state,
+            camera: this.camera.state,
             model: this.model.state,
-            editor: this.editor.state,
             uniforms: this.uniforms.state}
   },
 
   set state(state) {
+    this.editor.state = state.editor
     this.camera.state = state.camera
     this.model.state = state.model
-    this.editor.state = state.editor
     this.uniforms.state = state.uniforms
   }
 }

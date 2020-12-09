@@ -7,8 +7,7 @@ import Initializer from './Initializer'
 import Header from './Header'
 
 export default function() {
-  const props = {passes: 'base R2T'.split(' ')}
-  const {className, id} = compReg.register(import.meta.url, props)
+  const {className, id} = compReg.register(import.meta.url)
 
   return <body className={className} id={id}>
            <header className={className+'-Header'}>
@@ -16,13 +15,13 @@ export default function() {
            </header>
            <div className={className+'-Content'}>
              <section className={className+'-EditorPanel'}>
-               <Editor passes={props.passes}/>
+               <Editor passes={['base', 'R2T']}/>
              </section>
              <section className={className+'-ControlsPanel'}>
                <Controls/>
              </section>
              <section className={className+'-CanvasPanel'}>
-               <Canvas passes={props.passes}/>
+               <Canvas/>
              </section>
              <section className={className+'-VerticalBorder'}/>
              <section className={className+'-HorizontalBorder'}/>

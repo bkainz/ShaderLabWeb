@@ -7,9 +7,8 @@ import CameraDolly from './instance/CameraDolly'
 import loadMesh from '../../../helpers/loadMesh'
 import algebra from '../../../helpers/algebra'
 
-function Canvas(el, {props}) {
+function Canvas(el) {
   this.el = el
-  this.props = props
   this.app = el.closest('.App').__component__
   this.app.canvas = this
   this.cameraRotation = new CameraRotation(this)
@@ -19,14 +18,8 @@ function Canvas(el, {props}) {
   this.webGL.enable(this.webGL.BLEND)
   this.webGL.blendFunc(this.webGL.SRC_ALPHA, this.webGL.ONE_MINUS_SRC_ALPHA);
 
-  this.framebuffers = {}
+  this.userFramebuffers = {}
   this.userProgrammedMeshes = {}
-  for (const id of props.passes) {
-    this.firstPass = this.firstPass || id
-    this.lastPass = id
-    this.framebuffers[id] = new Framebuffer(this.webGL)
-    this.userProgrammedMeshes[id] = new ProgrammedMesh(new Mesh(this.webGL), new Program(this.webGL, id))
-  }
 
   const quadProgram = new Program(this.webGL, 'quad')
   quadProgram.updateShader('vertex', `
@@ -52,7 +45,6 @@ function Canvas(el, {props}) {
   quadMesh.update(loadMesh('quad'))
 
   this.quad = new ProgrammedMesh(quadMesh, quadProgram)
-  this.quad.updateUniform('sampler2D', 'image', this.framebuffers[this.lastPass].attachments.color)
 
   const originProgram = new Program(this.webGL, 'origin')
   originProgram.updateShader('vertex', `
@@ -87,30 +79,6 @@ function Canvas(el, {props}) {
 
 Canvas.prototype = {
   initialize() {
-    const firstFramebuffer = this.framebuffers[this.firstPass]
-    const firstProgrammedMesh = this.userProgrammedMeshes[this.firstPass]
-
-    for (const attachment in firstFramebuffer.attachments) {
-      const attachmentId = firstProgrammedMesh.program.name+' '+attachment
-      this.app.registerValue(attachmentId, 'sampler2D')
-      this.app.values.sampler2D[attachmentId].value = firstFramebuffer.attachments[attachment]
-    }
-
-    firstProgrammedMesh.depthTest = this.app.values.config['Depth Test'].value
-    this.app.values.config['Depth Test'].el.addEventListener('valueChanged', ({detail: depthTest}) => {
-      firstProgrammedMesh.depthTest = depthTest
-    })
-
-    firstProgrammedMesh.faceCull = this.app.values.config['Face Culling'].value
-    this.app.values.config['Face Culling'].el.addEventListener('valueChanged', ({detail: faceCull}) => {
-      firstProgrammedMesh.faceCull = faceCull
-    })
-
-    firstProgrammedMesh.frontFace = this.app.values.config['Front Face'].value
-    this.app.values.config['Front Face'].el.addEventListener('valueChanged', ({detail: frontFace}) => {
-      firstProgrammedMesh.frontFace = frontFace
-    })
-
     this.app.values.mat4['View Matrix'].el.addEventListener('valueChanged', ({detail: value}) => {
       this.origin.updateUniform('mat4', 'vMatrix', value)
     })
@@ -118,8 +86,6 @@ Canvas.prototype = {
     this.app.values.mat4['Projection Matrix'].el.addEventListener('valueChanged', ({detail: value}) => {
       this.origin.updateUniform('mat4', 'pMatrix', value)
     })
-
-    this.userProgrammedMeshes[this.lastPass].mesh.update(loadMesh('quad'))
   },
 
   get size() {
@@ -127,6 +93,39 @@ Canvas.prototype = {
   },
 
   updateProgram(programId, shaders) {
+    if (!this.userProgrammedMeshes[programId]) {
+      const framebuffer = new Framebuffer(this.webGL)
+      const programmedMesh = new ProgrammedMesh(new Mesh(this.webGL), new Program(this.webGL, programId))
+
+      if (!Object.keys(this.userProgrammedMeshes).length) {
+        for (const attachment in framebuffer.attachments) {
+          const attachmentId = programmedMesh.program.name+' '+attachment
+          this.app.registerValue(attachmentId, 'sampler2D')
+          this.app.values.sampler2D[attachmentId].value = framebuffer.attachments[attachment]
+        }
+
+        this.app.values.config['Depth Test'].el.addEventListener('valueChanged', ({detail: value}) => {
+          programmedMesh.depthTest = value
+        })
+
+        this.app.values.config['Face Culling'].el.addEventListener('valueChanged', ({detail: value}) => {
+          programmedMesh.faceCull = value
+        })
+
+        this.app.values.config['Front Face'].el.addEventListener('valueChanged', ({detail: value}) => {
+          programmedMesh.frontFace = value
+        })
+      }
+      else {
+        programmedMesh.mesh.update(loadMesh('quad'))
+      }
+
+      this.quad.updateUniform('sampler2D', 'image', framebuffer.attachments.color)
+
+      this.userFramebuffers[programId] = framebuffer
+      this.userProgrammedMeshes[programId] = programmedMesh
+    }
+
     const program = this.userProgrammedMeshes[programId].program
     this.app.log.append(`<hr data-text="${program.name}: Compile & Link Shaders">`, '')
 
@@ -158,14 +157,14 @@ Canvas.prototype = {
     this.el.width = width
     this.el.height = height
     this.webGL.viewport(0, 0, width, height)
-    for (const id in this.framebuffers) this.framebuffers[id].updateViewport(width, height)
+    for (const id in this.userFramebuffers) this.userFramebuffers[id].updateViewport(width, height)
   },
 
   render() {
-    for (const id of this.props.passes) {
-      this.framebuffers[id].startRender()
-      this.userProgrammedMeshes[id].render()
-      this.framebuffers[id].endRender()
+    for (const programId in this.userProgrammedMeshes) {
+      this.userFramebuffers[programId].startRender()
+      this.userProgrammedMeshes[programId].render()
+      this.userFramebuffers[programId].endRender()
     }
 
     this.webGL.bindFramebuffer(this.webGL.FRAMEBUFFER, null)
