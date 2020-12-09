@@ -34,7 +34,7 @@
 .${className}-Item-Head hr:after {
   content: attr(data-text);
   background: var(--color-panel-light);
-  color: var(--color-panel-dark);
+  color: var(--color-panel-text);
   position: absolute;
   top: 50%;
   left: 50%;
