@@ -26,6 +26,7 @@ Log.prototype = {
                          `<div class="${this.className}-Item-Body">`+message+`</div>`+
                        `</div>`
     this.el.appendChild(itemEl)
+    this.el.scrollTop = this.el.scrollHeight
   }
 }
 

@@ -1,9 +1,15 @@
-.${className}-Item {
-  display: flex;
+.${className} {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: auto;
 }
 
-.${className}-Item + .${className}-Item {
-  margin-top: 0.5em;
+.${className}-Item {
+  display: flex;
+  margin: 0.5em;
 }
 
 .${className}-Item-Time {
