@@ -76,7 +76,8 @@ App.prototype = {
       this.resizeHorizontally((e.clientY-bb.top)/bb.height * 100)
     })
 
-    const render = () => {
+    const render = time => {
+      this.setValue('int', 'Time in Milliseconds', Math.floor(time))
       this.canvas.render()
       requestAnimationFrame(render)
     }
