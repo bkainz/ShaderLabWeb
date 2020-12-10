@@ -11,11 +11,11 @@ CameraDolly.prototype = {
   update(event) {
     event.preventDefault()
 
-    const startPosition = this.canvas.app.values.vec3['Camera Position'].value
-    const startTarget = this.canvas.app.values.vec3['Camera Target'].value
+    const startPosition = this.canvas.app.getValue('vec3', 'Camera Position')
+    const startTarget = this.canvas.app.getValue('vec3', 'Camera Target')
     const targetToPosition = minus(startPosition, startTarget)
     const distance = times(normalize(targetToPosition), event.deltaY)
-    this.canvas.app.values.vec3['Camera Position'].value = plus(startTarget, plus(targetToPosition, distance))
+    this.canvas.app.setValue('vec3', 'Camera Position', plus(startTarget, plus(targetToPosition, distance)))
   }
 }
 

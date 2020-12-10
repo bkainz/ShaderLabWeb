@@ -37,8 +37,8 @@ CameraRotation.prototype = {
     const dClientY = -(event.clientY - this.event.clientY) // origin of html at top left, origin of webl at bottom left
     this.event = event
 
-    const target = this.canvas.app.values.vec3['Camera Target'].value
-    const position = this.canvas.app.values.vec3['Camera Position'].value
+    const target = this.canvas.app.getValue('vec3', 'Camera Target')
+    const position = this.canvas.app.getValue('vec3', 'Camera Position')
 
     let targetToPosition = minus(position, target)
     if (dClientX || dClientY) {
@@ -55,7 +55,7 @@ CameraRotation.prototype = {
       targetToPosition = Mv(Rp, Mv(Rt, targetToPosition))
     }
 
-    this.canvas.app.values.vec3['Camera Position'].value = plus(target, targetToPosition)
+    this.canvas.app.setValue('vec3', 'Camera Position', plus(target, targetToPosition))
   },
 
   end(event) {

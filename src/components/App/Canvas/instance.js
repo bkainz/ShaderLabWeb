@@ -81,13 +81,8 @@ function Canvas(el) {
 
 Canvas.prototype = {
   initialize() {
-    this.app.values.mat4['View Matrix'].el.addEventListener('valueChanged', ({detail: value}) => {
-      this.origin.updateUniform('mat4', 'vMatrix', value)
-    })
-
-    this.app.values.mat4['Projection Matrix'].el.addEventListener('valueChanged', ({detail: value}) => {
-      this.origin.updateUniform('mat4', 'pMatrix', value)
-    })
+    this.app.onChangedValue('mat4', 'View Matrix', value => this.origin.updateUniform('mat4', 'vMatrix', value))
+    this.app.onChangedValue('mat4', 'Projection Matrix', value => this.origin.updateUniform('mat4', 'pMatrix', value))
   },
 
   get size() {
@@ -105,21 +100,20 @@ Canvas.prototype = {
 
         for (const attachment in framebuffer.attachments) {
           const attachmentId = programmedMesh.program.name+' '+attachment
-          this.app.registerValue(attachmentId, 'sampler2D')
-          this.app.values.sampler2D[attachmentId].value = framebuffer.attachments[attachment]
+          this.app.setValue('sampler2D', attachmentId, framebuffer.attachments[attachment])
         }
 
-        this.app.values.config['Depth Test'].el.addEventListener('valueChanged', ({detail: value}) => {
+        this.app.onChangedValue('config','Depth Test',  value => {
           programmedMesh.depthTest = value
           this.wireframeRenderer.depthTest = value
         })
 
-        this.app.values.config['Face Culling'].el.addEventListener('valueChanged', ({detail: value}) => {
+        this.app.onChangedValue('config', 'Face Culling', value => {
           programmedMesh.faceCull = value
           this.wireframeRenderer.faceCull = value
         })
 
-        this.app.values.config['Front Face'].el.addEventListener('valueChanged', ({detail: value}) => {
+        this.app.onChangedValue('config', 'Front Face', value => {
           programmedMesh.frontFace = value
           this.wireframeRenderer.frontFace = value
         })
@@ -202,7 +196,7 @@ Canvas.prototype = {
     for (const programId in this.userProgrammedMeshes) {
       this.userFramebuffers[programId].startRender()
       this.userProgrammedMeshes[programId].render()
-      if (programId === this.modelProgramId && this.app.values.config['Show Wireframe'].value) {
+      if (programId === this.modelProgramId && this.app.getValue('config', 'Show Wireframe')) {
         this.webGL.enable(this.webGL.POLYGON_OFFSET_FILL)
         this.webGL.polygonOffset(-1, -1)
         this.wireframeRenderer.render()
@@ -215,7 +209,7 @@ Canvas.prototype = {
     this.webGL.clearColor(0, 0, 0, 1)
     this.webGL.clear(this.webGL.COLOR_BUFFER_BIT | this.webGL.DEPTH_BUFFER_BIT)
     this.quad.render()
-    this.app.values.config['Show World Coordinates'].value && this.origin.render()
+    this.app.getValue('config', 'Show World Coordinates') && this.origin.render()
   }
 }
 

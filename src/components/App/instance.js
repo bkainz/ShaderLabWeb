@@ -93,9 +93,22 @@ App.prototype = {
     this.el.dispatchEvent(new CustomEvent('viewportChanged', {detail: this.canvas.size}))
   },
 
-  registerValue(name, type) {
+  setValue(type, name, value) {
     this.values[type] = this.values[type] || {}
     this.values[type][name] = this.values[type][name] || new Value(name, type)
+    this.values[type][name].value = value
+  },
+
+  getValue(type, name) {
+    this.values[type] = this.values[type] || {}
+    this.values[type][name] = this.values[type][name] || new Value(name, type)
+    return this.values[type][name].value
+  },
+
+  onChangedValue(type, name, callback) {
+    this.values[type] = this.values[type] || {}
+    this.values[type][name] = this.values[type][name] || new Value(name, type)
+    this.values[type][name].el.addEventListener('valueChanged', ({detail: value}) => callback(value))
   },
 
   get state() {

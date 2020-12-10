@@ -13,12 +13,12 @@ export default {
 
       Object.defineProperty(prototype, field, {
         get() {
-          return this.app.values[config.type][config.name].value
+          return this.app.getValue(config.type, config.name)
         },
         set(value) {
-          this.app.values[config.type][config.name].value = !config.isNumeric ? value
-                                                          : !config.isArray   ? Number(value)
-                                                          :                     value.map(Number)
+          this.app.setValue(config.type, config.name, !config.isNumeric ? value
+                                                    : !config.isArray   ? Number(value)
+                                                    :                     value.map(Number))
         }
       })
     }
@@ -43,8 +43,7 @@ export default {
       els.forEach(el => el.addEventListener('change', e => instance[field] = config.isArray ? els.map(el => getInputValue(el))
                                                                                             : getInputValue(els[0])))
 
-      instance.app.registerValue(config.name, config.type)
-      instance.app.values[config.type][config.name].el.addEventListener('valueChanged', ({detail: value}) => {
+      instance.app.onChangedValue(config.type, config.name, value => {
         const valueByEl = Array.isArray(value) ? value : [value]
         els.forEach((el, idx) => setInputValue(el, config.isNumeric ? Math.round(valueByEl[idx]*1000)/1000 : valueByEl[idx] || ''))
         config.onChange && config.onChange.call(instance, value)

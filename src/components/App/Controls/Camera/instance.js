@@ -7,15 +7,15 @@ function updateViewMatrix() {
   const position = this.position || [0, 0, 0]
   const target = this.target || [0, 0, 0]
   const cameraMatrix = camera.camera(position, target, [0, 1, 0])
-  this.app.values.mat4['Camera Matrix'].value = cameraMatrix
-  this.app.values.mat3['Camera Rotation'].value = algebra.mat4ToMat3(cameraMatrix)
-  this.app.values.mat4['View Matrix'].value = algebra.I(cameraMatrix)
+  this.app.setValue('mat4', 'Camera Matrix', cameraMatrix)
+  this.app.setValue('mat3', 'Camera Rotation', algebra.mat4ToMat3(cameraMatrix))
+  this.app.setValue('mat4', 'View Matrix', algebra.I(cameraMatrix))
 }
 
 function updateProjectionMatrix() {
   const pMatrix = this.projection === 'Perspective' ? camera.perspectiveProjection(this.perspectiveFov, this.width/this.height, this.nearClipping, this.farClipping)
                                                     : camera.orthographicProjection(this.orthographicFov, this.width/this.height, this.nearClipping, this.farClipping)
-  this.app.values.mat4['Projection Matrix'].value = pMatrix
+  this.app.setValue('mat4', 'Projection Matrix', pMatrix)
 }
 
 function Camera(el, {className}) {
@@ -39,44 +39,35 @@ Camera.prototype = {
   initialize() {
     state.initializeForInstance(this, STATE)
 
-    this.app.registerValue('Perspective Projection?', 'bool')
-    this.app.registerValue('Orthographic Projection?', 'bool')
-    this.app.values.config['Projection'].el.addEventListener('valueChanged', ({detail: value}) => {
-      this.app.values.bool['Perspective Projection?'].value = value === 'Perspective'
-      this.app.values.bool['Orthographic Projection?'].value = value === 'Orthographic'
+    this.app.onChangedValue('config', 'Projection', value => {
+      this.app.setValue('bool', 'Perspective Projection?', value === 'Perspective')
+      this.app.setValue('bool', 'Orthographic Projection?', value === 'Orthographic')
       this.el.querySelector(`.${escapeCSS(this.className)}-Field.perspective-fov`).style.display = value === 'Perspective' ? '' : 'none'
       this.el.querySelector(`.${escapeCSS(this.className)}-Field.orthographic-fov`).style.display = value === 'Orthographic' ? '' : 'none'
     })
 
-    this.app.registerValue('Canvas Width', 'float')
-    this.app.registerValue('Canvas Height', 'float')
-    this.app.values.float['Canvas Width'].el.addEventListener('valueChanged', updateProjectionMatrix.bind(this))
-    this.app.values.float['Canvas Height'].el.addEventListener('valueChanged', updateProjectionMatrix.bind(this))
+    this.app.onChangedValue('float', 'Canvas Width', updateProjectionMatrix.bind(this))
+    this.app.onChangedValue('float', 'Canvas Height', updateProjectionMatrix.bind(this))
     this.app.el.addEventListener('viewportChanged', ({detail: {width, height}}) => {
       this.width = width
       this.height = height
     })
-
-    this.app.registerValue('Camera Matrix', 'mat4')
-    this.app.registerValue('Camera Rotation', 'mat3')
-    this.app.registerValue('View Matrix', 'mat4')
-    this.app.registerValue('Projection Matrix', 'mat4')
   },
 
   get width() {
-    return this.app.values.float['Canvas Width'].value
+    return this.app.getValue('float', 'Canvas Width')
   },
 
   set width(width) {
-    this.app.values.float['Canvas Width'].value = Number(width)
+    this.app.setValue('float', 'Canvas Width', Number(width))
   },
 
   get height() {
-    return this.app.values.float['Canvas Height'].value
+    return this.app.getValue('float', 'Canvas Height')
   },
 
   set height(height) {
-    this.app.values.float['Canvas Height'].value = Number(height)
+    this.app.setValue('float', 'Canvas Height', Number(height))
   }
 }
 

@@ -29,7 +29,7 @@ function SamplerValue(app, uniformName, name, type, pass) {
     this.imagesEl.style.display = attachment ? 'none' : ''
 
     if (attachment) {
-      this.value = this.app.values[this.type][attachment].value
+      this.value = this.app.getValue(this.type, attachment)
     } else {
       const value = {}
       await Promise.all(Object.keys(this.images).map(async target => {

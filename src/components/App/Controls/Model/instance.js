@@ -41,8 +41,8 @@ function updateModelMatrix() {
   const rotationAngle = this.rotationAngle || 0
   const scale = this.scale || [1, 1, 1]
   const transform = M(R(rotationAngle, rotationAxis), S(scale))
-  this.app.values.mat3['Model Transform'].value = algebra.mat4ToMat3(transform)
-  this.app.values.mat4['Model Matrix'].value = M(T(position), transform)
+  this.app.setValue('mat3', 'Model Transform', algebra.mat4ToMat3(transform))
+  this.app.setValue('mat4', 'Model Matrix', M(T(position), transform))
 }
 
 const STATE = {
@@ -104,8 +104,6 @@ const STATE = {
 Model.prototype = {
   initialize() {
     state.initializeForInstance(this, STATE)
-    this.app.registerValue('Model Transform', 'mat3')
-    this.app.registerValue('Model Matrix', 'mat4')
     this.meshFileEl.files[0] && this.meshFileEl.dispatchEvent(new Event('change'))
   }
 }
