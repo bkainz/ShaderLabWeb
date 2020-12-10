@@ -21,11 +21,11 @@ Shader.prototype = {
       const message = 'Compilation failed: '+webGl.getShaderInfoLog(this.webGlShader)
       webGl.deleteShader(this.webGlShader)
       this.webGlShader = null
-      return message
+      return {failed: true, message}
     }
     else {
       webGl.attachShader(this.program.webGlProgram, this.webGlShader)
-      return 'Compilation successful'
+      return {failed: false, message: 'Compilation successful'}
     }
   },
 

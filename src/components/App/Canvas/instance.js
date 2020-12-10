@@ -138,13 +138,13 @@ Canvas.prototype = {
     this.app.log.append(`<hr data-text="${program.name}: Compile & Link Shaders">`, '')
 
     shaders.forEach(shader => {
-      const compileMessage = program.updateShader(shader.type, shader.source, shader.isLinked)
-      this.app.log.append(shader.name, compileMessage)
+      const compileStatus = program.updateShader(shader.type, shader.source, shader.isLinked)
+      this.app.log.append(shader.name, compileStatus.message, compileStatus.failed)
     })
 
-    const linkMessage = program.relink()
+    const linkStatus = program.relink()
 
-    if (!linkMessage) {
+    if (!linkStatus.failed) {
       if (programId === this.modelProgramId) {
         const vertexSource = `
           attribute vec3 vertex_barycentric;
@@ -178,8 +178,7 @@ Canvas.prototype = {
       this.app.el.dispatchEvent(new CustomEvent('userProgramUpdated', {detail: program}))
     }
 
-    this.app.log.append(program.name, linkMessage ? 'Linking failed: '+linkMessage
-                                                  : 'Linking successful')
+    this.app.log.append(program.name, linkStatus.message, linkStatus.failed)
   },
 
   updateMesh(programId, mesh) {

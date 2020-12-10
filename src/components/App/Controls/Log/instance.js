@@ -14,7 +14,7 @@ Log.prototype = {
     // nothing to do
   },
 
-  append(scope, message) {
+  append(scope, message, error) {
     const itemEl = document.createElement('div')
     itemEl.classList.add(`${this.className}-Item`)
     const time = new Date()
@@ -23,10 +23,12 @@ Log.prototype = {
     itemEl.innerHTML = `<div class="${this.className}-Item-Time">`+timestamp+`</div>`+
                        `<div class="${this.className}-Item-Message">`+
                          `<div class="${this.className}-Item-Head">`+scope+`</div>`+
-                         `<div class="${this.className}-Item-Body">`+message+`</div>`+
+                         `<div class="${this.className}-Item-Body${error ? ' error' : ''}">`+message+`</div>`+
                        `</div>`
     this.el.appendChild(itemEl)
     this.el.scrollTop = this.el.scrollHeight
+
+    error && this.app.controls.tabs.focus('Log')
   }
 }
 

@@ -23,14 +23,16 @@ Program.prototype = {
     }
     else {
       this.shaders[type] = null
-      return 'Skipped (not linked)'
+      return {failed: false, message: 'Skipped (not linked)'}
     }
   },
 
   relink() {
     if (!('fragment' in this.shaders && 'vertex' in this.shaders)) return
     this.webGL.linkProgram(this.webGlProgram)
-    return this.webGL.getProgramInfoLog(this.webGlProgram)
+    const message = this.webGL.getProgramInfoLog(this.webGlProgram)
+    return {failed: !!message, message: message ? 'Linking failed: '+message
+                                                : 'Linking successful'}
   }
 }
 
