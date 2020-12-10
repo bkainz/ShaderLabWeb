@@ -30,9 +30,10 @@ Program.prototype = {
   relink() {
     if (!('fragment' in this.shaders && 'vertex' in this.shaders)) return
     this.webGL.linkProgram(this.webGlProgram)
+    const failed = !this.webGL.getProgramParameter(this.webGlProgram, this.webGL.LINK_STATUS)
     const message = this.webGL.getProgramInfoLog(this.webGlProgram)
-    return {failed: !!message, message: message ? 'Linking failed: '+message
-                                                : 'Linking successful'}
+    return {failed, message: failed ? 'Linking failed: '+message
+                                    : 'Linking successful'}
   }
 }
 
