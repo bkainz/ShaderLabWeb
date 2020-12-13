@@ -22,7 +22,7 @@ function Shader(el, {className, props}) {
   this.name = props.name
   this.source = ''
   this.id = [props.pass, props.type].filter(Boolean).join('/')
-  this.app = el.closest('.App').__component__
+  this.app = el.closest('.components\\/App').__component__
   this.app.editor.shaders[this.pass] = this.app.editor.shaders[this.pass] || {}
   this.app.editor.shaders[this.pass][this.type] = this
 

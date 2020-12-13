@@ -7,7 +7,7 @@ const {M, T, R, S} = algebra
 function Model(el, {className}) {
   this.el = el
   this.className = className
-  this.app = el.closest('.App').__component__
+  this.app = el.closest('.components\\/App').__component__
   this.app.model = this
 
   this.meshNameEl = this.el.querySelector(`.${escapeCSS(this.className)}-MeshName`)

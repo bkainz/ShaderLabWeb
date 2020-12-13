@@ -1,6 +1,6 @@
 function Controls(el) {
   this.el = el
-  this.app = el.closest('.App').__component__
+  this.app = el.closest('.components\\/App').__component__
   this.app.controls = this
 }
 

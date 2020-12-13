@@ -9,7 +9,7 @@ function Value(app, uniformName, name, type, pass) {
   this.pass = pass
   this.uniformName = uniformName
 
-  this.className = 'App/Controls/Uniforms/instance/Value'
+  this.className = app.className+'/Controls/Uniforms/instance/Value'
   this.id = `${this.className}#${instanceId += 1}`
 
   this.el = document.createElement('div')

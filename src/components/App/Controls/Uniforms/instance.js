@@ -4,7 +4,7 @@ function Uniforms(el, {id, className}) {
   this.el = el
   this.id = id
   this.className = className
-  this.app = el.closest('.App').__component__
+  this.app = el.closest('.components\\/App').__component__
   this.app.uniforms = this
   this.perProgram = {}
 }

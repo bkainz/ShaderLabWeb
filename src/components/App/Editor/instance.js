@@ -1,6 +1,6 @@
 function Editor(el, {props}) {
   this.el = el
-  this.app = el.closest('.App').__component__
+  this.app = el.closest('.components\\/App').__component__
   this.app.editor = this
   this.props = props
   this.shaders = {} // Shaders register themselves in their constructor

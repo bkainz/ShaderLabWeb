@@ -21,7 +21,7 @@ function updateProjectionMatrix() {
 function Camera(el, {className}) {
   this.el = el
   this.className = className
-  this.app = el.closest('.App').__component__
+  this.app = el.closest('.components\\/App').__component__
   this.app.camera = this
 }
 

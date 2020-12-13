@@ -4,7 +4,7 @@ function Header(el, {className, id}) {
   this.el = el
   this.className = className
   this.id = id
-  this.app = el.closest('.App').__component__
+  this.app = el.closest('.components\\/App').__component__
   this.app.header = this
   this.saveButtonEl = this.el.querySelector(`#${escapeCSS(this.id)}-SaveButton`)
   this.loadButtonEl = this.el.querySelector(`#${escapeCSS(this.id)}-LoadButton`)

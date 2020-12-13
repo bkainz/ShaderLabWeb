@@ -1,4 +1,5 @@
 import defaultState from '../../defaultState.json'
+import escapeCSS from '../../helpers/escapeCSS'
 
 function Value(name, type) {
   this.name = name
@@ -20,7 +21,7 @@ function App(el, {className}) {
   this.el = el
   this.className = className
   this.values = {}
-  this.contentEl = this.el.querySelector(`.${this.className}-Content`)
+  this.contentEl = this.el.querySelector(`.${escapeCSS(this.className)}-Content`)
 }
 
 App.prototype = {
@@ -66,12 +67,12 @@ App.prototype = {
       })
     }
 
-    initalizeDraggableBorder(this.contentEl.querySelector(`.${this.className}-VerticalBorder`), e => {
+    initalizeDraggableBorder(this.contentEl.querySelector(`.${escapeCSS(this.className)}-VerticalBorder`), e => {
       const bb = this.contentEl.getBoundingClientRect()
       this.resizeVertically((e.clientX-bb.left)/bb.width * 100)
     })
 
-    initalizeDraggableBorder(this.contentEl.querySelector(`.${this.className}-HorizontalBorder`), e => {
+    initalizeDraggableBorder(this.contentEl.querySelector(`.${escapeCSS(this.className)}-HorizontalBorder`), e => {
       const bb = this.contentEl.getBoundingClientRect()
       this.resizeHorizontally((e.clientY-bb.top)/bb.height * 100)
     })

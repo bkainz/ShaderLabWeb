@@ -1,11 +1,9 @@
 import React from 'react'
-import compReg from '../../../componentRegistry'
 import Tabs from '../Tabs'
 import Shader from './Shader'
 
-export default function(props) {
-  const {className, id} = compReg.register(import.meta.url, props)
-
+export default Component.register(import.meta.url, ({className, id, props}) => {
+  props.shaderTemplateId = Shader.registerTemplate()
   return <form className={className} id={id}>
            <div className={className+'-Shaders'}>
              <Tabs tabs={props.passes.flatMap(passKey => {
@@ -19,4 +17,4 @@ export default function(props) {
              <button className={className+'-CompileButton'}>Compile & Link</button>
            </div>
          </form>
-}
+})

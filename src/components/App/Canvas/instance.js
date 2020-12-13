@@ -9,7 +9,7 @@ import algebra from '../../../helpers/algebra'
 
 function Canvas(el) {
   this.el = el
-  this.app = el.closest('.App').__component__
+  this.app = el.closest('.components\\/App').__component__
   this.app.canvas = this
   this.cameraRotation = new CameraRotation(this)
   this.cameraDolly = new CameraDolly(this)
