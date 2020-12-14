@@ -18,25 +18,35 @@ function Value(app, uniformName, name, type, pass) {
   this.el.innerHTML = `
     <input type="checkbox" form="${this.id}-Form" id="${this.id}-State" class="${this.className}-State">
     <label for="${this.id}-State" class="${this.className}-Header">${name}</label>
-    <div class="${this.className}-Value"></div>
+    <div class="${this.className}-Body">
+      <div class="${this.className}-Attachment"></div>
+      <div class="${this.className}-Value"></div>
+    </div>
   `.trim().replace(/\n {4}/g, '\n')
   this.stateEl = this.el.querySelector(`.${escapeCSS(this.className)}-State`)
   this.headerEl = this.el.querySelector(`.${escapeCSS(this.className)}-Header`)
+  this.attachmentEl = this.el.querySelector(`.${escapeCSS(this.className)}-Attachment`)
   this.valueEl = this.el.querySelector(`.${escapeCSS(this.className)}-Value`)
 
-  const attachments = this.app.values[type.signature || type] || {}
-  this.valueEl.innerHTML = Object.keys(attachments).length ? `
-attach to: <select name="${this.id}-Attachment" class="${this.className}-Attachment">
-  <option value="">None</option>${Object.keys(attachments).map(name => `
-  <option value="${name}">${name}</option>`).join('')}
-</select>`.trim() : `
-<input type="hidden" name="${this.id}-Attachment" value="" class="${this.className}-Attachment">`.trim()
+  const updateAttachmentList = attachments => {
+    this.attachmentEl.innerHTML = Object.keys(attachments).length ? `
+      attach to: <select class="${this.className}-AttachmentInput">
+        <option value="">None</option>${Object.keys(attachments).map(name => `
+        <option value="${name}">${name}</option>`).join('')}
+      </select>`.trim() : `
+      <input type="hidden" value="" class="${this.className}-AttachmentInput">`.trim()
+    this.attachmentInputEl = this.attachmentEl.querySelector(`.${escapeCSS(this.className)}-AttachmentInput`)
+    this.attachmentInputEl.addEventListener('change', e => this.attachment = this.attachmentInputEl.value)
+  }
+  this.app.onChangedValueTypeList(this.type.signature || this.type, attachments => {
+    updateAttachmentList(attachments)
+    this.attachmentInputEl.value = this.attachment
+  })
+  updateAttachmentList(this.app.values[this.type.signature || this.type] || {})
 
   this._attachmentChangeListener = ({detail: value}) => this.value = value
-  this.attachmentEl = this.el.querySelector(`.${escapeCSS(this.className)}-Attachment`)
-  this.attachmentEl.addEventListener('change', e => this.attachment = this.attachmentEl.value)
-  this.el.addEventListener('attachmentChanged', ({detail: attachment}) => this.attachmentEl.value = attachment)
-  this.attachment = this.attachmentEl.value
+  this.el.addEventListener('attachmentChanged', ({detail: attachment}) => this.attachmentInputEl.value = attachment)
+  this.attachment = this.attachmentInputEl.value
 }
 
 Value.prototype = {

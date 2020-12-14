@@ -96,20 +96,25 @@ App.prototype = {
 
   setValue(type, name, value) {
     this.values[type] = this.values[type] || {}
-    this.values[type][name] = this.values[type][name] || new Value(name, type)
+    if (!this.values[type][name]) {
+      this.values[type][name] = new Value(name, type)
+      this.el.dispatchEvent(new CustomEvent('valueTypeListChanged', {detail: this.values[type]}))
+    }
     this.values[type][name].value = value
   },
 
   getValue(type, name) {
-    this.values[type] = this.values[type] || {}
-    this.values[type][name] = this.values[type][name] || new Value(name, type)
-    return this.values[type][name].value
+    return this.values[type] && this.values[type][name] && this.values[type][name].value
   },
 
   onChangedValue(type, name, callback) {
     this.values[type] = this.values[type] || {}
     this.values[type][name] = this.values[type][name] || new Value(name, type)
     this.values[type][name].el.addEventListener('valueChanged', ({detail: value}) => callback(value))
+  },
+
+  onChangedValueTypeList(type, callback) {
+    this.el.addEventListener('valueTypeListChanged', ({detail: list}) => list === this.values[type] && callback(list))
   },
 
   get state() {
