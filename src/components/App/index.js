@@ -12,7 +12,7 @@ export default Component.register(import.meta.url, ({className, id}) =>
     </header>
     <div className={className+'-Content'}>
       <section className={className+'-EditorPanel'}>
-        <Editor passes={['base', 'R2T']}/>
+        <Editor/>
       </section>
       <section className={className+'-ControlsPanel'}>
         <Controls/>

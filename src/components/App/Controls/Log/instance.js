@@ -28,7 +28,7 @@ Log.prototype = {
     this.el.appendChild(itemEl)
     this.el.scrollTop = this.el.scrollHeight
 
-    error && this.app.controls.tabs.focus('Log')
+    error && this.app.controls.tabs.focus('log')
   }
 }
 
