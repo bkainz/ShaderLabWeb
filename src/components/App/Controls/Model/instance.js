@@ -88,7 +88,7 @@ const STATE = {
                                       : count < 2 ? 'float'
                                       :             'vec'+count
       })
-      this.app.el.dispatchEvent(new CustomEvent('meshChanged', {detail: {pass: 'base', mesh}}))
+      this.app.el.dispatchEvent(new CustomEvent('meshChanged', {detail: {programId: 'base', mesh}}))
     }},
   position: {type: 'vec3', name: 'Model Position', onChange: updateModelMatrix},
   rotationAxis: {type: 'vec3', name: 'Model Rotation Axis', onChange: updateModelMatrix},

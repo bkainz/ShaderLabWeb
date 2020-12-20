@@ -17,10 +17,10 @@ document.head.appendChild(monacoEditor)
 function Shader(el, {className, props}) {
   this.el = el
   this.className = className
-  this.pass = props.pass
+  this.programId = props.programId
   this.type = props.type
   this.name = props.name
-  this.id = props.pass+'/'+props.type
+  this.id = props.programId+'/'+props.type
 
   this.sourceEl = this.el.querySelector(`.${escapeCSS(this.className)}-Source`)
   this.isLinkedEl = this.el.querySelector(`.${escapeCSS(this.className)}-isLinked`)

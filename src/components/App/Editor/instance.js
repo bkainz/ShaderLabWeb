@@ -15,24 +15,24 @@ function Editor(el, {className, props}) {
 Editor.prototype = {
   initialize() {
     this.tabs = this.el.querySelector(`.${escapeCSS(this.className)}-Shaders`).firstElementChild.__component__
-    this.el.addEventListener('submit', e => {this.updateShaders(); e.preventDefault()})
+    this.el.addEventListener('submit', e => {this.updatePrograms(); e.preventDefault()})
   },
 
-  updateShaders() {
-    Object.keys(this.shaders).forEach(pass => {
-      const shaders = Object.values(this.shaders[pass]).map(shader => {
+  updatePrograms() {
+    for (const programId in this.shaders) {
+      const shaders = Object.values(this.shaders[programId]).map(shader => {
         return Object.assign({}, shader.state, {type: shader.type, name: shader.name})
       })
-      this.app.el.dispatchEvent(new CustomEvent('shadersChanged', {detail: {pass, shaders}}))
-    })
+      this.app.el.dispatchEvent(new CustomEvent('programChanged', {detail: {programId, shaders}}))
+    }
   },
 
   get state() {
     const state = {}
-    for (const pass in this.shaders) {
-      state[pass] = {}
-      for (const type in this.shaders[pass])
-        state[pass][type] = this.shaders[pass][type].state
+    for (const programId in this.shaders) {
+      state[programId] = {}
+      for (const type in this.shaders[programId])
+        state[programId][type] = this.shaders[programId][type].state
     }
     return state
   },
@@ -40,16 +40,16 @@ Editor.prototype = {
   set state(state) {
     this.shaders = {}
     this.tabs.clear()
-    for (const pass in state) {
-      this.shaders[pass] = {}
-      for (const type in state[pass]) {
-        const name =  (pass === 'base' ? '' : pass+' ')+type[0].toUpperCase()+type.slice(1)+' Shader'
-        this.shaders[pass][type] = Component.instantiate(this.props.Shader, {pass, type, name, state: state[pass][type]})
-        this.tabs.add(pass+'/'+type, name, this.shaders[pass][type].el)
+    for (const programId in state) {
+      this.shaders[programId] = {}
+      for (const type in state[programId]) {
+        const name =  (programId === 'base' ? '' : programId+' ')+type[0].toUpperCase()+type.slice(1)+' Shader'
+        this.shaders[programId][type] = Component.instantiate(this.props.Shader, {programId, type, name, state: state[programId][type]})
+        this.tabs.add(programId+'/'+type, name, this.shaders[programId][type].el)
       }
     }
     this.tabs.focus(0)
-    this.updateShaders()
+    this.updatePrograms()
   }
 }
 

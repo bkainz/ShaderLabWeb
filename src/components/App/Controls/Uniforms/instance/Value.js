@@ -2,11 +2,11 @@ import escapeCSS from '../../../../../helpers/escapeCSS'
 
 let instanceId = 0
 
-function Value(app, uniformName, name, type, pass) {
+function Value(app, uniformName, name, type, programId) {
   this.app = app
   this.name = name
   this.type = type
-  this.pass = pass
+  this.programId = programId
   this.uniformName = uniformName
 
   this.className = app.className+'/Controls/Uniforms/instance/Value'
@@ -76,7 +76,7 @@ Value.prototype = {
     this._value = value
     this.el.dispatchEvent(new CustomEvent('valueChanged', {detail: value}))
 
-    const detail = {pass: this.pass, uniform: {name: this.uniformName, type: this.type, value}}
+    const detail = {programId: this.programId, uniform: {name: this.uniformName, type: this.type, value}}
     this.app.el.dispatchEvent(new CustomEvent('uniformChanged', {detail}))
   },
 

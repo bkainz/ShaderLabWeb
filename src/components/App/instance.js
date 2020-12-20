@@ -26,16 +26,16 @@ function App(el, {className}) {
 
 App.prototype = {
   initialize() {
-    this.el.addEventListener('shadersChanged', ({detail: {pass, shaders}}) => {
-      this.canvas.updateProgram(pass, shaders)
+    this.el.addEventListener('programChanged', ({detail: {programId, shaders}}) => {
+      this.canvas.updateProgram(programId, shaders)
     })
 
-    this.el.addEventListener('uniformChanged', ({detail: {pass, uniform}}) => {
-      this.canvas.updateUniform(pass, uniform)
+    this.el.addEventListener('uniformChanged', ({detail: {programId, uniform}}) => {
+      this.canvas.updateUniform(programId, uniform)
     })
 
-    this.el.addEventListener('meshChanged', ({detail: {pass, mesh}}) => {
-      this.canvas.updateMesh(pass, mesh)
+    this.el.addEventListener('meshChanged', ({detail: {programId, mesh}}) => {
+      this.canvas.updateMesh(programId, mesh)
     })
 
     this.el.addEventListener('viewportChanged', ({detail: {width, height}}) => {
