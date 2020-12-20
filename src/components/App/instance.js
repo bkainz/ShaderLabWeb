@@ -108,6 +108,12 @@ App.prototype = {
     return this.values[type] && this.values[type][name] && this.values[type][name].value
   },
 
+  removeValue(type, name) {
+    if (!this.values[type]) return
+    delete this.values[type][name]
+    this.el.dispatchEvent(new CustomEvent('valueTypeListChanged', {detail: this.values[type]}))
+  },
+
   onChangedValue(type, name, callback) {
     this.values[type] = this.values[type] || {}
     this.values[type][name] = this.values[type][name] || new Value(name, type)
