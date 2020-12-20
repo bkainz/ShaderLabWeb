@@ -20,9 +20,11 @@ Editor.prototype = {
 
   updatePrograms() {
     for (const programId in this.shaders) {
-      const shaders = Object.values(this.shaders[programId]).map(shader => {
-        return Object.assign({}, shader.state, {type: shader.type, name: shader.name})
-      })
+      const shaders = {}
+      for (const type in this.shaders[programId]) {
+        const shader = this.shaders[programId][type]
+        shaders[type] = Object.assign(shader.state, {type: shader.type, name: shader.name})
+      }
       this.app.el.dispatchEvent(new CustomEvent('programChanged', {detail: {programId, shaders}}))
     }
   },

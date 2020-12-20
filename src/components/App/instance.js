@@ -132,6 +132,19 @@ App.prototype = {
   },
 
   set state(state) {
+    // Derive canvas state from the editor state: Each shader pair in the editor state
+    // gets a framebuffer, mesh and program. Mesh, program and framebuffer are also
+    // combined into a "programmed mesh" linking the otherwise independent mesh and
+    // program.
+    state.canvas = {framebuffers: {}, meshes: {}, programs: {}, programmedMeshes: {}}
+    Object.keys(state.editor).forEach((id, idx) => {
+      state.canvas.framebuffers[id] = {}
+      state.canvas.meshes[id] = {mesh: idx === 0 ? 'void' : 'quad', isModel: idx === 0}
+      state.canvas.programs[id] = {}
+      state.canvas.programmedMeshes[id] = {mesh: id, program: id, framebuffer: id}
+    })
+
+    this.canvas.state = state.canvas
     this.editor.state = state.editor
     this.camera.state = state.camera
     this.model.state = state.model

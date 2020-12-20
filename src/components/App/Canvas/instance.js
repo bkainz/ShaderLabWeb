@@ -19,61 +19,58 @@ function Canvas(el) {
   this.webGL.blendFunc(this.webGL.SRC_ALPHA, this.webGL.ONE_MINUS_SRC_ALPHA);
   this.webGL.getExtension('OES_standard_derivatives')
 
-  this.userFramebuffers = {}
-  this.userProgrammedMeshes = {}
-  this.modelProgramId = null
+  this.framebuffers = {}
+  this.meshes = {}
+  this.programs = {}
+  this.programmedMeshes = {}
 
   const quadProgram = new Program(this.webGL, 'quad')
-  quadProgram.updateShader('vertex', `
-    attribute vec3 vertex_worldSpace;
-    attribute vec2 textureCoordinate_input;
-    varying vec2 uvs;
-    
-    void main() {
-      gl_Position = vec4(vertex_worldSpace, 1.0);
-      uvs = textureCoordinate_input;
-    }`, true)
-  quadProgram.updateShader('fragment', `
-    precision mediump float;
-    uniform sampler2D image;
-    varying vec2 uvs;
-    
-    void main() {
-      gl_FragColor = texture2D(image, uvs.st);
-    }`, true)
-  quadProgram.relink()
+  quadProgram.update({
+    vertex: {source: `attribute vec3 vertex_worldSpace;
+                      attribute vec2 textureCoordinate_input;
+                      varying vec2 uvs;
 
-  const quadMesh = new Mesh(this.webGL)
-  quadMesh.update(loadMesh('quad'))
+                      void main() {
+                        gl_Position = vec4(vertex_worldSpace, 1.0);
+                        uvs = textureCoordinate_input;
+                      }`},
+    fragment: {source: `precision mediump float;
+                        uniform sampler2D image;
+                        varying vec2 uvs;
+
+                        void main() {
+                          gl_FragColor = texture2D(image, uvs.st);
+                        }`}
+  })
+
+  const quadMesh = new Mesh(this.webGL, 'quad', loadMesh('quad'))
 
   this.quad = new ProgrammedMesh(quadMesh, quadProgram)
 
   const originProgram = new Program(this.webGL, 'origin')
-  originProgram.updateShader('vertex', `
-    attribute vec3 vertex_worldSpace;
-    
-    uniform mat4 mMatrix;
-    uniform mat4 vMatrix;
-    uniform mat4 pMatrix;
-    
-    varying vec3 fragment_worldSpace;
-    
-    void main() {
-      gl_Position = pMatrix * vMatrix * mMatrix * vec4(vertex_worldSpace, 1);
-      fragment_worldSpace = vertex_worldSpace;
-    }`, true)
-  originProgram.updateShader('fragment', `
-    precision mediump float;
-    
-    varying vec3 fragment_worldSpace;
-    
-    void main() {
-      gl_FragColor = vec4(step(0.0001, fragment_worldSpace), 1);
-    }`, true)
-  originProgram.relink()
+  originProgram.update({
+    vertex: {source: `attribute vec3 vertex_worldSpace;
 
-  const originMesh = new Mesh(this.webGL)
-  originMesh.update(loadMesh('origin'))
+                      uniform mat4 mMatrix;
+                      uniform mat4 vMatrix;
+                      uniform mat4 pMatrix;
+
+                      varying vec3 fragment_worldSpace;
+
+                      void main() {
+                        gl_Position = pMatrix * vMatrix * mMatrix * vec4(vertex_worldSpace, 1);
+                        fragment_worldSpace = vertex_worldSpace;
+                      }`},
+    fragment: {source: `precision mediump float;
+
+                        varying vec3 fragment_worldSpace;
+
+                        void main() {
+                          gl_FragColor = vec4(step(0.0001, fragment_worldSpace), 1);
+                        }`}
+  })
+
+  const originMesh = new Mesh(this.webGL, 'origin', loadMesh('origin'))
 
   this.origin = new ProgrammedMesh(originMesh, originProgram)
   this.origin.updateUniform('mat4', 'mMatrix', algebra.S([5, 5, 5]))
@@ -89,120 +86,162 @@ Canvas.prototype = {
     return {width: this.el.offsetWidth, height: this.el.offsetHeight}
   },
 
-  updateProgram(programId, shaders) {
-    if (!this.userProgrammedMeshes[programId]) {
-      const framebuffer = new Framebuffer(this.webGL)
-      const programmedMesh = new ProgrammedMesh(new Mesh(this.webGL), new Program(this.webGL, programId))
+  set state(state) {
+    for (const id in this.programmedMeshes) this.destroyProgrammedMesh(id)
+    for (const id in this.programs) this.destroyProgram(id)
+    for (const id in this.meshes) this.destroyMesh(id)
+    for (const id in this.framebuffers) this.destroyFramebuffer(id)
 
-      if (!Object.keys(this.userProgrammedMeshes).length) {
-        this.modelProgramId = programId
-        this.wireframeRenderer = new ProgrammedMesh(programmedMesh.mesh, new Program(this.webGL, 'wireframe'))
+    for (const id in state.framebuffers) this.createFramebuffer(id, state.framebuffers[id])
+    for (const id in state.meshes) this.createMesh(id, state.meshes[id])
+    for (const id in state.programs) this.createProgram(id, state.programs[id])
+    for (const id in state.programmedMeshes) this.createProgrammedMesh(id, state.programmedMeshes[id])
 
-        for (const attachment in framebuffer.attachments) {
-          const attachmentId = programmedMesh.program.name+' '+attachment
-          this.app.setValue('sampler2D', attachmentId, framebuffer.attachments[attachment])
-        }
-
-        this.app.onChangedValue('config','Depth Test',  value => {
-          programmedMesh.depthTest = value
-          this.wireframeRenderer.depthTest = value
-        })
-
-        this.app.onChangedValue('config', 'Face Culling', value => {
-          programmedMesh.faceCull = value
-          this.wireframeRenderer.faceCull = value
-        })
-
-        this.app.onChangedValue('config', 'Front Face', value => {
-          programmedMesh.frontFace = value
-          this.wireframeRenderer.frontFace = value
-        })
-      }
-      else {
-        programmedMesh.mesh.update(loadMesh('quad'))
-      }
-
-      this.quad.updateUniform('sampler2D', 'image', framebuffer.attachments.color)
-
-      this.userFramebuffers[programId] = framebuffer
-      this.userProgrammedMeshes[programId] = programmedMesh
-    }
-
-    const program = this.userProgrammedMeshes[programId].program
-    this.app.log.append(`<hr data-text="${program.name}: Compile & Link Shaders">`, '')
-
-    shaders.forEach(shader => {
-      const compileStatus = program.updateShader(shader.type, shader.source, shader.isLinked)
-      this.app.log.append(shader.name, compileStatus.message, compileStatus.failed)
-    })
-
-    const linkStatus = program.relink()
-
-    if (!linkStatus.failed) {
-      if (programId === this.modelProgramId) {
-        const vertexSource = `
-          attribute vec3 vertex_barycentric;
-          varying vec3 fragment_barycentric;
-
-          ${program.shaders.vertex.source.replace(/gl_Position\s*=\s*[^;]+;/, `
-          $&
-          fragment_barycentric = vertex_barycentric;`)}`.replace(/\n {8}/g, '\n')
-        this.wireframeRenderer.program.updateShader('vertex', vertexSource, true)
-
-        const fragmentSource = `
-          #extension GL_OES_standard_derivatives : enable
-          precision mediump float;
-          varying vec3 fragment_barycentric;
-
-          vec4 blendWireframe(vec4 fragColor) {
-            vec3 w = fwidth(fragment_barycentric);
-            vec3 d = step(w*0.5, fragment_barycentric);
-            float dEdge = min(min(d.x, d.y), d.z);
-            return mix(vec4(1.0), fragColor, dEdge);
-          }
-
-          void main() {
-            gl_FragColor = blendWireframe(vec4(0.0));
-          }`.replace(/\n {8}/g, '\n')
-        this.wireframeRenderer.program.updateShader('fragment', fragmentSource, true)
-        this.wireframeRenderer.program.relink()
-      }
-
-      this.userProgrammedMeshes[programId].reset()
-      this.app.el.dispatchEvent(new CustomEvent('userProgramUpdated', {detail: program}))
-    }
-
-    this.app.log.append(program.name, linkStatus.message, linkStatus.failed)
+    const lastFramebufferId = Object.keys(state.framebuffers).pop()
+    this.quad.updateUniform('sampler2D', 'image', this.framebuffers[lastFramebufferId].attachments.color)
   },
 
-  updateMesh(programId, mesh) {
-    this.userProgrammedMeshes[programId].mesh.update(mesh)
-    programId === this.modelProgramId && this.wireframeRenderer.mesh.update(mesh)
+  // framebuffer CRUD
+  createFramebuffer(id) {
+    if (this.framebuffers[id]) throw new Error(`framebuffer id "${id}" already taken`)
+    this.framebuffers[id] = new Framebuffer(this.webGL, id, {width: this.el.width, height: this.el.height})
+    this.framebuffers[id].meshes = {}
+    const attachments = this.framebuffers[id].attachments
+    for (const attachmentId in attachments)
+      this.app.setValue('sampler2D', this.framebuffers[id].name+' '+attachmentId, attachments[attachmentId])
+  },
+
+  destroyFramebuffer(id) {
+    for (const attachmentId in this.framebuffers[id].attachments)
+      this.app.removeValue('sampler2D', this.framebuffers[id].name+' '+attachmentId)
+    this.framebuffers[id].destroy()
+    delete this.framebuffers[id]
+  },
+
+  // mesh CRUD
+  createMesh(id, {mesh, isModel}) {
+    if (this.meshes[id]) throw new Error(`mesh id "${id}" already taken`)
+    this.meshes[id] = new Mesh(this.webGL, id, loadMesh(mesh))
+    this.meshes[id].isModel = isModel
+  },
+
+  updateMesh(id, mesh) {
+    this.meshes[id].update(mesh)
+  },
+
+  destroyMesh(id) {
+    this.meshes[id].destroy()
+    delete this.meshes[id]
+  },
+
+  // program CRUD
+  createProgram(id) {
+    if (this.programs[id]) throw new Error(`program id "${id}" already taken`)
+    this.programs[id] = {surface: new Program(this.webGL, id),
+                         wireframe: new Program(this.webGL, id+'_wireframe')}
+  },
+
+  updateProgram(id, shaders) {
+    this.programs[id].surface.update(shaders)
+
+    const program = this.programs[id].surface
+    this.app.log.append(`<hr data-text="${program.name}: Compile & Link Shaders">`, '')
+    for (const type in program.shaders)
+      this.app.log.append(program.shaders[type].name, program.shaders[type].compileMessage, !program.shaders[type].isValid)
+    this.app.log.append(program.name, program.linkMessage, !program.isValid)
+
+    if (!this.programs[id].surface.isValid) return
+
+    this.programs[id].wireframe.update({
+      vertex: {source: `
+        attribute vec3 vertex_barycentric;
+        varying vec3 fragment_barycentric;
+
+        ${program.shaders.vertex.source.replace(/gl_Position\s*=\s*[^;]+;/, `
+        $&
+        fragment_barycentric = vertex_barycentric;`)}`},
+      fragment: {source: `
+        #extension GL_OES_standard_derivatives : enable
+        precision mediump float;
+        varying vec3 fragment_barycentric;
+
+        vec4 blendWireframe(vec4 fragColor) {
+          vec3 w = fwidth(fragment_barycentric);
+          vec3 d = step(w*0.5, fragment_barycentric);
+          float dEdge = min(min(d.x, d.y), d.z);
+          return mix(vec4(1.0), fragColor, dEdge);
+        }
+
+        void main() {
+          gl_FragColor = blendWireframe(vec4(0.0));
+        }`}
+    })
+
+    this.app.el.dispatchEvent(new CustomEvent('programUpdated', {detail: this.programs[id].surface}))
+  },
+
+  destroyProgram(id) {
+    this.app.el.dispatchEvent(new CustomEvent('programDestroyed', {detail: this.programs[id].surface}))
+    this.programs[id].surface.destroy()
+    this.programs[id].wireframe.destroy()
+    delete this.programs[id]
+  },
+
+  // programmed mesh CRUD
+  createProgrammedMesh(id, {mesh, program, framebuffer}) {
+    if (this.programmedMeshes[id]) throw new Error(`programmed mesh id "${id}" already taken`)
+
+    this.programmedMeshes[id] = this.framebuffers[framebuffer].meshes[id] = {framebuffer}
+    for (const type in this.programs[program])
+      this.programmedMeshes[id][type] = new ProgrammedMesh(this.meshes[mesh], this.programs[program][type])
+
+    if (!this.meshes[mesh].isModel) return
+
+    for (const type in this.programmedMeshes[id]) {
+      this.programmedMeshes[id][type].depthTest = this.app.getValue('config', 'Depth Test')
+      this.programmedMeshes[id][type].faceCull = this.app.getValue('config', 'Face Culling')
+      this.programmedMeshes[id][type].frontFace = this.app.getValue('config', 'Front Face')
+      this.app.onChangedValue('config', 'Depth Test',  value => this.programmedMeshes[id][type].depthTest = value)
+      this.app.onChangedValue('config', 'Face Culling', value => this.programmedMeshes[id][type].faceCull = value)
+      this.app.onChangedValue('config', 'Front Face', value => this.programmedMeshes[id][type].frontFace = value)
+    }
   },
 
   updateUniform(programId, uniform) {
-    this.userProgrammedMeshes[programId].updateUniform(uniform.type, uniform.name, uniform.value)
-    programId === this.modelProgramId && this.wireframeRenderer.updateUniform(uniform.type, uniform.name, uniform.value)
+    this.programmedMeshes[programId].surface.updateUniform(uniform.type, uniform.name, uniform.value)
+    this.programmedMeshes[programId].wireframe.updateUniform(uniform.type, uniform.name, uniform.value)
+  },
+
+  destroyProgrammedMesh(id) {
+    this.programmedMeshes[id].surface.destroy()
+    this.programmedMeshes[id].wireframe.destroy()
+    delete this.framebuffers[this.programmedMeshes[id].framebuffer].meshes[id]
+    delete this.programmedMeshes[id]
   },
 
   updateViewport(width, height) {
     this.el.width = width
     this.el.height = height
     this.webGL.viewport(0, 0, width, height)
-    for (const id in this.userFramebuffers) this.userFramebuffers[id].updateViewport(width, height)
+    for (const id in this.framebuffers) this.framebuffers[id].updateSize({width, height})
   },
 
   render() {
-    for (const programId in this.userProgrammedMeshes) {
-      this.userFramebuffers[programId].startRender()
-      this.userProgrammedMeshes[programId].render()
-      if (programId === this.modelProgramId && this.app.getValue('config', 'Show Wireframe')) {
-        this.webGL.enable(this.webGL.POLYGON_OFFSET_FILL)
-        this.webGL.polygonOffset(-1, -1)
-        this.wireframeRenderer.render()
-        this.webGL.disable(this.webGL.POLYGON_OFFSET_FILL)
+    for (const framebufferId in this.framebuffers) {
+      this.framebuffers[framebufferId].startRender()
+
+      for (const meshId in this.framebuffers[framebufferId].meshes) {
+        const programmedMesh = this.framebuffers[framebufferId].meshes[meshId]
+        programmedMesh.surface.render()
+        if (programmedMesh.surface.mesh.isModel && this.app.getValue('config', 'Show Wireframe')) {
+          this.webGL.enable(this.webGL.POLYGON_OFFSET_FILL)
+          this.webGL.polygonOffset(-1, -1)
+          programmedMesh.wireframe.render()
+          this.webGL.disable(this.webGL.POLYGON_OFFSET_FILL)
+        }
       }
-      this.userFramebuffers[programId].endRender()
+
+      this.framebuffers[framebufferId].endRender()
     }
 
     this.webGL.bindFramebuffer(this.webGL.FRAMEBUFFER, null)
