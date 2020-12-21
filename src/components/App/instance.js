@@ -34,8 +34,8 @@ App.prototype = {
       this.canvas.updateUniform(programId, uniform)
     })
 
-    this.el.addEventListener('meshChanged', ({detail: {programId, mesh}}) => {
-      this.canvas.updateMesh(programId, mesh)
+    this.el.addEventListener('meshChanged', ({detail: {id, mesh}}) => {
+      this.canvas.updateMesh(id, mesh)
     })
 
     this.el.addEventListener('viewportChanged', ({detail: {width, height}}) => {
@@ -137,6 +137,8 @@ App.prototype = {
       state.canvas.programs[id] = {}
       state.canvas.programmedMeshes[id] = {mesh: id, program: id, framebuffer: id}
     })
+
+    this.model.meshId = Object.keys(state.editor)[0]
 
     this.canvas.state = state.canvas
     this.editor.state = state.editor
