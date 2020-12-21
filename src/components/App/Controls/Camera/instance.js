@@ -1,7 +1,7 @@
 import escapeCSS from '../../../../helpers/escapeCSS'
 import camera from '../../../../helpers/camera'
 import algebra from '../../../../helpers/algebra'
-import state from '../helpers/state'
+import state from '../../../../helpers/state'
 
 function updateViewMatrix() {
   const position = this.position || [0, 0, 0]

@@ -1,4 +1,4 @@
-import state from '../helpers/state'
+import state from '../../../../helpers/state'
 import algebra from '../../../../helpers/algebra'
 import loadMesh from '../../../../helpers/loadMesh'
 import escapeCSS from '../../../../helpers/escapeCSS'
