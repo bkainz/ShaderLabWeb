@@ -33,8 +33,9 @@ function SamplerValue(app, uniformName, name, type, programId) {
     } else {
       const value = {}
       await Promise.all(Object.keys(this.images).map(async target => {
-        const image = await this.images[target].imageEl
-        value[target] = image.getAttribute('src') ? image : undefined
+        const image = this.images[target]
+        if (!image.imageEl.complete) await new Promise(resolve => image.el.addEventListener(e => resolve(), {once: true}))
+        value[target] = image.imageEl.getAttribute('src') ? image.imageEl : undefined
       }))
       this.value = value
     }
@@ -49,13 +50,13 @@ SamplerValue.prototype = Object.create(Value.prototype, Object.getOwnPropertyDes
     }
     else {
       const value = {}
-      for (const target in this.images) value[target] = this.images[target].url
+      for (const target in this.images) value[target] = this.images[target].imageEl.src
       return {value}
     }
   },
   set state(state) {
     this.attachment = state.attachment || ''
-    if (state.value !== undefined) for (const target in this.images) this.images[target].url = state.value[target]
+    if (state.value !== undefined) for (const target in this.images) this.images[target].imageEl.src = state.value[target]
   }
 }))
 
