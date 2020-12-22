@@ -1,86 +1,39 @@
-import defaultState from '../../defaultState.json'
+import Value from './instance/Value'
 import escapeCSS from '../../helpers/escapeCSS'
-
-function Value(name, type) {
-  this.name = name
-  this.type = type
-  this._value = undefined
-  this.el = document.createElement('div')
-}
-Value.prototype = {
-  get value() {
-    return this._value
-  },
-  set value(value) {
-    this._value = value
-    this.el.dispatchEvent(new CustomEvent('valueChanged', {detail: value}))
-  }
-}
+import defaultState from '../../defaultState.json'
 
 function App(el, {className}) {
   this.el = el
   this.className = className
   this.values = {}
-  this.contentEl = this.el.querySelector(`.${escapeCSS(this.className)}-Content`)
 }
 
 App.prototype = {
   initialize() {
-    this.el.addEventListener('programChanged', ({detail: {programId, shaders}}) => {
-      this.canvas.updateProgram(programId, shaders)
-    })
-
-    this.el.addEventListener('uniformChanged', ({detail: {programId, uniform}}) => {
-      this.canvas.updateUniform(programId, uniform)
-    })
-
-    this.el.addEventListener('meshChanged', ({detail: {id, mesh}}) => {
-      this.canvas.updateMesh(id, mesh)
-    })
-
-    this.el.addEventListener('viewportChanged', ({detail: {width, height}}) => {
-      this.canvas.updateViewport(width, height)
-    })
-
-    this.header.initialize()
-    this.log.initialize()
-    this.camera.initialize()
-    this.model.initialize()
-    this.uniforms.initialize()
-    this.editor.initialize()
-    this.canvas.initialize()
-
     this.state = defaultState
 
-    this.el.dispatchEvent(new CustomEvent('viewportChanged', {detail: this.canvas.size}))
+    // Watch canvas panel size and update the canvas' viewport
+    const contentEl = this.el.querySelector(`.${escapeCSS(this.className)}-Content`)
+    const verticalBorderEl = contentEl.querySelector(`.${escapeCSS(this.className)}-VerticalBorder`)
+    const horizontalBorderEl = contentEl.querySelector(`.${escapeCSS(this.className)}-HorizontalBorder`)
 
-    window.addEventListener('resize', e => this.el.dispatchEvent(new CustomEvent('viewportChanged', {detail: this.canvas.size})))
-
-    function initalizeDraggableBorder(el, callback) {
-      el.addEventListener('mousedown', e => {
-        el.classList.add('active')
-        el.addEventListener('mousemove', callback)
-        el.addEventListener('mouseup', e => {
-          el.classList.remove('active')
-          el.removeEventListener('mousemove', callback)
-        })
-      })
-    }
-
-    initalizeDraggableBorder(this.contentEl.querySelector(`.${escapeCSS(this.className)}-VerticalBorder`), e => {
-      const bb = this.contentEl.getBoundingClientRect()
+    initializeDraggableBorder(verticalBorderEl, e => {
+      const bb = contentEl.getBoundingClientRect()
       const percent = (e.clientX-bb.left)/bb.width * 100
-      this.contentEl.style.gridTemplateColumns = percent+'% var(--border-width) 1fr'
-      this.el.dispatchEvent(new CustomEvent('viewportChanged', {detail: this.canvas.size}))
+      contentEl.style.gridTemplateColumns = percent+'% var(--border-width) 1fr'
+      this.canvas.updateViewport()
     })
 
-    initalizeDraggableBorder(this.contentEl.querySelector(`.${escapeCSS(this.className)}-HorizontalBorder`), e => {
-      const bb = this.contentEl.getBoundingClientRect()
+    initializeDraggableBorder(horizontalBorderEl, e => {
+      const bb = contentEl.getBoundingClientRect()
       const percent = (e.clientY-bb.top)/bb.height * 100
-      this.contentEl.style.gridTemplateRows = percent+'% var(--border-width) 1fr'
-      this.el.dispatchEvent(new CustomEvent('viewportChanged', {detail: this.canvas.size}))
+      contentEl.style.gridTemplateRows = percent+'% var(--border-width) 1fr'
+      this.canvas.updateViewport()
     })
 
+    window.addEventListener('resize', e => this.canvas.updateViewport())
+
+    // Enter render loop
     const render = time => {
       this.setValue('int', 'Time in Milliseconds', Math.floor(time))
       this.canvas.render()
@@ -146,6 +99,17 @@ App.prototype = {
     this.model.state = state.model
     this.uniforms.state = state.uniforms
   }
+}
+
+function initializeDraggableBorder(borderEl, callback) {
+  borderEl.addEventListener('mousedown', e => {
+    borderEl.classList.add('active')
+    borderEl.addEventListener('mousemove', callback)
+    borderEl.addEventListener('mouseup', e => {
+      borderEl.classList.remove('active')
+      borderEl.removeEventListener('mousemove', callback)
+    })
+  })
 }
 
 export default App

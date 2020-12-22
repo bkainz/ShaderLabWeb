@@ -1,6 +1,7 @@
 import React from 'react'
-import Tabs from '../Tabs'
+import Tabs from '../../Tabs'
 import Shader from './Shader'
+import Initializer from '../../Initializer'
 
 export default Component.register(import.meta.url, ({className, id, props}) => {
   props.Shader = Shader.registerTemplate()
@@ -11,5 +12,6 @@ export default Component.register(import.meta.url, ({className, id, props}) => {
            <div className={className+'-Controls'}>
              <button className={className+'-CompileButton'}>Compile & Link</button>
            </div>
+           <Initializer/>
          </form>
 })

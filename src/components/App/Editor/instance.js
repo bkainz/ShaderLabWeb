@@ -25,7 +25,7 @@ Editor.prototype = {
         const shader = this.shaders[programId][type]
         shaders[type] = Object.assign(shader.state, {type: shader.type, name: shader.name})
       }
-      this.app.el.dispatchEvent(new CustomEvent('programChanged', {detail: {programId, shaders}}))
+      this.app.canvas.updateProgram(programId, shaders)
     }
   },
 

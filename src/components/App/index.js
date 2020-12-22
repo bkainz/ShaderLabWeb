@@ -2,7 +2,7 @@ import React from 'react'
 import Canvas from './Canvas'
 import Controls from './Controls'
 import Editor from './Editor'
-import Initializer from './Initializer'
+import Initializer from '../Initializer'
 import Header from './Header'
 
 export default Component.register(import.meta.url, ({className, id}) =>

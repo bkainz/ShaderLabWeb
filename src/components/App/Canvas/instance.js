@@ -4,86 +4,89 @@ import Program from './instance/Program'
 import ProgrammedMesh from './instance/ProgrammedMesh'
 import CameraRotation from './instance/CameraRotation'
 import CameraDolly from './instance/CameraDolly'
+import escapeCSS from '../../../helpers/escapeCSS'
 import loadMesh from '../../../helpers/loadMesh'
 import algebra from '../../../helpers/algebra'
 
-function Canvas(el) {
+function Canvas(el, {className}) {
   this.el = el
+  this.className = className
   this.app = el.closest('.components\\/App').__component__
   this.app.canvas = this
-  this.cameraRotation = new CameraRotation(this)
-  this.cameraDolly = new CameraDolly(this)
-
-  this.webGL = el.getContext('webgl', {alpha: false})
-  this.webGL.enable(this.webGL.BLEND)
-  this.webGL.blendFunc(this.webGL.SRC_ALPHA, this.webGL.ONE_MINUS_SRC_ALPHA);
-  this.webGL.getExtension('OES_standard_derivatives')
 
   this.framebuffers = {}
   this.meshes = {}
   this.programs = {}
   this.programmedMeshes = {}
 
-  const quadProgram = new Program(this.webGL, 'quad')
-  quadProgram.update({
-    vertex: {source: `attribute vec3 vertex_worldSpace;
-                      attribute vec2 textureCoordinate_input;
-                      varying vec2 uvs;
-
-                      void main() {
-                        gl_Position = vec4(vertex_worldSpace, 1.0);
-                        uvs = textureCoordinate_input;
-                      }`},
-    fragment: {source: `precision mediump float;
-                        uniform sampler2D image;
-                        varying vec2 uvs;
-
-                        void main() {
-                          gl_FragColor = texture2D(image, uvs.st);
-                        }`}
-  })
-
-  const quadMesh = new Mesh(this.webGL, 'quad', loadMesh('quad'))
-
-  this.quad = new ProgrammedMesh(quadMesh, quadProgram)
-
-  const originProgram = new Program(this.webGL, 'origin')
-  originProgram.update({
-    vertex: {source: `attribute vec3 vertex_worldSpace;
-
-                      uniform mat4 mMatrix;
-                      uniform mat4 vMatrix;
-                      uniform mat4 pMatrix;
-
-                      varying vec3 fragment_worldSpace;
-
-                      void main() {
-                        gl_Position = pMatrix * vMatrix * mMatrix * vec4(vertex_worldSpace, 1);
-                        fragment_worldSpace = vertex_worldSpace;
-                      }`},
-    fragment: {source: `precision mediump float;
-
-                        varying vec3 fragment_worldSpace;
-
-                        void main() {
-                          gl_FragColor = vec4(step(0.0001, fragment_worldSpace), 1);
-                        }`}
-  })
-
-  const originMesh = new Mesh(this.webGL, 'origin', loadMesh('origin'))
-
-  this.origin = new ProgrammedMesh(originMesh, originProgram)
-  this.origin.updateUniform('mat4', 'mMatrix', algebra.S([5, 5, 5]))
+  this.canvasEl = null
+  this.cameraRotation = new CameraRotation(this)
+  this.cameraDolly = new CameraDolly(this)
 }
 
 Canvas.prototype = {
   initialize() {
+    this.canvasEl = this.el.querySelector(`.${escapeCSS(this.className)}-Canvas`)
+    this.webGL = this.canvasEl.getContext('webgl', {alpha: false})
+    this.webGL.enable(this.webGL.BLEND)
+    this.webGL.blendFunc(this.webGL.SRC_ALPHA, this.webGL.ONE_MINUS_SRC_ALPHA);
+    this.webGL.getExtension('OES_standard_derivatives')
+
+    const quadProgram = new Program(this.webGL, 'quad')
+    quadProgram.update({
+      vertex: {source: `attribute vec3 vertex_worldSpace;
+                        attribute vec2 textureCoordinate_input;
+                        varying vec2 uvs;
+  
+                        void main() {
+                          gl_Position = vec4(vertex_worldSpace, 1.0);
+                          uvs = textureCoordinate_input;
+                        }`},
+      fragment: {source: `precision mediump float;
+                          uniform sampler2D image;
+                          varying vec2 uvs;
+  
+                          void main() {
+                            gl_FragColor = texture2D(image, uvs.st);
+                          }`}
+    })
+    const quadMesh = new Mesh(this.webGL, 'quad', loadMesh('quad'))
+    this.quad = new ProgrammedMesh(quadMesh, quadProgram)
+
+    const originProgram = new Program(this.webGL, 'origin')
+    originProgram.update({
+      vertex: {source: `attribute vec3 vertex_worldSpace;
+  
+                        uniform mat4 mMatrix;
+                        uniform mat4 vMatrix;
+                        uniform mat4 pMatrix;
+  
+                        varying vec3 fragment_worldSpace;
+  
+                        void main() {
+                          gl_Position = pMatrix * vMatrix * mMatrix * vec4(vertex_worldSpace, 1);
+                          fragment_worldSpace = vertex_worldSpace;
+                        }`},
+      fragment: {source: `precision mediump float;
+  
+                          varying vec3 fragment_worldSpace;
+  
+                          void main() {
+                            gl_FragColor = vec4(step(0.0001, fragment_worldSpace), 1);
+                          }`}
+    })
+    const originMesh = new Mesh(this.webGL, 'origin', loadMesh('origin'))
+    this.origin = new ProgrammedMesh(originMesh, originProgram)
+    this.origin.updateUniform('mat4', 'mMatrix', algebra.S([5, 5, 5]))
+
     this.app.onChangedValue('mat4', 'View Matrix', value => this.origin.updateUniform('mat4', 'vMatrix', value))
     this.app.onChangedValue('mat4', 'Projection Matrix', value => this.origin.updateUniform('mat4', 'pMatrix', value))
+
+    this.updateViewport()
   },
 
   get size() {
-    return {width: this.el.offsetWidth, height: this.el.offsetHeight}
+    return {width: this.canvasEl.width, height: this.canvasEl.height}
   },
 
   set state(state) {
@@ -104,7 +107,7 @@ Canvas.prototype = {
   // framebuffer CRUD
   createFramebuffer(id) {
     if (this.framebuffers[id]) throw new Error(`framebuffer id "${id}" already taken`)
-    this.framebuffers[id] = new Framebuffer(this.webGL, id, {width: this.el.width, height: this.el.height})
+    this.framebuffers[id] = new Framebuffer(this.webGL, id, this.size)
     this.framebuffers[id].meshes = {}
     const attachments = this.framebuffers[id].attachments
     for (const attachmentId in attachments)
@@ -219,11 +222,12 @@ Canvas.prototype = {
     delete this.programmedMeshes[id]
   },
 
-  updateViewport(width, height) {
-    this.el.width = width
-    this.el.height = height
-    this.webGL.viewport(0, 0, width, height)
-    for (const id in this.framebuffers) this.framebuffers[id].updateSize({width, height})
+  updateViewport() {
+    this.canvasEl.width = this.canvasEl.offsetWidth
+    this.canvasEl.height = this.canvasEl.offsetHeight
+    this.webGL.viewport(0, 0, this.canvasEl.width, this.canvasEl.height)
+    for (const id in this.framebuffers) this.framebuffers[id].updateSize(this.size)
+    this.app.el.dispatchEvent(new CustomEvent('viewportChanged', {detail: this.size}))
   },
 
   render() {

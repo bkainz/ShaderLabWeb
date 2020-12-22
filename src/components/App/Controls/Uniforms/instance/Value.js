@@ -75,9 +75,7 @@ Value.prototype = {
   set value(value) {
     this._value = value
     this.el.dispatchEvent(new CustomEvent('valueChanged', {detail: value}))
-
-    const detail = {programId: this.programId, uniform: {name: this.uniformName, type: this.type, value}}
-    this.app.el.dispatchEvent(new CustomEvent('uniformChanged', {detail}))
+    this.app.canvas.updateUniform(this.programId, {name: this.uniformName, type: this.type, value})
   },
 
   get state() {

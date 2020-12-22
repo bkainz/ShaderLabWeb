@@ -10,10 +10,6 @@ function Log(el, {className}) {
 }
 
 Log.prototype = {
-  initialize() {
-    // nothing to do
-  },
-
   append(scope, message, error) {
     const itemEl = document.createElement('div')
     itemEl.classList.add(`${this.className}-Item`)

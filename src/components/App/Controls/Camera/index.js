@@ -1,4 +1,5 @@
 import React from 'react'
+import Initializer from '../../../Initializer'
 
 export default Component.register(import.meta.url, ({className, id}) =>
   <div className={className} id={id}>
@@ -65,5 +66,6 @@ export default Component.register(import.meta.url, ({className, id}) =>
         <input type="number" defaultValue="30" step="any" min="0" className={className+'-FieldInput orthographicFov'}/>
       </div>
     </div>
+    <Initializer/>
   </div>
 )

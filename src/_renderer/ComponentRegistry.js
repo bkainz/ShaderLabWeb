@@ -35,7 +35,7 @@ ComponentRegistry.prototype = {
             const id = el.id
             props = props || {}
             let parentEl = el; while (parentEl = parentEl.parentElement) if (parentEl.__component__) break
-            el.__component__ = new this.module(el, {className, id, props, owner: parentEl && parentEl.__component__})
+            el.__component__ = new this.module(el, {className, id, props, parent: parentEl && parentEl.__component__})
             return el.__component__
           },
           instantiateStaticInstance(el) {

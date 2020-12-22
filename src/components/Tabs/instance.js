@@ -1,4 +1,4 @@
-import escapeCSS from '../../../helpers/escapeCSS'
+import escapeCSS from '../../helpers/escapeCSS'
 
 function Tabs(el, {className, id}) {
   this.el = el

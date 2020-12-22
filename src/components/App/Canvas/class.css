@@ -1,4 +1,5 @@
-.${className} {
+.${className},
+.${className}-Canvas {
   width: 100%;
   height: 100%;
 }
