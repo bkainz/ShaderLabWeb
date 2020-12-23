@@ -15,7 +15,7 @@ rsync -avL --del $BASE/public/ $SSH:$DIR
 
 scp $BASE/scripts/nginx/server-block $SSH:/etc/nginx/sites-available/$NAME
 ssh $SSH "
-  sudo sed -i -e 's!\$URL!$URL!' /etc/nginx/sites-available/$NAME
-  sudo sed -i -e 's!\$DIR!$DIR!' /etc/nginx/sites-available/$NAME
-  sudo ln -sfn /etc/nginx/sites-available/$NAME /etc/nginx/sites-enabled/$NAME
-  sudo systemctl restart nginx"
+  sudo -S sed -i -e 's!\$URL!$URL!' /etc/nginx/sites-available/$NAME
+  sudo -S sed -i -e 's!\$DIR!$DIR!' /etc/nginx/sites-available/$NAME
+  sudo -S ln -sfn /etc/nginx/sites-available/$NAME /etc/nginx/sites-enabled/$NAME
+  sudo -S systemctl restart nginx"
