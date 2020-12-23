@@ -34,7 +34,8 @@ Configure the server with:
 ```
 rm /etc/nginx/sites-enabled/default
 mkdir /var/www/html/ShaderLabWeb
-chown user:user /var/www/html/ShaderLabWeb
+chown user:group /var/www/html/ShaderLabWeb
+chmod 775 /var/www/html/ShaderLabWeb
 ```
 
 with `user` being the user used for deployment.

@@ -11,7 +11,7 @@ DIR=/var/www/html/$NAME
 SSH=$USR@$SRV
 BASE=$(dirname $0)/..
 
-rsync -avL --del $BASE/public/ $SSH:$DIR
+rsync -avL --del --groupmap=*:developers --chmod=Du=rwx,Dg=rwx,Do=rx,Fu=rw,Fg=rw,Fo=r $BASE/public/ $SSH:$DIR
 
 scp $BASE/scripts/nginx/server-block $SSH:/etc/nginx/sites-available/$NAME
 ssh $SSH "
