@@ -2,39 +2,41 @@ import fs from 'fs'
 import url from 'url'
 import path from 'path'
 
-const __dirname = path.dirname(url.fileURLToPath(import.meta.url))
+const srcDir = path.dirname(path.dirname(path.dirname(url.fileURLToPath(import.meta.url))))
 
 const importRegexp = /^\s*import\s+(\w+)\s+from\s+(['"])([^"']+)\2(;|$)\n*/myg
 const exportRegexp = /export\s+default\s+/
 
-const modules = {}
+function ModuleRegistry() {
+  this.modules = {}
+}
 
-const registry = {
+ModuleRegistry.prototype = {
   register(contentPath) {
-    const id = path.relative(__dirname, contentPath.endsWith('/instance.js') ? contentPath.slice(0, -12)
-                                      : contentPath.endsWith('.js')          ? contentPath.slice(0, -3)
-                                      :                                        contentPath)
+    const id = path.relative(srcDir, contentPath.endsWith('/instance.js') ? contentPath.slice(0, -12)
+                                   : contentPath.endsWith('.js')          ? contentPath.slice(0, -3)
+                                   :                                        contentPath)
 
-    if (!modules[id]) {
+    if (!this.modules[id]) {
       const dependencies = {}
       const content = fs.readFileSync(contentPath, 'utf-8')
                         .replace(importRegexp, (match, alias, _, importPath) => {
                           const extname = path.extname(importPath)
                           const modulePath = path.join(path.dirname(contentPath), importPath) + (extname ? '' : '.js')
-                          const module = registry.register(modulePath)
+                          const module = this.register(modulePath)
                           dependencies[module.id] = alias
                           return ''
                         })
                         .replace(exportRegexp, () => `modules['${id}'] = `)
 
-      modules[id] = {id, content, dependencies}
+      this.modules[id] = {id, content, dependencies}
     }
 
-    return modules[id]
+    return this.modules[id]
   },
   toScript() {
     return `
-      const modules = {}${Object.values(modules).map(module => path.extname(module.id) === '.json' ? `
+      const modules = {}${Object.values(this.modules).map(module => path.extname(module.id) === '.json' ? `
       modules['${module.id}'] = ${module.content.replace(/\n/g, '\n      ')}` : `
       !function(${Object.values(module.dependencies).join(', ')}) {
         ${module.content.replace(/\n/g, '\n        ')}
@@ -44,4 +46,4 @@ const registry = {
   }
 }
 
-export default registry
+export default ModuleRegistry

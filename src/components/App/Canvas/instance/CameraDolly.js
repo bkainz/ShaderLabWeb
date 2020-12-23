@@ -1,5 +1,5 @@
 import algebra from '../../../../helpers/algebra'
-const {minus, plus, times, normalize} = algebra
+const {minus, plus, times} = algebra
 
 function CameraDolly(canvas) {
   this.canvas = canvas
@@ -12,10 +12,10 @@ CameraDolly.prototype = {
     event.preventDefault()
 
     const startPosition = this.canvas.app.getValue('vec3', 'Camera Position')
-    const startTarget = this.canvas.app.getValue('vec3', 'Camera Target')
-    const targetToPosition = minus(startPosition, startTarget)
-    const distance = times(normalize(targetToPosition), event.deltaY)
-    this.canvas.app.setValue('vec3', 'Camera Position', plus(startTarget, plus(targetToPosition, distance)))
+    const target = this.canvas.app.getValue('vec3', 'Camera Target')
+    const targetToPosition = minus(startPosition, target)
+    const dPosition = times(targetToPosition, Math.sign(event.deltaY)/10)
+    this.canvas.app.setValue('vec3', 'Camera Position', plus(target, plus(targetToPosition, dPosition)))
   }
 }
 

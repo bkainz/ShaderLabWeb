@@ -7,10 +7,16 @@ function ProgrammedMesh(mesh, program) {
   this.depthTest = ''
   this.faceCull = ''
   this.frontFace = 'CCW'
+
+  this.resetListener = e => this.reset()
+  this.program.eventEl.addEventListener('changed', this.resetListener)
 }
 
 ProgrammedMesh.prototype = {
   reset() {
+    this.program.eventEl.removeEventListener('changed', this.resetListener)
+    for (const unit in this.createdTextures) this.webGL.deleteTexture(this.createdTextures[unit])
+    this.createdTextures = []
     this.uniforms = {}
     this.textures = []
   },
@@ -38,17 +44,23 @@ ProgrammedMesh.prototype = {
         break
       case 'sampler2D':
       case 'samplerCube':
-        let texture
-        if (value instanceof WebGLTexture) {
-          texture = value
+        const unit = this.uniforms[name] ? this.uniforms[name].value : this.textures.length
+
+        if (this.createdTextures[unit]) {
+          this.webGL.deleteTexture(this.createdTextures[unit])
+          delete this.createdTextures[unit]
+        }
+
+        if (value === null || value instanceof WebGLTexture) {
+          this.textures[unit] = value
         }
         else {
-          texture = this.webGL.createTexture()
+          this.textures[unit] = this.createdTextures[unit] = this.webGL.createTexture()
           const target = type === 'sampler2D'   ? this.webGL.TEXTURE_2D
                        : type === 'samplerCube' ? this.webGL.TEXTURE_CUBE_MAP
                        :                          null
           this.webGL.activeTexture(this.webGL.TEXTURE0)
-          this.webGL.bindTexture(target, texture)
+          this.webGL.bindTexture(target, this.textures[unit])
 
           function isPowerOf2(value){ return (value & (value - 1)) === 0 }
           let isPow2 = true
@@ -79,8 +91,6 @@ ProgrammedMesh.prototype = {
           this.webGL.bindTexture(target, null)
         }
 
-        const unit = this.uniforms[name] ? this.uniforms[name].value : this.textures.length
-        this.textures[unit] = texture
         this.uniforms[name] = {type, value: unit}
         break
       default:
@@ -187,6 +197,10 @@ ProgrammedMesh.prototype = {
           throw new Error(`unknown or unsupported uniform type '${type}'`)
       }
     }
+  },
+
+  destroy() {
+    this.reset()
   }
 }
 

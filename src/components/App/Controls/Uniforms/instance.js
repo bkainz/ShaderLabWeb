@@ -4,14 +4,14 @@ function Uniforms(el, {id, className}) {
   this.el = el
   this.id = id
   this.className = className
-  this.app = el.closest('.App').__component__
+  this.app = el.closest('.components\\/App').__component__
   this.app.uniforms = this
   this.perProgram = {}
 }
 
 Uniforms.prototype = {
   initialize() {
-    this.app.el.addEventListener('userProgramUpdated', ({detail: program}) => {
+    this.app.el.addEventListener('programUpdated', ({detail: program}) => {
       const uniforms = Object.values(program.shaders).reduce((uniforms, shader) => Object.assign(uniforms, shader.uniforms), {})
       const uniformsConfig = {name: '', fields: []}
       const oldUniforms = this.perProgram[program.id]
@@ -28,6 +28,11 @@ Uniforms.prototype = {
       oldUniforms ? this.el.replaceChild(newUniforms.el, oldUniforms.el)
                   : this.el.appendChild(newUniforms.el)
       this.perProgram[program.id] = newUniforms
+    })
+
+    this.app.el.addEventListener('programDestroyed', ({detail: program}) => {
+      this.perProgram[program.id].el.remove()
+      delete this.perProgram[program.id]
     })
   },
 

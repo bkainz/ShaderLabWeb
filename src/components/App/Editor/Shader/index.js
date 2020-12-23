@@ -1,16 +1,12 @@
 import React from 'react'
-import compReg from '../../../../componentRegistry'
 
-export default function(props) {
-  const {className, id} = compReg.register(import.meta.url, props)
-  const shaderId = [props.pass, props.type].filter(Boolean).join('/')
-
-  return <div className={className} id={id}>
-           <div className={className+'-Source'} name={shaderId+'-source'}/>
-           <div className={className+'-Controls'}>
-             <label>
-               <input className={className+'-isLinked'} type="checkbox" name={shaderId+'-isLinked'} defaultChecked={true}/> Link to program
-             </label>
-           </div>
-         </div>
-}
+export default Component.register(import.meta.url, ({className, id}) =>
+  <div className={className} id={id}>
+    <div className={className+'-Source'}/>
+    <div className={className+'-Controls'}>
+      <label>
+        <input className={className+'-isLinked'} type="checkbox" defaultChecked={true}/> Link to program
+      </label>
+    </div>
+  </div>
+)

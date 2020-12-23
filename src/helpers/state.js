@@ -1,4 +1,9 @@
-import escapeCSS from '../../../../helpers/escapeCSS'
+import escapeCSS from './escapeCSS'
+
+/*
+ * This helper concentrates and simplifies defining multiple state fields for a
+ * component interface by supplying a condensed fields description.
+ */
 
 export default {
   initializeForPrototype(prototype, fields) {

@@ -1,10 +1,6 @@
-import loadMesh from '../../../../helpers/loadMesh'
-
-let lastMeshId = 0
-
-function Mesh(webGL) {
-  this.id = lastMeshId += 1
+function Mesh(webGL, id, mesh) {
   this.webGL = webGL
+  this.id = id
   this.elementBuffer = this.webGL.createBuffer()
   this.elementCount = 0
   this.elementType = this.webGL.TRIANGLES
@@ -12,7 +8,7 @@ function Mesh(webGL) {
                                                                            : this.webGL.UNSIGNED_SHORT
   this.dataBuffer = this.webGL.createBuffer()
   this.attributes = null
-  this.update(loadMesh('void'))
+  this.update(mesh)
 }
 
 Mesh.prototype = {
@@ -55,6 +51,11 @@ Mesh.prototype = {
       this.webGL.disableVertexAttribArray(location)
       this.webGL.bindBuffer(this.webGL.ARRAY_BUFFER, null)
     }
+  },
+
+  destroy() {
+    this.webGL.deleteBuffer(this.elementBuffer)
+    this.webGL.deleteBuffer(this.dataBuffer)
   }
 }
 

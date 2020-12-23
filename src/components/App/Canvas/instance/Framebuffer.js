@@ -1,5 +1,7 @@
-function Framebuffer(webGL) {
+function Framebuffer(webGL, id, size) {
   this.webGL = webGL
+  this.id = id
+  this.name = this.id[0].toUpperCase()+this.id.slice(1)+' Pass'
 
   this.framebuffer = this.webGL.createFramebuffer()
   this.attachments = {color: this.webGL.createTexture()}
@@ -29,10 +31,11 @@ function Framebuffer(webGL) {
   }
 
   this.webGL.bindFramebuffer(this.webGL.FRAMEBUFFER, null)
+  this.updateSize(size)
 }
 
 Framebuffer.prototype = {
-  updateViewport(width, height) {
+  updateSize({width, height}) {
     this.webGL.activeTexture(this.webGL.TEXTURE0)
     this.webGL.bindTexture(this.webGL.TEXTURE_2D, this.attachments.color)
     this.webGL.texImage2D(this.webGL.TEXTURE_2D, 0, this.webGL.RGBA, width, height, 0,
@@ -66,7 +69,18 @@ Framebuffer.prototype = {
 
   endRender() {
     return this.attachments.color
-  }
+  },
+
+  destroy() {
+    this.webGL.deleteFramebuffer(this.framebuffer)
+    this.webGL.deleteTexture(this.attachments.color)
+
+    if (this.webGL.getExtension('WEBGL_depth_texture')) {
+      this.webGL.deleteTexture(this.attachments.depth)
+    } else {
+      this.webGL.deleteRenderbuffer(this.depthBuffer)
+    }
+  },
 }
 
 export default Framebuffer

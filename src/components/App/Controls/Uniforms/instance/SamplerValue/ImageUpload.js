@@ -12,11 +12,12 @@ function ImageUpload(samplerValue, target) {
 `.trim()
   this.fileEl = this.el.querySelector(`.${escapeCSS(this.className)}-File`)
   this.imageEl = this.el.querySelector(`.${escapeCSS(this.className)}-Preview`)
+  this.imageEl.onload = () => this.el.dispatchEvent(new CustomEvent('imageChanged', {detail: this.imageEl}))
 
   this.fileEl.addEventListener('change', async e => {
     const reader = new FileReader()
     reader.readAsDataURL(this.fileEl.files[0])
-    reader.onloadend = () => this.url = reader.result
+    reader.onloadend = () => this.imageEl.src = reader.result
   })
 }
 ImageUpload.prototype = {
@@ -25,7 +26,6 @@ ImageUpload.prototype = {
   },
   set url(url) {
     this.imageEl.src = url
-    this.imageEl.onload = () => this.el.dispatchEvent(new CustomEvent('imageChanged', {detail: this.imageEl}))
   }
 }
 

@@ -30,23 +30,26 @@
   transform-origin: 25% 50%;
 }
 
-.${className}\/instance\/Value-Value {
-  margin: 0.25em var(--indentation) 2em;
-  display: none;
-}
-
-.${className}\/instance\/Value-State:checked ~ .${className}\/instance\/Value-Value {
-  display: block;
-}
-
 .${className}\/instance\/Value-State:checked ~ .${className}\/instance\/Value-Header::before {
   transform: rotate(45deg);
 }
 
+.${className}\/instance\/Value-Body {
+  margin: 0.25em var(--indentation) 2em;
+  display: none
+}
+
 .${className}\/instance\/Value-Attachment {
+  margin-bottom: 0.25em;
+}
+
+.${className}\/instance\/Value-State:checked ~ .${className}\/instance\/Value-Body {
+  display: block;
+}
+
+.${className}\/instance\/Value-AttachmentInput {
   border: 1px solid currentColor;
   padding: 0.25em;
-  margin-bottom: 0.25em;
 }
 
 .${className}\/instance\/Value-NumericRow {

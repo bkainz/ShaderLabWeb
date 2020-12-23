@@ -5,15 +5,11 @@ function format(number, zeros) {
 function Log(el, {className}) {
   this.el = el
   this.className = className
-  this.app = el.closest('.App').__component__
+  this.app = el.closest('.components\\/App').__component__
   this.app.log = this
 }
 
 Log.prototype = {
-  initialize() {
-    // nothing to do
-  },
-
   append(scope, message, error) {
     const itemEl = document.createElement('div')
     itemEl.classList.add(`${this.className}-Item`)
@@ -28,7 +24,7 @@ Log.prototype = {
     this.el.appendChild(itemEl)
     this.el.scrollTop = this.el.scrollHeight
 
-    error && this.app.controls.tabs.focus('Log')
+    error && this.app.controls.tabs.focus('log')
   }
 }
 

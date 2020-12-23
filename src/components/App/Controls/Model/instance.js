@@ -1,4 +1,4 @@
-import state from '../helpers/state'
+import state from '../../../../helpers/state'
 import algebra from '../../../../helpers/algebra'
 import loadMesh from '../../../../helpers/loadMesh'
 import escapeCSS from '../../../../helpers/escapeCSS'
@@ -7,7 +7,7 @@ const {M, T, R, S} = algebra
 function Model(el, {className}) {
   this.el = el
   this.className = className
-  this.app = el.closest('.App').__component__
+  this.app = el.closest('.components\\/App').__component__
   this.app.model = this
 
   this.meshNameEl = this.el.querySelector(`.${escapeCSS(this.className)}-MeshName`)
@@ -88,7 +88,7 @@ const STATE = {
                                       : count < 2 ? 'float'
                                       :             'vec'+count
       })
-      this.app.el.dispatchEvent(new CustomEvent('meshChanged', {detail: {pass: 'base', mesh}}))
+      this.app.canvas.updateMesh(this.meshId, mesh)
     }},
   position: {type: 'vec3', name: 'Model Position', onChange: updateModelMatrix},
   rotationAxis: {type: 'vec3', name: 'Model Rotation Axis', onChange: updateModelMatrix},

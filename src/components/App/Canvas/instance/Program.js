@@ -4,6 +4,7 @@ function Program(webGL, id) {
   this.webGL = webGL
   this.id = id
   this.webGlProgram = this.webGL.createProgram()
+  this.eventEl = document.createElement('div')
   this.name = this.id[0].toUpperCase()+this.id.slice(1)+' Pass'
   this.shaders = {}
 }
@@ -13,27 +14,33 @@ Program.prototype = {
     return this.webGL.getProgramParameter(this.webGlProgram, this.webGL.LINK_STATUS)
   },
 
-  updateShader(type, source, isLinked) {
-    this.shaders[type] && this.shaders[type].detach(this.webGL, this.webGlProgram)
-
-    if (isLinked) {
-      const shader = new Shader(this, type, source, isLinked)
-      this.shaders[type] = shader
-      return shader.attach(this.webGL, this.webGlProgram)
-    }
-    else {
-      this.shaders[type] = null
-      return {failed: false, message: 'Skipped (not linked)'}
-    }
+  get linkMessage() {
+    return !this.isValid ? 'Linking failed: '+this.webGL.getProgramInfoLog(this.webGlProgram)
+                         : 'Linking successful'
   },
 
-  relink() {
-    if (!('fragment' in this.shaders && 'vertex' in this.shaders)) return
+  update(shaders) {
+    for (const type in shaders) {
+      if (this.shaders[type]) {
+        if (this.webGL.getAttachedShaders(this.webGlProgram).indexOf(this.shaders[type].webGlShader) !== -1)
+          this.webGL.detachShader(this.webGlProgram, this.shaders[type].webGlShader)
+        this.shaders[type].name = shaders[type].name
+        this.shaders[type].source = shaders[type].source
+        this.shaders[type].isLinked = shaders[type].isLinked !== false
+      }
+      else {
+        this.shaders[type] = new Shader(this.webGL, type, shaders[type])
+      }
+
+      this.shaders[type].isValid && this.webGL.attachShader(this.webGlProgram, this.shaders[type].webGlShader)
+    }
     this.webGL.linkProgram(this.webGlProgram)
-    const failed = !this.webGL.getProgramParameter(this.webGlProgram, this.webGL.LINK_STATUS)
-    const message = this.webGL.getProgramInfoLog(this.webGlProgram)
-    return {failed, message: failed ? 'Linking failed: '+message
-                                    : 'Linking successful'}
+    this.eventEl.dispatchEvent(new Event('changed'))
+  },
+
+  destroy() {
+    this.webGL.deleteProgram(this.webGlProgram)
+    for (const type in this.shaders) this.shaders[type].destroy()
   }
 }
 

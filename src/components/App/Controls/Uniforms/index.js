@@ -1,8 +1,8 @@
 import React from 'react'
-import compReg from '../../../../componentRegistry'
+import Initializer from '../../../Initializer'
 
-export default function(props) {
-  const {className, id} = compReg.register(import.meta.url, props)
-
-  return <div className={className} id={id}/>
-}
+export default Component.register(import.meta.url, ({className, id}) =>
+  <div className={className} id={id}>
+    <Initializer/>
+  </div>
+)

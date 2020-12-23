@@ -1,7 +1,7 @@
 import escapeCSS from '../../../../helpers/escapeCSS'
 import camera from '../../../../helpers/camera'
 import algebra from '../../../../helpers/algebra'
-import state from '../helpers/state'
+import state from '../../../../helpers/state'
 
 function updateViewMatrix() {
   const position = this.position || [0, 0, 0]
@@ -21,7 +21,7 @@ function updateProjectionMatrix() {
 function Camera(el, {className}) {
   this.el = el
   this.className = className
-  this.app = el.closest('.App').__component__
+  this.app = el.closest('.components\\/App').__component__
   this.app.camera = this
 }
 
@@ -39,11 +39,14 @@ Camera.prototype = {
   initialize() {
     state.initializeForInstance(this, STATE)
 
+    const perspectiveFovEl = this.el.querySelector(`.${escapeCSS(this.className)}-Field.perspective-fov`)
+    const orthographicFovEl = this.el.querySelector(`.${escapeCSS(this.className)}-Field.orthographic-fov`)
+
     this.app.onChangedValue('config', 'Projection', value => {
       this.app.setValue('bool', 'Perspective Projection?', value === 'Perspective')
       this.app.setValue('bool', 'Orthographic Projection?', value === 'Orthographic')
-      this.el.querySelector(`.${escapeCSS(this.className)}-Field.perspective-fov`).style.display = value === 'Perspective' ? '' : 'none'
-      this.el.querySelector(`.${escapeCSS(this.className)}-Field.orthographic-fov`).style.display = value === 'Orthographic' ? '' : 'none'
+      perspectiveFovEl.style.display = value === 'Perspective' ? '' : 'none'
+      orthographicFovEl.style.display = value === 'Orthographic' ? '' : 'none'
     })
 
     this.app.onChangedValue('float', 'Canvas Width', updateProjectionMatrix.bind(this))

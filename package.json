@@ -9,7 +9,7 @@
   },
   "scripts": {
     "transpile": "yarn babel src --out-dir _transpiled --delete-dir-on-start --copy-files",
-    "build": "yarn transpile && yarn node --es-module-specifier-resolution=node _transpiled/build.js",
+    "build": "yarn transpile && yarn node --es-module-specifier-resolution=node scripts/build.js",
     "deploy": "yarn build && scripts/deploy.sh"
   },
   "dependencies": {
