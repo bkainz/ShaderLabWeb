@@ -2,7 +2,7 @@ import state from '../../../../helpers/state'
 import algebra from '../../../../helpers/algebra'
 import loadMesh from '../../../../helpers/loadMesh'
 import escapeCSS from '../../../../helpers/escapeCSS'
-const {M, T, R, S, I, mat4ToMat3} = algebra
+const {M, T, R, S, I, mat4ToMat3, transpose} = algebra
 
 function Model(el, {className}) {
   this.el = el
@@ -45,6 +45,7 @@ function updateModelMatrix() {
   this.app.setValue('mat3', 'Model Transform', mat4ToMat3(transform))
   this.app.setValue('mat4', 'Model Matrix', modelMatrix)
   this.app.setValue('mat4', 'Inverse Model Matrix', I(modelMatrix))
+  this.app.setValue('mat3', 'Normal Matrix', mat4ToMat3(transpose(I(transform))))
 }
 
 const STATE = {
