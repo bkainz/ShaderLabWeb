@@ -29,6 +29,7 @@ function Value(app, uniformName, name, type, programId) {
   this.valueEl = this.el.querySelector(`.${escapeCSS(this.className)}-Value`)
 
   const updateAttachmentList = attachments => {
+    if (!Object.keys(attachments).length) this.attachmentEl.classList.add('none')
     this.attachmentEl.innerHTML = Object.keys(attachments).length ? `
       attach to: <select class="${this.className}-AttachmentInput">
         <option value="">None</option>${Object.keys(attachments).map(name => `

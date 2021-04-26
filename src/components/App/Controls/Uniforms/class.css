@@ -39,8 +39,8 @@
   display: none
 }
 
-.${className}\/instance\/Value-Attachment {
-  margin-bottom: 0.25em;
+.${className}\/instance\/Value-Attachment:not(.none) {
+  margin-bottom: 0.5em;
 }
 
 .${className}\/instance\/Value-State:checked ~ .${className}\/instance\/Value-Body {
