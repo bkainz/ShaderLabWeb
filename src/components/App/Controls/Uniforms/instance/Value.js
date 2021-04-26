@@ -32,8 +32,9 @@ function Value(app, uniformName, name, type, programId) {
     if (!Object.keys(attachments).length) this.attachmentEl.classList.add('none')
     this.attachmentEl.innerHTML = Object.keys(attachments).length ? `
       attach to: <select class="${this.className}-AttachmentInput">
-        <option value="">None</option>${Object.keys(attachments).map(name => `
-        <option value="${name}">${name}</option>`).join('')}
+        <option value="">None</option>
+        ${Object.keys(attachments).sort((a, b) => a.localeCompare(b, 'en', {sensitivity: 'base', numeric: true}))
+                .map(name => `<option value="${name}">${name}</option>`).join('\n')}
       </select>`.trim() : `
       <input type="hidden" value="" class="${this.className}-AttachmentInput">`.trim()
     this.attachmentInputEl = this.attachmentEl.querySelector(`.${escapeCSS(this.className)}-AttachmentInput`)

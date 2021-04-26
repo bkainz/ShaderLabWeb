@@ -2,20 +2,23 @@ import escapeCSS from '../../../../helpers/escapeCSS'
 import camera from '../../../../helpers/camera'
 import algebra from '../../../../helpers/algebra'
 import state from '../../../../helpers/state'
+const {I, mat4ToMat3} = algebra
 
 function updateViewMatrix() {
   const position = this.position || [0, 0, 0]
   const target = this.target || [0, 0, 0]
   const cameraMatrix = camera.camera(position, target, [0, 1, 0])
   this.app.setValue('mat4', 'Camera Matrix', cameraMatrix)
-  this.app.setValue('mat3', 'Camera Rotation', algebra.mat4ToMat3(cameraMatrix))
-  this.app.setValue('mat4', 'View Matrix', algebra.I(cameraMatrix))
+  this.app.setValue('mat3', 'Camera Rotation', mat4ToMat3(cameraMatrix))
+  this.app.setValue('mat4', 'View Matrix', I(cameraMatrix))
+  this.app.setValue('mat4', 'Inverse View Matrix', cameraMatrix)
 }
 
 function updateProjectionMatrix() {
   const pMatrix = this.projection === 'Perspective' ? camera.perspectiveProjection(this.perspectiveFov, this.width/this.height, this.nearClipping, this.farClipping)
                                                     : camera.orthographicProjection(this.orthographicFov, this.width/this.height, this.nearClipping, this.farClipping)
   this.app.setValue('mat4', 'Projection Matrix', pMatrix)
+  this.app.setValue('mat4', 'Inverse Projection Matrix', I(pMatrix))
 }
 
 function Camera(el, {className}) {

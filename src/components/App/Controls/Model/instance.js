@@ -2,7 +2,7 @@ import state from '../../../../helpers/state'
 import algebra from '../../../../helpers/algebra'
 import loadMesh from '../../../../helpers/loadMesh'
 import escapeCSS from '../../../../helpers/escapeCSS'
-const {M, T, R, S} = algebra
+const {M, T, R, S, I, mat4ToMat3} = algebra
 
 function Model(el, {className}) {
   this.el = el
@@ -41,8 +41,10 @@ function updateModelMatrix() {
   const rotationAngle = this.rotationAngle || 0
   const scale = this.scale || [1, 1, 1]
   const transform = M(R(rotationAngle, rotationAxis), S(scale))
-  this.app.setValue('mat3', 'Model Transform', algebra.mat4ToMat3(transform))
-  this.app.setValue('mat4', 'Model Matrix', M(T(position), transform))
+  const modelMatrix = M(T(position), transform)
+  this.app.setValue('mat3', 'Model Transform', mat4ToMat3(transform))
+  this.app.setValue('mat4', 'Model Matrix', modelMatrix)
+  this.app.setValue('mat4', 'Inverse Model Matrix', I(modelMatrix))
 }
 
 const STATE = {
