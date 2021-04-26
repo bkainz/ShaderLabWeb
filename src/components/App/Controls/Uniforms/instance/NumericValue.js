@@ -16,10 +16,14 @@ function NumericValue(app, uniformName, name, type, programId) {
   const roundValue = value => Math.round(value*1000)/1000
 
   this.inputEls = []
+  const containerEl = document.createElement('div')
+  containerEl.classList.add(this.className+'-NumericContainer')
+  if (type.startsWith('mat')) containerEl.classList.add('transpose')
+  this.valueEl.appendChild(containerEl)
   for (let row = 0; row < nRows; row += 1) {
     const rowEl = document.createElement('div')
     rowEl.classList.add(this.className+'-NumericRow')
-    this.valueEl.appendChild(rowEl)
+    containerEl.appendChild(rowEl)
 
     for (let col = 0; col < nCols; col += 1) {
       const index = row*nCols+col

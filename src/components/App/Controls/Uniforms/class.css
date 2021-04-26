@@ -52,13 +52,26 @@
   padding: 0.25em;
 }
 
+.${className}\/instance\/Value-NumericContainer {
+  display: flex;
+  flex-flow: column;
+  margin: -0.125em;
+}
+
+.${className}\/instance\/Value-NumericContainer.transpose {
+  flex-flow: row;
+}
+
 .${className}\/instance\/Value-NumericRow {
   display: flex;
-  margin: 0 -0.25em;
+}
+
+.${className}\/instance\/Value-NumericContainer.transpose .${className}\/instance\/Value-NumericRow {
+  flex-flow: column;
 }
 
 .${className}\/instance\/Value-NumericInput {
-  margin: 0.25em;
+  margin: 0.125em;
   box-sizing: border-box;
   width: 5em;
   padding: 0.25em;
