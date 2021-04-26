@@ -32,6 +32,7 @@ Shader.prototype = {
   set source(source) {
     this.webGL.shaderSource(this.webGlShader, source)
     this.webGL.compileShader(this.webGlShader)
+    source = GLSLParser.stripComments(source)
     this.constInts = GLSLParser.parseConstInts(source)
     this.structs = GLSLParser.parseStructs(source, this.constInts)
     this.uniforms = GLSLParser.parseUniforms(source, this.constInts)

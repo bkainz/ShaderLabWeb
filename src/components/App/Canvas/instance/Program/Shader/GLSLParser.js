@@ -1,5 +1,6 @@
 const rConstInt = /const\s+int\s+(\w+)\s*=\s*([^\s;]+)\s*;/g
 const rUniform = /uniform\s+/g
+const rComment = /\/\/[^\n]*(?:\n|$)|\/\*(?:[^*]*|\*(?!\/))*\*\//g
 const rNamedStruct = /struct\s+(\w+)\s*{\s*/g
 
 const rType = /(\w+)\s+/y
@@ -120,6 +121,10 @@ function evalConstIntExpression(constInts, expression) {
 }
 
 export default {
+  stripComments(string) {
+    return string.replace(rComment, '')
+  },
+
   parseConstInts(string) {
     const constInts = {}
     let ConstIntMatch
