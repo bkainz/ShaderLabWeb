@@ -1,4 +1,4 @@
-const rConstInt = /const\s+int\s+(\w+)\s*=\s*([^\s;]+)\s*;/g
+const rConstInt = /const\s+int\s+(\w+)\s*=([^;]+);/g
 const rUniform = /uniform\s+/g
 const rComment = /\/\/[^\n]*(?:\n|$)|\/\*(?:[^*]*|\*(?!\/))*\*\//g
 const rNamedStruct = /struct\s+(\w+)\s*{\s*/g
@@ -6,7 +6,11 @@ const rNamedStruct = /struct\s+(\w+)\s*{\s*/g
 const rType = /(\w+)\s+/y
 const rStruct = /struct(?:\s+(\w+))?\s*{\s*/y
 const rStructEnd = /\s*}\s*/y
-const rName = /(\w+)(?:\[([^\]]+)])?\s*;\s*/y
+const rName = /(\w+)(?:\s*\[([^\]]+)])?\s*;\s*/y
+const rIdentifier = /\w[\w\d]*/y
+const rDecimalInteger = /[1-9]\d*/y
+const rOctalInteger = /0[0-7]*/y
+const rHexadecimalInteger = /0[xX][\da-fA-F]+/y
 
 function parseType(string, ptr) {
   rType.lastIndex = ptr
@@ -90,7 +94,7 @@ function buildField(field, structs, constInts) {
   let type = structs[field.type] || field.type
 
   if (field.length) {
-    const length = evalConstIntExpression(constInts, field.length)
+    const length = evalConstInt(constInts, field.length)
     type = {name: undefined,
             fields: Array.from({length}, (_, name) => buildField({name, type}, structs, constInts)),
             signature: `${type.signature || type}[${length}]`}
@@ -113,11 +117,24 @@ function buildStruct(struct, structs, constInts) {
           signature: '{'+signature.join(',')+'}'}
 }
 
-function evalConstIntExpression(constInts, expression) {
-  return new Function('expression', `${Object.keys(constInts).map(name => `
+const rConstIntExprTokens = new RegExp([
+  /\s+/.source,
+  rIdentifier.source,
+  rDecimalInteger.source,
+  rOctalInteger.source,
+  rHexadecimalInteger.source,
+  /[()]|[+\-*/%]|<=|>=|==|!=|&&|\|\|\^\^|[<>?:]/.source
+].join('|'), 'g')
+function evalConstInt(constInts, expression) {
+  expression = expression.replace(rConstIntExprTokens, '') === '' ? expression : '0'
+  return new Function(`${Object.keys(constInts).map(name => `
     const ${name} = ${constInts[name]}`).join('')}
-    return eval(expression)
-  `)(expression)
+    try {
+      return ${expression}
+    } catch (e) {
+      return 0
+    }
+  `)()
 }
 
 export default {
@@ -128,7 +145,7 @@ export default {
   parseConstInts(string) {
     const constInts = {}
     let ConstIntMatch
-    while (ConstIntMatch = rConstInt.exec(string)) constInts[ConstIntMatch[1]] = ConstIntMatch[2]
+    while (ConstIntMatch = rConstInt.exec(string)) constInts[ConstIntMatch[1]] = evalConstInt(constInts, ConstIntMatch[2])
     return constInts
   },
 
