@@ -8,10 +8,10 @@ function updateViewMatrix() {
   const position = this.position || [0, 0, 0]
   const target = this.target || [0, 0, 0]
   const cameraMatrix = camera.camera(position, target, [0, 1, 0])
-  this.app.setValue('mat4', 'Camera Matrix', cameraMatrix)
-  this.app.setValue('mat3', 'Camera Rotation', mat4ToMat3(cameraMatrix))
   this.app.setValue('mat4', 'View Matrix', I(cameraMatrix))
   this.app.setValue('mat4', 'Inverse View Matrix', cameraMatrix)
+  this.app.setValueMigration('mat4', 'Camera Matrix', 'Inverse View Matrix')
+  this.app.setValue('mat3', 'Camera Rotation', mat4ToMat3(cameraMatrix))
 }
 
 function updateProjectionMatrix() {

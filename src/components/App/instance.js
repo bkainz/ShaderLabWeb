@@ -6,6 +6,7 @@ function App(el, {className}) {
   this.el = el
   this.className = className
   this.values = {}
+  this.valueMigrations = {}
 }
 
 App.prototype = {
@@ -69,6 +70,11 @@ App.prototype = {
 
   onChangedValueTypeList(type, callback) {
     this.el.addEventListener('valueTypeListChanged', ({detail: list}) => list === this.values[type] && callback(list))
+  },
+
+  setValueMigration(type, alias, name) {
+    this.valueMigrations[type] = this.valueMigrations[type] || {}
+    this.valueMigrations[type][alias] = name
   },
 
   get state() {

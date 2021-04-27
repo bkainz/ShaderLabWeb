@@ -57,6 +57,8 @@ Value.prototype = {
   },
   set attachment(attachment) {
     const attachments = this.app.values[this.type.signature || this.type]
+    const attachmentMigrations = this.app.valueMigrations[this.type.signature || this.type]
+    attachment = attachmentMigrations && attachmentMigrations[attachment] || attachment
 
     if (this._attachment) attachments[this._attachment].el.removeEventListener('valueChanged', this._attachmentChangeListener)
     this._attachment = attachment
