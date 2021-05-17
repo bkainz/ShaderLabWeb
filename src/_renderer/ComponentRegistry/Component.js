@@ -1,4 +1,4 @@
-import escapeCSS from '../../helpers/escapeCSS'
+import escapeCSS from '../../componentHelpers/escapeCSS'
 import React from 'react'
 import ReactDomServer from 'react-dom/server'
 

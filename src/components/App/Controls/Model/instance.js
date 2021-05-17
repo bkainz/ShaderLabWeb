@@ -1,7 +1,7 @@
-import state from '../../../../helpers/state'
-import algebra from '../../../../helpers/algebra'
-import loadMesh from '../../../../helpers/loadMesh'
-import escapeCSS from '../../../../helpers/escapeCSS'
+import state from '../../../../componentHelpers/state'
+import algebra from '../../../../componentHelpers/algebra'
+import loadMesh from '../../../../componentHelpers/loadMesh'
+import escapeCSS from '../../../../componentHelpers/escapeCSS'
 const {M, T, R, S, I, mat4ToMat3, transpose} = algebra
 
 function Model(el, {className}) {

@@ -1,4 +1,4 @@
-import escapeCSS from '../../../helpers/escapeCSS'
+import escapeCSS from '../../../componentHelpers/escapeCSS'
 
 function Editor(el, {className, props}) {
   this.el = el

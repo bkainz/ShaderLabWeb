@@ -1,7 +1,7 @@
-import escapeCSS from '../../../../helpers/escapeCSS'
-import camera from '../../../../helpers/camera'
-import algebra from '../../../../helpers/algebra'
-import state from '../../../../helpers/state'
+import escapeCSS from '../../../../componentHelpers/escapeCSS'
+import camera from '../../../../componentHelpers/camera'
+import algebra from '../../../../componentHelpers/algebra'
+import state from '../../../../componentHelpers/state'
 const {I, mat4ToMat3} = algebra
 
 function updateViewMatrix() {

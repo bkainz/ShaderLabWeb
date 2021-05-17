@@ -1,4 +1,4 @@
-import algebra from '../../../../helpers/algebra'
+import algebra from '../../../../componentHelpers/algebra'
 const {minus, plus, times} = algebra
 
 function CameraDolly(canvas) {

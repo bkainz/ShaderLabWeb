@@ -1,4 +1,4 @@
-import escapeCSS from '../../../helpers/escapeCSS'
+import escapeCSS from '../../../componentHelpers/escapeCSS'
 
 function Header(el, {className, id}) {
   this.el = el

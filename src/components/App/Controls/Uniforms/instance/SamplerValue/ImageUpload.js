@@ -1,4 +1,4 @@
-import escapeCSS from '../../../../../../helpers/escapeCSS'
+import escapeCSS from '../../../../../../componentHelpers/escapeCSS'
 
 function ImageUpload(samplerValue, target) {
   this.className = samplerValue.className+'/ImageUpload'

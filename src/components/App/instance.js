@@ -1,5 +1,5 @@
 import Value from './instance/Value'
-import escapeCSS from '../../helpers/escapeCSS'
+import escapeCSS from '../../componentHelpers/escapeCSS'
 import defaultState from '../../defaultState.json'
 
 function App(el, {className}) {

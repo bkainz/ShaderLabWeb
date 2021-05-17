@@ -1,4 +1,4 @@
-import algebra from '../../../../helpers/algebra'
+import algebra from '../../../../componentHelpers/algebra'
 const {minus, plus, length, cross, R, Mv} = algebra
 
 const EVENTS = {

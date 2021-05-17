@@ -1,4 +1,4 @@
-import escapeCSS from '../../../../helpers/escapeCSS'
+import escapeCSS from '../../../../componentHelpers/escapeCSS'
 
 const editorLoadedCallbacks = []
 let editorLoaded = editorLoadedCallbacks.push.bind(editorLoadedCallbacks)

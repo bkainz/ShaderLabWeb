@@ -4,9 +4,9 @@ import Program from './instance/Program'
 import ProgrammedMesh from './instance/ProgrammedMesh'
 import CameraRotation from './instance/CameraRotation'
 import CameraDolly from './instance/CameraDolly'
-import escapeCSS from '../../../helpers/escapeCSS'
-import loadMesh from '../../../helpers/loadMesh'
-import algebra from '../../../helpers/algebra'
+import escapeCSS from '../../../componentHelpers/escapeCSS'
+import loadMesh from '../../../componentHelpers/loadMesh'
+import algebra from '../../../componentHelpers/algebra'
 
 function Canvas(el, {className}) {
   this.el = el
