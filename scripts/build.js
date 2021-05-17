@@ -17,8 +17,8 @@ fs.mkdirSync(path.join(publicDir, 'monaco-editor'))
 fs.symlinkSync(path.join(__rootdir, 'node_modules/monaco-editor/min'), path.join(publicDir, 'monaco-editor/min'))
 fs.symlinkSync(path.join(__rootdir, 'node_modules/monaco-editor/min-maps'), path.join(publicDir, 'monaco-editor/min-maps'))
 
-fs.writeFileSync(path.join(publicDir, 'index.html'), renderHTMLPage({
+renderHTMLPage({
   meta: `<title>ShaderLabWeb</title>
          <meta name="robots" content="noindex, nofollow">`.replace(/\n {11}/, '\n'),
   Body: App
-}))
+})().then(html => fs.promises.writeFile(path.join(publicDir, 'index.html'), html))

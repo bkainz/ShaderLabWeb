@@ -2,6 +2,7 @@ import React from 'react'
 import Canvas from './Canvas'
 import Controls from './Controls'
 import Editor from './Editor'
+import Shader from './Editor/Shader'
 import Initializer from '../Initializer'
 import Header from './Header'
 
@@ -12,7 +13,7 @@ export default Component.register(import.meta.url, ({className, id}) =>
     </header>
     <div className={className+'-Content'}>
       <section className={className+'-EditorPanel'}>
-        <Editor/>
+        <Editor Shader={Shader.registerTemplate()}/>
       </section>
       <section className={className+'-ControlsPanel'}>
         <Controls/>

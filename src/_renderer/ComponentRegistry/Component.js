@@ -1,4 +1,5 @@
 import escapeCSS from '../../helpers/escapeCSS'
+import React from 'react'
 import ReactDomServer from 'react-dom/server'
 
 function Component(registry, component) {
@@ -11,15 +12,22 @@ function Component(registry, component) {
   this._instanceStyle = component.instanceStyle
 
   this.prevInstanceId = 0
-  this.instances = {}
+  this.instances = []
   this.template = ''
 }
 
 Component.prototype = {
   registerInstance(props) {
-    const id = this.prevInstanceId += 1
-    this.instances[id] = Object.assign({}, props)
-    return this.component.instantiator({className: this.className, id: this.className+'-'+id, props: this.instances[id]})
+    const filteredProps = {}
+    for (let key in props) if (key !== 'children' && key !== 'ref' && key !== 'key') filteredProps[key] = props[key]
+    const propsJSON = Object.keys(filteredProps).length ? JSON.stringify(filteredProps) : ''
+    const id = this.className+'-'+(this.prevInstanceId += 1)
+    this.instances.push(id)
+    return <>
+             {propsJSON && <script type="application/json" id={`__${id}-props`} dangerouslySetInnerHTML={{__html: propsJSON}}/>}
+             <this.component.instantiator className={this.className} id={id} props={props}/>
+           </>
+
   },
 
   registerTemplate() {
@@ -31,7 +39,7 @@ Component.prototype = {
   },
 
   get instanceStyle() {
-    return Object.keys(this.instances).map(id => this._instanceStyle.replace(/\${id}/g, escapeCSS(this.className+'-'+id))).join('\n')
+    return this.instances.map(id => this._instanceStyle.replace(/\${id}/g, escapeCSS(id))).join('\n')
   }
 }
 

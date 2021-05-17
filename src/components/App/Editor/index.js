@@ -1,10 +1,8 @@
 import React from 'react'
 import Tabs from '../../Tabs'
-import Shader from './Shader'
 import Initializer from '../../Initializer'
 
-export default Component.register(import.meta.url, ({className, id, props}) => {
-  props.Shader = Shader.registerTemplate()
+export default Component.register(import.meta.url, ({className, id}) => {
   return <form className={className} id={id}>
            <div className={className+'-Shaders'}>
              <Tabs tabs={[]}/>
