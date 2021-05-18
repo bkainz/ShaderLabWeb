@@ -1,0 +1,56 @@
+server {
+    server_name $URL;
+
+    listen [::]:443 ssl http2;
+    listen 443 ssl http2;
+
+    ssl_certificate /etc/letsencrypt/live/$URL/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/$URL/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+    add_header Strict-Transport-Security "max-age=31536000" always;
+    ssl_trusted_certificate /etc/letsencrypt/live/$URL/chain.pem;
+    ssl_stapling on;
+    ssl_stapling_verify on;
+
+    access_log /var/log/nginx/$URL.access.log;
+    error_log /var/log/nginx/$URL.error.log;
+
+    if ($request_method !~ ^(GET|HEAD|POST|PUT|DELETE)$ ) {
+        return 405;
+    }
+
+    root /var/www/html/$URL;
+
+    error_page 404 /404;
+    error_page 500 502 503 504 /50x;
+
+    location / {
+        error_page 418 = @proxy;
+        if ($request_method != GET) {
+            return 418;
+        }
+
+        try_files $uri $uri.html $uri/index.html @proxy;
+    }
+
+    location @proxy {
+        proxy_pass http://127.0.0.1:$PORT;
+        proxy_set_header Host $host;
+        proxy_intercept_errors on;
+        error_page 404 501 502 503 504 @404;
+    }
+
+    location @404 {
+        return 404;
+    }
+}
+
+server {
+    server_name $URL;
+
+    listen [::]:80;
+    listen 80;
+
+    return 301 https://$host$request_uri;
+}
