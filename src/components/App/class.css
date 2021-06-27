@@ -1,28 +1,8 @@
-
 .${className} {
-  --color-panel-dark: #003b73;
-  --color-panel-light: white;
-  --color-panel-text: #333;
-  --color-button-dark: var(--color-panel-dark);
-  --color-button-light: var(--color-panel-light);
-  --color-border: var(--color-panel-dark);
-
-  width: 100vw;
-  height: 100vh;
-
-  display: flex;
-  flex-flow: column;
-}
-
-.${className}-Header {
-  grid-area: header;
-  position: relative;
-}
-
-.${className}-Content {
-  --border-width: 3px;
-  flex: 1 1 auto;
+  width: 100%;
+  height: 100%;
   display: grid;
+  --border-width: 3px;
   grid-template: "canvas  vborder editor" 50%
                  "hborder vborder editor" var(--border-width)
                  "options vborder editor" 1fr / 50% var(--border-width) 1fr;

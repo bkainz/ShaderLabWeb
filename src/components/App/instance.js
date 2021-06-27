@@ -14,21 +14,20 @@ App.prototype = {
     this.state = defaultState
 
     // Watch canvas panel size and update the canvas' viewport
-    const contentEl = this.el.querySelector(`.${escapeCSS(this.className)}-Content`)
-    const verticalBorderEl = contentEl.querySelector(`.${escapeCSS(this.className)}-VerticalBorder`)
-    const horizontalBorderEl = contentEl.querySelector(`.${escapeCSS(this.className)}-HorizontalBorder`)
+    const verticalBorderEl =  this.el.querySelector(`.${escapeCSS(this.className)}-VerticalBorder`)
+    const horizontalBorderEl =  this.el.querySelector(`.${escapeCSS(this.className)}-HorizontalBorder`)
 
     initializeDraggableBorder(verticalBorderEl, e => {
-      const bb = contentEl.getBoundingClientRect()
+      const bb =  this.el.getBoundingClientRect()
       const percent = (e.clientX-bb.left)/bb.width * 100
-      contentEl.style.gridTemplateColumns = percent+'% var(--border-width) 1fr'
+      this.el.style.gridTemplateColumns = percent+'% var(--border-width) 1fr'
       this.canvas.updateViewport()
     })
 
     initializeDraggableBorder(horizontalBorderEl, e => {
-      const bb = contentEl.getBoundingClientRect()
+      const bb =  this.el.getBoundingClientRect()
       const percent = (e.clientY-bb.top)/bb.height * 100
-      contentEl.style.gridTemplateRows = percent+'% var(--border-width) 1fr'
+      this.el.style.gridTemplateRows = percent+'% var(--border-width) 1fr'
       this.canvas.updateViewport()
     })
 

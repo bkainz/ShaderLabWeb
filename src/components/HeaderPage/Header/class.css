@@ -1,0 +1,26 @@
+.${className} {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0.5em 1em;
+  height: 3em;
+}
+
+.${className}-Logo {
+  flex: 1 1 0;
+  display: flex;
+  align-items: center;
+}
+
+@media (min-width: 26em) {
+  .${className}-Logo {
+    font-size: 1.5em;
+  }
+}
+
+@media (min-width: 32em) {
+  .${className}-Logo {
+    font-size: 2em;
+  }
+}

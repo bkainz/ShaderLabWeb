@@ -1,0 +1,15 @@
+.${className} {
+  width: 100vw;
+  height: 100vh;
+
+  --color-panel-dark: #003b73;
+  --color-panel-light: white;
+  --color-panel-text: #333;
+  --color-button-dark: var(--color-panel-dark);
+  --color-button-light: var(--color-panel-light);
+  --color-border: var(--color-panel-dark);
+  --border-radius: 0.1em;
+
+  background: var(--color-panel-dark);
+  color: var(--color-panel-light);
+}

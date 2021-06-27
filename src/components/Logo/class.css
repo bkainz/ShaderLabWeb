@@ -1,0 +1,22 @@
+.${className} {
+  display: flex;
+  flex-flow: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.${className}-Title {
+  font-weight: 300;
+}
+
+.${className}-VerticalBar {
+  flex: 0 0 auto;
+  margin: 0 0.5em;
+  height: 1.25em;
+  width: 0.03125em;
+  background: currentColor;
+}
+
+.${className}-Logo {
+  height: 0.75em;
+}
