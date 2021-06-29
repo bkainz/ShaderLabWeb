@@ -1,0 +1,102 @@
+.${className} {
+  display: flex;
+  justify-content: center;
+  height: 100%;
+}
+
+.${className}-Area {
+  width: 20em;
+  max-width: 100vw;
+  margin-top: 1em;
+  padding: 1em;
+  box-sizing: border-box;
+  display: flex;
+  flex-flow: column;
+}
+
+.${className}-Headline {
+  font-size: 2em;
+  margin-bottom: 0.5em;
+}
+
+.${className}-Content {
+  flex: 1 1 auto;
+  height: 100%;
+}
+
+.${className}-Section {
+  position: relative;
+}
+
+.${className}-Section + .${className}-Section {
+  margin-top: 1em;
+}
+
+.${className}-SectionHeading {
+  font-weight: bold;
+  margin-bottom: 0.5em;
+}
+
+.${className}-SectionContent {
+  position: relative;
+}
+
+.${className}-PasswordDiv {
+  display: flex;
+}
+
+.${className}-PasswordInput {
+  flex: 1 0 auto;
+}
+
+.${className}-ShowPasswordDiv {
+  margin-left: 1em;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+}
+
+.${className}-Input {
+  box-sizing: border-box;
+  width: 100%;
+  border: none;
+  border-radius: var(--border-radius);
+  background: white;
+  color: black;
+}
+
+input.${className}-Input {
+  padding: 0.5em;
+  height: 2em;
+}
+
+textarea.${className}-Input {
+  padding: 0.5em;
+  min-height: 10em;
+  resize: vertical;
+}
+
+.${className}-InputDescription {
+  margin-top: 0.5em;
+  font-size: 0.8em;
+}
+
+.${className}-Save {
+  margin-top: 2em;
+}
+
+.${className}-SaveButton {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0.5em;
+  border: 0;
+  border-radius: var(--border-radius);
+  background: white;
+  color: black;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.${className}-SaveMessage {
+  margin-top: 3px;
+}

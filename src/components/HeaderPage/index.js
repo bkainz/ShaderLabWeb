@@ -6,7 +6,7 @@ export default Component.register(import.meta.url, ({className, id, props}) =>
   <Page>
     <div className={className} id={id}>
       <header className={className+'-Header'}>
-        <Header/>
+        <Header session={props.session}/>
       </header>
       <div className={className+'-Content'}>
         <div className={className+'-ContentArea'}>

@@ -1,0 +1,12 @@
+.${className} {
+  color: white;
+  padding: 0.5em;
+
+  &.success {
+    background: #4bb543;
+  }
+
+  &.error {
+    background: #c00;
+  }
+}

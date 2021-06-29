@@ -1,0 +1,39 @@
+.${className} {
+  position: relative; /* needed to calculate scroll offset of items */
+}
+
+.${className}-Header {
+  display: flex;
+  font-weight: bold;
+}
+
+.${className}-Item {
+  display: flex;
+  cursor: pointer;
+  border-radius: var(--border-radius);
+  background: var(--color-panel-light);
+  color: var(--color-panel-dark);
+
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+
+  & ~ .${className}-Item {
+    margin-top: 2px;
+  }
+
+  &:hover {
+    background: #eee;
+  }
+}
+
+.${className}-Column {
+  min-height: 1em;
+  padding: 0.5em;
+
+  &.id {
+    flex: 0 1 2.5em;
+  }
+}

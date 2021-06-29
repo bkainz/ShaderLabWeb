@@ -24,3 +24,71 @@
     font-size: 2em;
   }
 }
+
+.${className}-Account {
+  flex: 0 0 auto;
+  text-align: right;
+  font-size: 0.75em;
+
+  display: flex;
+  align-items: center;
+
+  & a,
+  & button {
+    cursor: pointer;
+    color: currentColor;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+@keyframes ${className}-flash-message {
+  from { opacity: 1 }
+}
+
+.${className}-Message {
+  padding: 0.5em;
+  margin: 0 1em;
+  opacity: 0;
+  animation: ${className}-flash-message 5s ease-out;
+  position: relative;
+
+  &:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--color-panel-light);
+    opacity: 0.38;
+  }
+}
+
+.${className}-AccountUsername {
+  font-weight: bold;
+  font-size: calc(1em / 0.75);
+}
+
+.${className}-AdminNavigation,
+.${className}-UserNavigation {
+  margin-top: 0.5em;
+}
+
+.${className}-Navigation {
+  display: inline-block;
+}
+
+.${className}-NavigationItem {
+  display: inline-block;
+
+  &::after {
+    content: "| ";
+  }
+
+  &:last-child::after {
+    content: "";
+  }
+}

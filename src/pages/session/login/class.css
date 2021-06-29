@@ -1,0 +1,63 @@
+.${className} {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.${className}-Area {
+  width: 15em;
+}
+
+.${className}-Logo {
+  font-size: 1.5em;
+}
+
+@media (min-width: 26em) {
+  .${className}-Logo {
+    font-size: 2em;
+  }
+}
+
+.${className}-Message {
+  padding: 0.5em;
+  margin: 1em 0;
+  position: relative;
+
+  &:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--color-panel-light);
+    opacity: 0.38;
+  }
+}
+
+.${className}-LogInForm {
+  margin-top: 1em;
+  display: flex;
+  flex-flow: column;
+}
+
+.${className}-Input {
+  display: block;
+  margin-bottom: 0.5em;;
+  padding: 0.5em;
+  background: var(--color-button-light);
+  color: var(--color-button-dark);
+  border-radius: var(--border-radius);
+}
+
+.${className}-LogInButton {
+  align-self: flex-end;
+  padding: 0.5em;
+  cursor: pointer;
+  background: var(--color-button-light);
+  color: var(--color-button-dark);
+  border-radius: var(--border-radius);
+}

@@ -7,7 +7,7 @@ export default renderHTMLPage({
   meta: `<title>ShaderLabWeb</title>
          <meta name="robots" content="noindex, nofollow">`.replace(/\n {11}/, '\n'),
   Body: props =>
-          <HeaderPage {...props}>
+          <HeaderPage session={props.session}>
             <App/>
           </HeaderPage>
 })

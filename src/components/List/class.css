@@ -1,0 +1,109 @@
+.${className} {
+  display: flex;
+  flex-flow: column;
+  height: 100%;
+  position: relative;
+}
+
+.${className}-Filters,
+.${className}-ListItems {
+  min-height: 0;
+}
+
+.${className}-Filters {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: baseline;
+  margin-bottom: 1em;
+}
+
+.${className}-FiltersLabel {
+  flex: 0 0 auto;
+}
+
+.${className}-FiltersList {
+  flex: 1 1 auto;
+  align-items: flex-start;
+
+  --gap: 2px;
+  display: flex;
+
+  margin: calc(-1*var(--gap)/2);
+  & > * { margin: calc(var(--gap)/2) }
+}
+
+.${className}-FilterItem {
+  --padding: 0.4em;
+  position: relative;
+}
+
+.${className}-FilterName {
+  position: relative;
+  padding: var(--padding);
+  background: white;
+  color: black;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+}
+
+.${className}-FilterContent {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: calc(100% + var(--border-radius));
+  display: none;
+  background: white;
+  color: black;
+  overflow: hidden;
+}
+
+.${className}-FilterContentScroll {
+  overflow: hidden auto;
+  max-height: 80vh;
+  max-width: 80vw;
+}
+
+.${className}-FilterContentPadding {
+  padding: var(--padding);
+}
+
+.${className}-FilterItem:hover,
+.${className}-FilterItem:focus {
+  z-index: 2; /* So it sits above the tab flags */
+
+  & .${className}-FilterName {
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+  }
+
+  & .${className}-FilterContent {
+    display: block;
+    border-radius: 0 var(--border-radius) var(--border-radius) var(--border-radius);
+    box-shadow: 0 0 1em black;
+    z-index: -1;
+  }
+}
+
+.${className}-FilterValue {
+  display: flex;
+  flex-flow: row;
+  align-items: center;
+  white-space: nowrap;
+  cursor: pointer;
+
+  & + .${className}-FilterValue {
+    margin-top: 2px;
+  }
+}
+
+.${className}-FilterCheckbox {
+  margin: 0;
+}
+
+.${className}-FilterLabel {
+  padding-left: 0.25em;
+}
+
+.${className}-ListItems {
+  flex: 1 1 auto;
+  overflow: hidden auto;
+}
