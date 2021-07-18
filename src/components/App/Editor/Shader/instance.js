@@ -3,16 +3,13 @@ import escapeCSS from '../../../../componentHelpers/escapeCSS'
 const editorLoadedCallbacks = []
 let editorLoaded = editorLoadedCallbacks.push.bind(editorLoadedCallbacks)
 
-const monacoEditor = document.createElement('script')
-monacoEditor.src = 'monaco-editor/min/vs/loader.js'
-monacoEditor.addEventListener('load', e => {
-  require.config({paths: { 'vs': 'monaco-editor/min/vs' }})
+window.requireAvailable(() => {
+  require.config({paths: {vs: '/monaco-editor/min/vs'}})
   require(['vs/editor/editor.main'], _ => {
     editorLoaded = function(callback){ callback() }
     let callback; while (callback = editorLoadedCallbacks.shift()) callback()
   })
 })
-document.head.appendChild(monacoEditor)
 
 function Shader(el, {className, props}) {
   this.el = el

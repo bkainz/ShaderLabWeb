@@ -74,7 +74,7 @@ const meshes = {
          type: 'TRIANGLES',
          attributes: attributesConfig(3, 3, 2, 3)},
   get teapot() {
-    const path = new URL('assets/teapot.obj', document.baseURI).href
+    const path = new URL('/assets/teapot.obj', document.baseURI).href
     return fetch(path).then(response => response.text()).then(content => parseWavefront(path, content))
   }
 }
