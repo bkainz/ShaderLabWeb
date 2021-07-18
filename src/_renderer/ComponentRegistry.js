@@ -72,19 +72,6 @@ ComponentRegistry.prototype = {
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-          function instantiateComponentTree(element) {
-            const elements = document.createNodeIterator(element, NodeFilter.SHOW_ELEMENT)
-            while(element = elements.nextNode()) {
-              const component = components[element.classList.item(0)]
-              if (!component) continue
-              const propsEl = document.getElementById('__'+element.getAttribute('id')+'-props')
-              const props = propsEl ? JSON.parse(propsEl.parentElement.removeChild(propsEl).innerText) : {}
-              component.instantiate(element, props)
-            }
-          }
-
-          instantiateComponentTree(document.documentElement)
-
           new MutationObserver(mutations => {
             for (let mIdx = 0; mIdx < mutations.length; mIdx += 1) {
               for (let nIdx = 0; nIdx < mutations[mIdx].addedNodes.length; nIdx += 1) {
@@ -107,6 +94,19 @@ ComponentRegistry.prototype = {
               }
             }
           }).observe(document.documentElement, {childList: true, subtree: true})
+
+          function instantiateComponentTree(element) {
+            const elements = document.createNodeIterator(element, NodeFilter.SHOW_ELEMENT)
+            while(element = elements.nextNode()) {
+              const component = components[element.classList.item(0)]
+              if (!component) continue
+              const propsEl = document.getElementById('__'+element.getAttribute('id')+'-props')
+              const props = propsEl ? JSON.parse(propsEl.parentElement.removeChild(propsEl).innerText) : {}
+              component.instantiate(element, props)
+            }
+          }
+
+          instantiateComponentTree(document.documentElement)
         })
       }()
     `.trim().replace(/\n {6}/g, '\n')
