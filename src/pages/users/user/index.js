@@ -2,7 +2,9 @@ import React from 'react'
 import escapeCSS from '../../../componentHelpers/escapeCSS'
 import renderHTMLPage from '../../../_renderer/renderHTMLPage'
 import HeaderPage from '../../../components/HeaderPage'
+import List from '../../../components/List'
 import FlashMessage from '../../../components/FlashMessage'
+import Projects from '../../../components/Projects'
 import Initializer from '../../../components/Initializer'
 
 export default renderHTMLPage({
@@ -12,17 +14,12 @@ export default renderHTMLPage({
           <HeaderPage session={props.session}>
             <div className={className} id={id}>
               <div className={className+'-Area'}>
-                <h1 className={className+'-Headline'}>{props.user.id ? 'Edit user' : 'Create user'}</h1>
+                <h2 className={className+'-Headline'}>{props.user.id ? `Edit User (id: ${props.user.id})` : 'Create User'}</h2>
                 <div className={className+'-Content'}>
                   <form className={className+'-EditForm'} autoComplete="off"
                         hx-post={props.user.id ? undefined : '/users'}
                         hx-put={props.user.id ? '/users/'+props.user.id : undefined}
                         hx-target={'.'+escapeCSS(className+'-SaveMessage')}>
-                    {props.user.id
-                      ? <div className={className+'-Section'}>
-                          <div className={className+'-SectionHeading'}>Id: {props.user.id || 'new'}</div>
-                        </div>
-                      : ''}
                     <div className={className+'-Section'}>
                       <div className={className+'-SectionHeading'}>Username</div>
                       <div className={className+'-SectionContent'}>
@@ -42,17 +39,28 @@ export default renderHTMLPage({
                       </div>
                     </div>
                     <div className={className+'-Section '+className+'-Save'}>
-                      <button type="submit" className={className+'-Button save'}>save</button>
                       <div className={className+'-SaveMessage'}/>
+                      <button type="submit" className={className+'-Button save'}>save</button>
                     </div>
                   </form>
-                  {props.user.id && <form className={className+'-Delete'} method="POST" action={`/users/${props.user.id}/delete`}>
-                    <button type="submit" className={className+'-Button delete'}>delete</button>
-                  </form>}
+                  {props.user.id && <>
+                    <div className={className+'-Projects'}>
+                      <h2 className={className+'-Headline'}>User Projects</h2>
+                      <div className={className+'-SectionContent'}>
+                        <section className={className+'-List'}>
+                          <List resourceURI={'/users/'+props.user.id+'/projects'} filters={[]} state={[]}/>
+                        </section>
+                      </div>
+                    </div>
+                    <form className={className+'-Delete'} method="POST" action={`/users/${props.user.id}/delete`}>
+                      <h2 className={className+'-Headline'}>Delete User</h2>
+                      <button type="submit" className={className+'-Button delete'}>delete</button>
+                    </form>
+                  </>}
                   <Initializer/>
                 </div>
               </div>
             </div>
           </HeaderPage>,
-  [FlashMessage])
+  [FlashMessage, Projects])
 })

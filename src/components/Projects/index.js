@@ -13,7 +13,7 @@ export default Component.register(import.meta.url, ({className, id, props}) =>
             </div>
           </div>
           {props.items.map(item =>
-            <a key={item.id} href={`/projects/${item.id}`} className={className+'-Item'}>
+            <a key={item.id} href={`${props.resourceURI}/${item.id}`} className={className+'-Item'}>
               <div className={className+'-Column name'}>
                 {item.name}
               </div>

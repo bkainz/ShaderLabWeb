@@ -40,7 +40,7 @@ koa.use(appRoutes(app))
 koa.use(sessionRoutes(app))
 koa.use(accountRoutes(app))
 koa.use(userRoutes(app))
-koa.use(projectRoutes(app))
+koa.use(projectRoutes(app, {prefix: '/projects'}))
 
 Model.setup.isDone.then(() => {
   const server = http.createServer(koa.callback())

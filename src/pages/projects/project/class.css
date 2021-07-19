@@ -23,8 +23,14 @@
   margin-left: 1em;
 }
 
-.${className}-DeleteButton {
-  margin-left: 1em;
+.${className}-Actions {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end;
+}
+
+.${className}-Button {
   box-sizing: border-box;
   padding: 0.5em;
   border: 0;

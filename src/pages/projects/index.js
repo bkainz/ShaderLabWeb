@@ -13,11 +13,11 @@ export default renderHTMLPage({
               <div className={className+'-Area'}>
                 <h2 className={className+'-Headline'}>Projects</h2>
                 <div className={className+'-Content'}>
-                  <form hx-post="/projects">
+                  <form hx-post={props.resourceURI}>
                     <button className={className+'-CreateButton'}>Create</button>
                   </form>
                   <section className={className+'-List'}>
-                    <List resource="projects" filters={[]} state={[]}/>
+                    <List resourceURI={props.resourceURI} filters={[]} state={[]}/>
                   </section>
                 </div>
               </div>

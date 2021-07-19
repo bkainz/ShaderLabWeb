@@ -1,6 +1,7 @@
 import Router from '@koa/router'
 import {authenticateUser, authorizeRoot} from './middlewares/session'
 import httpParams from '../helpers/httpParams'
+import projectRoutes from './projects'
 
 import User from '../models/User'
 import usersPage from '../pages/users'
@@ -85,6 +86,8 @@ export default function(app) {
     await User.delete({id: Number(ctx.params.id)})
     ctx.redirect(ctx.router.url('users'))
   })
+
+  router.use(projectRoutes(app, {prefix: '/:user_id/projects'}))
 
   return router.routes()
 }

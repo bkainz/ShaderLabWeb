@@ -17,7 +17,7 @@ export default renderHTMLPage({
                     <a href={`/users/new`} className={className+'-AddButton'}>Add</a>
                   </section>
                   <section className={className+'-List'}>
-                    <List resource="users" filters={[]} state={[]}/>
+                    <List resourceURI="/users" filters={[]} state={[]}/>
                   </section>
                 </div>
               </div>

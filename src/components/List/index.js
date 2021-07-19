@@ -4,7 +4,7 @@ import escapeCSS from '../../componentHelpers/escapeCSS'
 import Initializer from '../Initializer'
 
 export default Component.register(import.meta.url, ({className, id, props}) =>
-  <div className={className} id={id} hx-trigger="load, submit" hx-get={`/${props.resource}/list`} hx-target={`#${escapeCSS(id+'-ListItems')}`}>
+  <div className={className} id={id} hx-trigger="load, submit" hx-get={props.resourceURI+'/list'} hx-target={`#${escapeCSS(id+'-ListItems')}`}>
     {props.filters.length
       ? <form className={className+'-Filters'}>
           <div className={className+'-FiltersLabel'}>filter by:&nbsp;</div>

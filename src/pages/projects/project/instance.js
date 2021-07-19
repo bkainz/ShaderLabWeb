@@ -8,15 +8,15 @@ export default class {
   }
 
   initialize() {
-    const editFormEl = this.el.querySelector(`.${escapeCSS(this.className)}-EditForm`)
-    const nameInputEl = this.el.querySelector(`.${escapeCSS(this.className)}-NameValue`)
-    nameInputEl.addEventListener('change', e => {
-      editFormEl.dispatchEvent(new Event('submit', {bubbles: true, cancelable: true}))
-    })
-    const projectEl = this.el.querySelector(`.${escapeCSS(this.className)}-Project`).lastElementChild
-    projectEl.addEventListener('stateChanged', e => {
-      editFormEl.dispatchEvent(new Event('submit', {bubbles: true, cancelable: true}))
-    })
+    if (this.props.session.fields.user.id === this.props.user.id) {
+      const editFormEl = this.el.querySelector(`.${escapeCSS(this.className)}-EditForm`)
+      this.el.querySelector(`.${escapeCSS(this.className)}-NameValue`).addEventListener('change', e => {
+        editFormEl.dispatchEvent(new Event('submit', {bubbles: true, cancelable: true}))
+      })
+      this.el.querySelector(`.${escapeCSS(this.className)}-Project`).lastElementChild.addEventListener('stateChanged', e => {
+        editFormEl.dispatchEvent(new Event('submit', {bubbles: true, cancelable: true}))
+      })
+    }
 
     const deleteFormEl = this.el.querySelector(`.${escapeCSS(this.className)}-DeleteForm`)
     deleteFormEl && deleteFormEl.addEventListener('submit', e => confirm('Irrevocably delete?') || e.preventDefault())

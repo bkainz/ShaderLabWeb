@@ -36,4 +36,8 @@
   &.name {
     flex: 1 1 auto;
   }
+
+  &.savedAt {
+    flex: 0 0 auto;
+  }
 }
