@@ -23,6 +23,9 @@ export default Component.register(import.meta.url, ({className, id, props}) =>
             <div className={className+'-UserNavigation'}>
               <ul className={className+'-Navigation'}>
                 <li className={className+'-NavigationItem'}>
+                  <a href="/projects">projects</a>
+                </li>
+                <li className={className+'-NavigationItem'}>
                   <a href="/account">account</a>
                 </li>
                 <li className={className+'-NavigationItem'}>
@@ -33,7 +36,7 @@ export default Component.register(import.meta.url, ({className, id, props}) =>
               </ul>
             </div>
           </div>
-        : <a href="/account">log in</a>}
+        : <a href="/projects">log in</a>}
       </div>
   </div>
 )

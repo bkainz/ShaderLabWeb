@@ -1,4 +1,5 @@
 import React from 'react'
+import Initializer from '../../../Initializer'
 
 export default Component.register(import.meta.url, ({className, id}) =>
   <div className={className} id={id}>
@@ -10,5 +11,6 @@ export default Component.register(import.meta.url, ({className, id}) =>
         <input className={className+'-isLinked'} type="checkbox" defaultChecked={true}/> Link to program
       </label>
     </div>
+    <Initializer/>
   </div>
 )

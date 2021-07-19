@@ -18,11 +18,8 @@ function Shader(el, {className, props}) {
   this.type = props.type
   this.name = props.name
   this.id = props.programId+'/'+props.type
-
   this.sourceEl = this.el.querySelector(`.${escapeCSS(this.className)}-Source`)
   this.isLinkedEl = this.el.querySelector(`.${escapeCSS(this.className)}-isLinked`)
-
-  this.state = props.state
 
   this.editor = null
   editorLoaded(_ => {
@@ -31,9 +28,17 @@ function Shader(el, {className, props}) {
                                                        automaticLayout: true,
                                                        minimap: {enabled: false}})
   })
+
+  this.state = props.state
 }
 
 Shader.prototype = {
+  initialize() {
+    this.app = this.el.closest('.components\\/App').__component__
+    this.isLinkedEl.addEventListener('change', e => this.app.announceStateChange())
+    editorLoaded(_ => this.editor.onDidChangeModelContent(e => this.app.announceStateChange()))
+  },
+
   get state() {
     return {source: this.editor ? this.editor.getValue() : this.source,
             isLinked: this.isLinkedEl.checked}

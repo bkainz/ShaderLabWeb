@@ -5,8 +5,9 @@ import Editor from './Editor'
 import Shader from './Editor/Shader'
 import Initializer from '../Initializer'
 
-export default Component.register(import.meta.url, ({className, id}) =>
+export default Component.register(import.meta.url, ({className, id, props}) =>
   <div className={className} id={id}>
+    <input type="hidden" form={props.form} name="state" value={props.state} className={className+'-State'}/>
     <section className={className+'-EditorPanel'}>
       <Editor Shader={Shader.registerTemplate()}/>
     </section>

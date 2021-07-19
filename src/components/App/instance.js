@@ -1,17 +1,19 @@
 import Value from './instance/Value'
 import escapeCSS from '../../componentHelpers/escapeCSS'
-import defaultState from '../../defaultState.json'
 
-function App(el, {className}) {
+function App(el, {className, props}) {
   this.el = el
   this.className = className
+  this.props = props
   this.values = {}
   this.valueMigrations = {}
 }
 
 App.prototype = {
   initialize() {
-    this.state = defaultState
+    this.stateEl = this.el.querySelector(`.${escapeCSS(this.className)}-State`)
+    this.state = JSON.parse(this.stateEl.value)
+    this.stateChangeThrottle && clearTimeout(this.stateChangeThrottle)
 
     // Watch canvas panel size and update the canvas' viewport
     const verticalBorderEl =  this.el.querySelector(`.${escapeCSS(this.className)}-VerticalBorder`)
@@ -103,6 +105,15 @@ App.prototype = {
     this.camera.state = state.camera
     this.model.state = state.model
     this.uniforms.state = state.uniforms
+  },
+
+  announceStateChange() {
+    this.stateChangeThrottle && clearTimeout(this.stateChangeThrottle)
+    this.stateChangeThrottle = setTimeout(() => {
+      this.stateChangeThrottle = undefined
+      this.stateEl.value = JSON.stringify(this.state)
+      this.el.dispatchEvent(new Event('stateChanged'))
+    }, 500)
   }
 }
 

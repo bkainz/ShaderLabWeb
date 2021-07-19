@@ -24,6 +24,7 @@ export default {
           this.app.setValue(config.type, config.name, !config.isNumeric ? value
                                                     : !config.isArray   ? Number(value)
                                                     :                     value.map(Number))
+          this.app.announceStateChange()
         }
       })
     }

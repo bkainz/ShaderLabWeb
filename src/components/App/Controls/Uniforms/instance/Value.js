@@ -79,6 +79,7 @@ Value.prototype = {
   set value(value) {
     this._value = value
     this.el.dispatchEvent(new CustomEvent('valueChanged', {detail: value}))
+    this.app.announceStateChange()
     this.app.canvas.updateUniform(this.programId, {name: this.uniformName, type: this.type, value})
   },
 

@@ -11,6 +11,7 @@ import appRoutes from './routes/app'
 import sessionRoutes from './routes/session'
 import accountRoutes from './routes/account'
 import userRoutes from './routes/users'
+import projectRoutes from './routes/projects'
 import exitHandler from './helpers/exitHandler'
 
 const app = new App()
@@ -39,6 +40,7 @@ koa.use(appRoutes(app))
 koa.use(sessionRoutes(app))
 koa.use(accountRoutes(app))
 koa.use(userRoutes(app))
+koa.use(projectRoutes(app))
 
 Model.setup.isDone.then(() => {
   const server = http.createServer(koa.callback())
