@@ -14,10 +14,13 @@ export default Component.register(import.meta.url, ({className, id}) =>
                    {id: 'model', label: 'Model', content: <Model/>},
                    {id: 'uniforms', label: 'Uniforms', content: <Uniforms/>}]}/>
     </div>
-    <div className={className+'-Controls'}>
-      State:&nbsp;
-      <button type="button" className={className+'-Button'} id={id+'-SaveButton'}>Save</button>&nbsp;
-      <button type="button" className={className+'-Button'} id={id+'-LoadButton'}>Load</button>
+    <div className={className+'-State'}>
+      <div className={className+'-StateHeadline'}>Download State:</div>
+      &nbsp;<button type="button" className={className+'-Button save-json'}>.json</button>
+      &nbsp;<button type="button" className={className+'-Button save-zip'}>.zip</button>
+      <div className={className+'-StateHeadline'}>Upload State:</div>
+      &nbsp;<button type="button" className={className+'-Button load-json'}>.json</button>
+      &nbsp;<button type="button" className={className+'-Button load-zip'}>.zip</button>
     </div>
     <Initializer/>
   </div>

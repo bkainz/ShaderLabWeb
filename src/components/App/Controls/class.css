@@ -5,8 +5,23 @@
   flex-flow: column;
 }
 
-.${className}-Controls {
+.${className}-Tabs {
+  flex: 1 1 auto;
+  position: relative;
+}
+
+.${className}-State {
   padding: 0.5em;
+  display: flex;
+  align-items: baseline;
+}
+
+.${className}-StateHeadline {
+  font-weight: bold;
+}
+
+* + .${className}-StateHeadline {
+  margin-left: 1em;
 }
 
 .${className}-Button {
@@ -15,9 +30,4 @@
   color: var(--color-button-dark);
   font-weight: bold;
   cursor: pointer;
-}
-
-.${className}-Tabs {
-  flex: 1 1 auto;
-  position: relative;
 }
