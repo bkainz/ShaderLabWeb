@@ -4,7 +4,7 @@
   align-items: center;
   justify-content: flex-end;
   padding: 0.5em 1em;
-  height: 3em;
+  min-height: 3em;
 }
 
 .${className}-Logo {

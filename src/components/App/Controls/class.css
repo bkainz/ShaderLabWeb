@@ -6,8 +6,6 @@
 }
 
 .${className}-Controls {
-  background: var(--color-panel-dark);
-  color: var(--color-panel-light);
   padding: 0.5em;
 }
 

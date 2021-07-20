@@ -37,7 +37,6 @@
 .${className}-HorizontalBorder,
 .${className}-VerticalBorder {
   position: relative;
-  background: var(--color-border);
 }
 
 .${className}-VerticalBorder::before {

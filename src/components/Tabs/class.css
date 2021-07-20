@@ -16,14 +16,14 @@
   flex: 0 0 auto;
   display: flex;
   flex-flow: row wrap;
-  background: var(--color-panel-dark);
-  color: var(--color-panel-light);
   font-weight: bold;
   user-select: none;
 }
 
 .${className}-Tab {
   padding: 0.5em;
+  background: var(--color-panel-dark);
+  color: var(--color-panel-light);
 }
 
 .${className}-Cards {
