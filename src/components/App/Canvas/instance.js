@@ -122,10 +122,9 @@ Canvas.prototype = {
   },
 
   // mesh CRUD
-  createMesh(id, {mesh, isModel}) {
+  createMesh(id, mesh) {
     if (this.meshes[id]) throw new Error(`mesh id "${id}" already taken`)
     this.meshes[id] = new Mesh(this.webGL, id, loadMesh(mesh))
-    this.meshes[id].isModel = isModel
   },
 
   updateMesh(id, mesh) {
@@ -198,7 +197,7 @@ Canvas.prototype = {
     for (const type in this.programs[program])
       this.programmedMeshes[id][type] = new ProgrammedMesh(this.meshes[mesh], this.programs[program][type])
 
-    if (!this.meshes[mesh].isModel) return
+    if (this.meshes[mesh].id !== 'model') return
 
     for (const type in this.programmedMeshes[id]) {
       this.programmedMeshes[id][type].depthTest = this.app.getValue('config', 'Depth Test')
@@ -237,7 +236,7 @@ Canvas.prototype = {
       for (const meshId in this.framebuffers[framebufferId].meshes) {
         const programmedMesh = this.framebuffers[framebufferId].meshes[meshId]
         programmedMesh.surface.render()
-        if (programmedMesh.surface.mesh.isModel && this.app.getValue('config', 'Show Wireframe')) {
+        if (programmedMesh.surface.mesh.id === 'model' && this.app.getValue('config', 'Show Wireframe')) {
           this.webGL.enable(this.webGL.POLYGON_OFFSET_FILL)
           this.webGL.polygonOffset(-1, -1)
           programmedMesh.wireframe.render()

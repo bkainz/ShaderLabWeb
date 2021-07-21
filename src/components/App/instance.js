@@ -91,14 +91,19 @@ App.prototype = {
     // combined into a "programmed mesh" linking the otherwise independent mesh and
     // program.
     state.canvas = {framebuffers: {}, meshes: {}, programs: {}, programmedMeshes: {}}
-    Object.keys(state.editor).forEach((id, idx) => {
-      state.canvas.framebuffers[id] = {}
-      state.canvas.meshes[id] = {mesh: idx === 0 ? 'void' : 'quad', isModel: idx === 0}
-      state.canvas.programs[id] = {}
-      state.canvas.programmedMeshes[id] = {mesh: id, program: id, framebuffer: id}
-    })
 
-    this.model.meshId = Object.keys(state.editor)[0]
+    const isOldEditorFormat = Object.keys(state.editor).length === 2 && state.editor.base && state.editor.R2T
+    const editorState = isOldEditorFormat ? {model: {base: state.editor.base}, quad: {R2T: state.editor.R2T}}
+                                          : state.editor
+
+    for (const meshId in editorState) {
+      state.canvas.meshes[meshId] = meshId === 'model' ? 'void' : 'quad'
+      for (const id in editorState[meshId]) {
+        state.canvas.framebuffers[id] = {}
+        state.canvas.programs[id] = {}
+        state.canvas.programmedMeshes[id] = {mesh: meshId, program: id, framebuffer: id}
+      }
+    }
 
     this.canvas.state = state.canvas
     this.editor.state = state.editor

@@ -91,7 +91,7 @@ const STATE = {
                                       : count < 2 ? 'float'
                                       :             'vec'+count
       })
-      this.app.canvas.updateMesh(this.meshId, mesh)
+      this.app.canvas.updateMesh('model', mesh)
     }},
   position: {type: 'vec3', name: 'Model Position', onChange: updateModelMatrix},
   rotationAxis: {type: 'vec3', name: 'Model Rotation Axis', onChange: updateModelMatrix},
