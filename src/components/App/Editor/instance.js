@@ -15,7 +15,7 @@ function Editor(el, {className, props}) {
 Editor.prototype = {
   initialize() {
     this.tabs = this.el.querySelector(`.${escapeCSS(this.className)}-Shaders`).firstElementChild.__component__
-    this.el.addEventListener('submit', e => {this.updatePrograms(); e.preventDefault()})
+    this.el.addEventListener('submit', e => {e.preventDefault(); this.updatePrograms()})
   },
 
   updatePrograms() {

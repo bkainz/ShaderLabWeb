@@ -11,7 +11,7 @@ function Controls(el, {className, ancestors}) {
 
 Controls.prototype = {
   get tabs() {
-    return this.el.firstElementChild.__component__
+    return this.el.querySelector(`.${escapeCSS(this.className)}-Tabs`).firstElementChild.__component__
   },
 
   initialize() {
