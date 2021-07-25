@@ -1,7 +1,7 @@
-function Framebuffer(webGL, id, size) {
+function Framebuffer(webGL, size) {
   this.webGL = webGL
-  this.id = id
-  this.name = this.id[0].toUpperCase()+this.id.slice(1)+' Pass'
+  this.meshes = new Set()
+  this.eventEl = document.createElement('div')
 
   this.framebuffer = this.webGL.createFramebuffer()
   this.attachments = {color: this.webGL.createTexture()}
@@ -80,7 +80,9 @@ Framebuffer.prototype = {
     } else {
       this.webGL.deleteRenderbuffer(this.depthBuffer)
     }
-  },
+
+    this.eventEl.dispatchEvent(new Event('destroyed'))
+  }
 }
 
 export default Framebuffer

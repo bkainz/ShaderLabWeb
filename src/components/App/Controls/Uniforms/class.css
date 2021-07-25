@@ -1,10 +1,11 @@
-.${className}\/instance\/Value + .${className}\/instance\/Value {
-  margin-top: 0.5em;
+.${className} {
+  margin-top: -0.5em;
 }
 
 .${className}\/instance\/Value {
   --indentation: 0.75em;
   --arrow-size: 0.35em;
+  margin-top: 0.5em;
 }
 
 .${className}\/instance\/Value-State {

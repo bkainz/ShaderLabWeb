@@ -1,7 +1,7 @@
 import Value from './Value'
 
-function NumericValue(app, uniformName, name, type, programId) {
-  Value.call(this, app, uniformName, name, type, programId)
+function NumericValue(app, uniformName, name, type, programmedMesh) {
+  Value.call(this, app, uniformName, name, type, programmedMesh)
 
   const nRows = type.startsWith('mat')  ? Number(type[3]) : 1
   const nCols = type.startsWith('mat')  ? Number(type[3])

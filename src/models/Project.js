@@ -1,6 +1,6 @@
 import Model from '../helpers/Model'
 import View from '../helpers/View'
-import defaultState from '../defaultState.json'
+import defaultState from '../../defaultStates/project.json'
 
 const table = 'projects'
 Model.setup.do(`CREATE TABLE IF NOT EXISTS ${table} (

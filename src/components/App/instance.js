@@ -47,8 +47,8 @@ App.prototype = {
   setValue(type, name, value) {
     this.values[type] = this.values[type] || {}
     if (!this.values[type][name]) {
-      this.values[type][name] = new Value(name, type)
-      this.el.dispatchEvent(new CustomEvent('valueTypeListChanged', {detail: this.values[type]}))
+      this.values[type][name] = new Value(type, name)
+      this.el.dispatchEvent(new CustomEvent('valueTypeListExpanded', {detail: this.values[type]}))
     }
     this.values[type][name].value = value
   },
@@ -57,20 +57,26 @@ App.prototype = {
     return this.values[type] && this.values[type][name] && this.values[type][name].value
   },
 
+  renameValue(type, oldName, newName) {
+    this.values[type][newName] = this.values[type][oldName]
+    delete this.values[type][oldName]
+    this.values[type][newName].name = newName
+  },
+
   removeValue(type, name) {
     if (!this.values[type]) return
+    this.values[type][name].el.dispatchEvent(new Event('removed'))
     delete this.values[type][name]
-    this.el.dispatchEvent(new CustomEvent('valueTypeListChanged', {detail: this.values[type]}))
   },
 
   onChangedValue(type, name, callback) {
     this.values[type] = this.values[type] || {}
-    this.values[type][name] = this.values[type][name] || new Value(name, type)
+    this.values[type][name] = this.values[type][name] || new Value(type, name)
     this.values[type][name].el.addEventListener('valueChanged', ({detail: value}) => callback(value))
   },
 
-  onChangedValueTypeList(type, callback) {
-    this.el.addEventListener('valueTypeListChanged', ({detail: list}) => list === this.values[type] && callback(list))
+  onExpandedValueTypeList(type, callback) {
+    this.el.addEventListener('valueTypeListExpanded', ({detail: list}) => list === this.values[type] && callback(list))
   },
 
   setValueMigration(type, alias, name) {
@@ -79,37 +85,43 @@ App.prototype = {
   },
 
   get state() {
-    return {editor: this.editor.state,
-            camera: this.camera.state,
+    return {camera: this.camera.state,
             model: this.model.state,
-            uniforms: this.uniforms.state}
+            passes: this.editor.state,
+            output: this.canvas.state}
   },
 
   set state(state) {
-    // Derive canvas state from the editor state: Each shader pair in the editor state
-    // gets a framebuffer, mesh and program. Mesh, program and framebuffer are also
-    // combined into a "programmed mesh" linking the otherwise independent mesh and
-    // program.
-    state.canvas = {framebuffers: {}, meshes: {}, programs: {}, programmedMeshes: {}}
-
-    const isOldEditorFormat = Object.keys(state.editor).length === 2 && state.editor.base && state.editor.R2T
-    const editorState = isOldEditorFormat ? {model: {base: state.editor.base}, quad: {R2T: state.editor.R2T}}
-                                          : state.editor
-
-    for (const meshId in editorState) {
-      state.canvas.meshes[meshId] = meshId === 'model' ? 'void' : 'quad'
-      for (const id in editorState[meshId]) {
-        state.canvas.framebuffers[id] = {}
-        state.canvas.programs[id] = {}
-        state.canvas.programmedMeshes[id] = {mesh: meshId, program: id, framebuffer: id}
+    if ('editor' in state && Object.keys(state.editor).length === 2 && 'base' in state.editor && 'R2T' in state.editor) {
+      const migrateOldUniformState = function(uniform) {
+        if (uniform.attachment) {
+          uniform.attachment = uniform.attachment === 'Base Pass color' ? 'Model/base Pass color'
+                             : uniform.attachment === 'Base Pass depth' ? 'Model/base Pass depth'
+                             : uniform.attachment === 'R2T Pass color' ? 'Quad/R2T Pass color'
+                             : uniform.attachment === 'R2T Pass depth' ? 'Quad/R2T Pass depth'
+                             : uniform.attachment
+        }
+        else {
+          for (const key in uniform)
+            migrateOldUniformState(uniform[key])
+        }
       }
+
+      for (const key in state.uniforms)
+        migrateOldUniformState(state.uniforms[key])
+
+      state.passes = {Model: {base: {shaders: state.editor.base, uniforms: state.uniforms.base}},
+                      Quad: {R2T: {shaders: state.editor.R2T, uniforms: state.uniforms.R2T}}}
+      state.output = {image: 'Quad/R2T Pass color'}
     }
 
-    this.canvas.state = state.canvas
-    this.editor.state = state.editor
+    for (const meshId in this.canvas.meshes) this.canvas.destroyMesh(meshId)
+    for (const meshId in state.passes) this.canvas.createMesh(meshId, meshId === 'Quad' ? 'quad' : 'void')
+
     this.camera.state = state.camera
     this.model.state = state.model
-    this.uniforms.state = state.uniforms
+    this.editor.state = state.passes
+    this.canvas.state = state.output
   },
 
   announceStateChange() {

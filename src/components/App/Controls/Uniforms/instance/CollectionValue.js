@@ -3,7 +3,7 @@ import NumericValue from './NumericValue'
 import BooleanValue from './BooleanValue'
 import SamplerValue from './SamplerValue'
 
-function CollectionValue(app, uniformName, name, type, program) {
+function CollectionValue(app, uniformName, name, type, programmedMesh) {
   Value.call(this, app, uniformName, name, type, [])
 
   this.fields = {}
@@ -21,7 +21,7 @@ function CollectionValue(app, uniformName, name, type, program) {
                   :                                           undefined
       const fieldUniformName = /^\d+$/.test(field.name) ? `${uniformName ? uniformName+'[' : ''}${field.name}${uniformName ? ']' : ''}`
                                                         : `${uniformName ? uniformName+'.' : ''}${field.name}`
-      this.fields[field.name] = new Value(this.app, fieldUniformName, field.name, field.type, program)
+      this.fields[field.name] = new Value(this.app, fieldUniformName, field.name, field.type, programmedMesh)
     }
     this.valueEl.appendChild(this.fields[field.name].el)
   }
@@ -54,6 +54,11 @@ CollectionValue.prototype = Object.create(Value.prototype, Object.getOwnProperty
     const uniforms = []
     for (const name in this.fields) uniforms.push(...this.fields[name].uniforms)
     return uniforms
+  },
+
+  destroy() {
+    for (const name in this.fields) this.fields[name].destroy()
+    return Value.prototype.destroy.call(this)
   }
 }))
 

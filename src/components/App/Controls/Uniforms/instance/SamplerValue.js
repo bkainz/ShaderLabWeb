@@ -1,8 +1,8 @@
 import Value from './Value'
 import ImageUpload from './SamplerValue/ImageUpload'
 
-function SamplerValue(app, uniformName, name, type, programId) {
-  Value.call(this, app, uniformName, name, type, programId)
+function SamplerValue(app, uniformName, name, type, programmedMesh) {
+  Value.call(this, app, uniformName, name, type, programmedMesh)
 
   this.imagesEl = document.createElement('div')
   this.imagesEl.classList.add(this.className+'-SamplerImages')
@@ -50,7 +50,7 @@ SamplerValue.prototype = Object.create(Value.prototype, Object.getOwnPropertyDes
     }
     else {
       const value = {}
-      for (const target in this.images) value[target] = this.images[target].imageEl.src
+      for (const target in this.images) value[target] = this.images[target].imageEl.getAttribute('src')
       return {value}
     }
   },

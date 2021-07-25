@@ -12,8 +12,9 @@
 
 .${className}-State {
   padding: 0.5em;
+  height: 2em;
   display: flex;
-  align-items: baseline;
+  align-items: center;
 }
 
 .${className}-StateHeadline {

@@ -2,6 +2,7 @@ function ProgrammedMesh(mesh, program) {
   this.program = program
   this.mesh = mesh
   this.webGL = program.webGL
+  this.eventEl = document.createElement('div')
 
   this.reset()
   this.depthTest = ''
@@ -9,12 +10,12 @@ function ProgrammedMesh(mesh, program) {
   this.frontFace = 'CCW'
 
   this.resetListener = e => this.reset()
-  this.program.eventEl.addEventListener('changed', this.resetListener)
+  this.program.eventEl.addEventListener('updated', this.resetListener)
 }
 
 ProgrammedMesh.prototype = {
   reset() {
-    this.program.eventEl.removeEventListener('changed', this.resetListener)
+    this.program.eventEl.removeEventListener('updated', this.resetListener)
     for (const unit in this.createdTextures) this.webGL.deleteTexture(this.createdTextures[unit])
     this.createdTextures = []
     this.uniforms = {}
@@ -96,6 +97,8 @@ ProgrammedMesh.prototype = {
       default:
         throw new Error(`unknown or unsupported uniform type '${type}'`)
     }
+
+    this.eventEl.dispatchEvent(new CustomEvent('updatedUniform', {detail: {type, name, value}}))
   },
 
   render() {
@@ -201,6 +204,7 @@ ProgrammedMesh.prototype = {
 
   destroy() {
     this.reset()
+    this.eventEl.dispatchEvent(new Event('destroyed'))
   }
 }
 

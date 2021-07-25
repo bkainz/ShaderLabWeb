@@ -1,7 +1,7 @@
 import Value from './Value'
 
-function BooleanValue(app, uniformName, name, type, programId) {
-  Value.call(this, app, uniformName, name, type, programId)
+function BooleanValue(app, uniformName, name, type, programmedMesh) {
+  Value.call(this, app, uniformName, name, type, programmedMesh)
 
   const nCols = type.startsWith('bvec') ? Number(type[4]) : 1
 

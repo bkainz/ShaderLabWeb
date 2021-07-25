@@ -1,5 +1,5 @@
 import React from 'react'
-import Tabs from '../../Tabs'
+import Tabs from './Tabs'
 import Initializer from '../../Initializer'
 
 export default Component.register(import.meta.url, ({className, id}) => {

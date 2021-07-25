@@ -1,5 +1,5 @@
 import React from 'react'
-import Tabs from '../../Tabs'
+import Tabs from './Tabs'
 import Log from './Log'
 import Camera from './Camera'
 import Model from './Model'

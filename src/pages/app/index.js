@@ -2,7 +2,7 @@ import React from 'react'
 import renderHTMLPage from '../../_renderer/renderHTMLPage'
 import HeaderPage from '../../components/HeaderPage'
 import App from '../../components/App'
-import defaultState from '../../defaultState.json'
+import defaultState from '../../../defaultStates/project.json'
 
 export default renderHTMLPage({
   meta: `<title>ShaderLabWeb</title>

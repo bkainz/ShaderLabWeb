@@ -1,29 +1,23 @@
 import GLSLParser from './Shader/GLSLParser'
 
-function Shader(webGL, type, {name, source, isLinked = true}) {
+function Shader(webGL, type) {
   this.webGL = webGL
   this.webGlShader = this.webGL.createShader(this.webGL[type.toUpperCase()+'_SHADER'])
 
   this.constInts = {}
   this.structs = {}
   this.uniforms = {}
-
-  this.type = type
-  this.name = name
-  this.source = source
-  this.isLinked = isLinked
 }
 
 Shader.prototype = {
   get isValid() {
-    return this.isLinked && this.webGL.getShaderParameter(this.webGlShader, this.webGL.COMPILE_STATUS)
+    return this.webGL.getShaderParameter(this.webGlShader, this.webGL.COMPILE_STATUS)
   },
 
   get compileMessage() {
     const isCompiled = this.webGL.getShaderParameter(this.webGlShader, this.webGL.COMPILE_STATUS)
-    return !isCompiled    ? 'Compilation failed: '+this.webGL.getShaderInfoLog(this.webGlShader)
-         : !this.isLinked ? 'Compilation skipped: Not linked'
-         :                  'Compilation successful'
+    return !isCompiled ? 'Compilation failed: '+this.webGL.getShaderInfoLog(this.webGlShader)
+         :               'Compilation successful'
   },
 
   get source() {
