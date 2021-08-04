@@ -14,8 +14,9 @@ function Editor(el, {className, props, ancestors}) {
 
 Editor.prototype = {
   initialize() {
-    this.tabs = this.el.querySelector(`.${escapeCSS(this.className)}-Shaders`).firstElementChild.__component__
-    this.el.addEventListener('submit', e => {
+    this.formEl = this.el.querySelector(`.${escapeCSS(this.className)}-Form`)
+    this.tabs = this.formEl.firstElementChild.__component__
+    this.formEl.addEventListener('submit', e => {
       e.preventDefault()
       for (const meshId in this.passes)
         for (const passId in this.passes[meshId])

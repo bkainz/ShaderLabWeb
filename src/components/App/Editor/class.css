@@ -5,7 +5,7 @@
   flex-flow: column;
 }
 
-.${className}-Shaders {
+.${className}-Form {
   flex: 1 1 auto;
   position: relative;
 }
