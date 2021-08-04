@@ -1,4 +1,4 @@
-import CallbackRegistry from './CallbackRegistry'
+import CallbackRegistry from './CallbackRegistry.js'
 
 const callbacks = new CallbackRegistry('')
 const signals = 'SIGINT SIGTERM'.split(' ')

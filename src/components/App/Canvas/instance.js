@@ -25,7 +25,7 @@ function Canvas(el, {className}) {
 Canvas.prototype = {
   initialize() {
     this.canvasEl = this.el.querySelector(`.${escapeCSS(this.className)}-Canvas`)
-    this.webGL = this.canvasEl.getContext('webgl', {alpha: false})
+    this.webGL = this.canvasEl.getContext('webgl', {alpha: false, preserveDrawingBuffer: true})
     this.webGL.enable(this.webGL.BLEND)
     this.webGL.blendFunc(this.webGL.SRC_ALPHA, this.webGL.ONE_MINUS_SRC_ALPHA);
     this.webGL.getExtension('OES_standard_derivatives')

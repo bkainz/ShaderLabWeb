@@ -25,6 +25,13 @@ server {
     error_page 404 /404;
     error_page 500 502 503 504 /50x;
 
+    location /feedback {
+        proxy_pass http://127.0.0.1:$FBKPORT/;
+        proxy_set_header Host $host;
+        proxy_intercept_errors on;
+        error_page 404 501 502 503 504 @404;
+    }
+
     location / {
         error_page 418 = @proxy;
         if ($request_method != GET) {
@@ -35,7 +42,7 @@ server {
     }
 
     location @proxy {
-        proxy_pass http://127.0.0.1:$PORT;
+        proxy_pass http://127.0.0.1:$APPPORT;
         proxy_set_header Host $host;
         proxy_intercept_errors on;
         error_page 404 501 502 503 504 @404;
