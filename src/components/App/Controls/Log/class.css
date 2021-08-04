@@ -58,9 +58,10 @@
 }
 
 @keyframes highlight {
-  from { color: red }
+  from { color: var(--color) }
 }
 
-.${className}-Item-Body.error {
+.${className}-Item-Body {
+  --color: currentColor;
   animation: highlight 5s ease-out;
 }

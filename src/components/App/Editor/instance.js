@@ -61,9 +61,9 @@ Editor.prototype = {
     this.app.log.append(`<hr data-text="${pass.name}: Compile & Link Shaders">`, '')
     for (const type in pass.program.shaders) {
       const shader = pass.program.shaders[type]
-      this.app.log.append(pass.shaders[type].name, shader.compileMessage, !shader.isValid)
+      this.app.log.append(pass.shaders[type].name, shader.compileMessage, !shader.isValid ? 'red' : '')
     }
-    this.app.log.append(pass.name, pass.program.linkMessage, !pass.program.isValid)
+    this.app.log.append(pass.name, pass.program.linkMessage, !pass.program.isValid ? 'red' : '')
 
     this.app.el.dispatchEvent(new CustomEvent('passUpdated', {detail: pass}))
   },
