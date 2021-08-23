@@ -12,7 +12,8 @@ APPUSR=shaderLabWeb
 GITDIR=/srv/git/$URL
 APPDIR=/srv/http/$URL
 
-# Create linux user
+# Create linux group and user
+groupadd deployment
 useradd -m -G deployment $APPUSR
 
 # Create git repo
@@ -33,3 +34,7 @@ chmod g+w /var/www/html/$URL
 # Create SSL certificate
 echo "server { server_name $URL; listen 80; }" > /etc/nginx/sites-available/$URL
 certbot certonly --nginx -n --agree-tos -d $URL -m $EMAIL
+
+# Open ports
+ufw allow http
+ufw allow https

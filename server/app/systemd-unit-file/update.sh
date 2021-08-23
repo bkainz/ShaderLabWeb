@@ -8,7 +8,7 @@ URL=$1
 APPUSR=shaderLabWeb
 APPDIR=/srv/http/$URL
 SCRIPT="$(which yarn) serve"
-PORT=3000
+PORT=$(test -n "$2" && echo $2 || 3000)
 
 sed -i -e "s!\$URL!$URL!" /etc/systemd/system/$URL.service
 sed -i -e "s!\$USR!$APPUSR!" /etc/systemd/system/$URL.service

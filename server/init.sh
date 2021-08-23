@@ -10,4 +10,4 @@ DIR="$(cd "$(dirname "$BASH_SOURCE")" &> /dev/null && pwd)"
 URL=$SRV
 
 ssh $USR@$SRV 'sudo bash -s' < "$DIR/app/init.sh" "$URL" "$EMAIL"
-"$DIR/update.sh" "$1"
+"$DIR/update.sh" "$1" "$3"
