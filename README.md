@@ -13,46 +13,61 @@ cd ShaderLabWeb
 yarn install
 ```
 
-Build the project locally with:
+Run the web app locally with:
 
 ```
-yarn build
+yarn serve
 ```
 
-This creates a `public` folder. Open `public/index.html` in a browser to check the
-build was successful.
+This serves the web app under http://localhost:3000.
 
 
-## Deployment
+## Setup of the server
 
-1) Set up the server
+a) On the server:
 
-Install nginx.
-
-Configure the server with:
+Install nginx (webserver) and certbot (SSL Certificate registration), e.g. on
+Ubuntu with:
 
 ```
-rm /etc/nginx/sites-enabled/default
-mkdir /var/www/html/ShaderLabWeb
-chown user:group /var/www/html/ShaderLabWeb
-chmod 775 /var/www/html/ShaderLabWeb
+apt install -y nginx
+snap install certbot --classic
 ```
 
-with `user` being the user used for deployment.
-
-Add your public key to `~/.ssh/authorized_keys` to avoid entering the ssh password
-multiple times during deployment.
+Add your SSH public key to `~/.ssh/authorized_keys` to avoid entering your SSH
+password multiple times during deployment.
 
 
-2) Deploy from the development environment
+b) On your development machine:
 
 Change the current directory to the root directory of this repo and run:
 
 ```
-yarn deploy user@server
+yarn init-server user@hostname ssl@email.com 3000
 ```
 
-with `user@server` being e.g. `ShaderLabWeb@51.105.38.14`.
+with `user@hostname` being your SSH login to the server. `server` must also already
+be the actual hostname (e.g. `shaderlabweb.doc.ic.ac.uk`) the app will be reachable
+under. For this hostname an SSL certificate will be registered with `ssl@email.com`
+being the email attached to the registered SSL certificate (through LetsEncrypt).
+The email is used to warn about an expiring certificate in the case the automatic
+renewal did not work as it should. `3000` is the port used internally by the nodejs
+server to which nginx is a public proxy.
+
+All of the above needs only to be done once on a newly created server. To push
+changes to the server follow the following deployment instructions.
+
+
+## Deploying updates to the server
+
+On the development machine, change the current directory to the root directory
+of this repo and run:
+
+```
+yarn deploy user@hostname
+```
+
+with `user@hostname` being the same as during the server setup above.
 
 
 ## Development
@@ -61,22 +76,32 @@ with `user@server` being e.g. `ShaderLabWeb@51.105.38.14`.
 
 ```
 ROOT
-├── assets/
-│   ├── logo.png
+├── defaultStates/
+│   ├── Model.json
+│   │     The state loaded into a newly created model pass
+│   ├── project.json
+│   │     The state loaded into the app on startup and into a newly created project
+│   └── Quad.json
+│         The state loaded into a newly created quad pass
+├── exampleFeedbackServer/
+│   └── serve.js
+├── public/
+│   ├── assets/logo.png
 │   │     The logo displayed at the top right corner
 │   └── teapot.obj
 │         The teapot model
-├── scripts/
-│     Scripts and files for building and deploying
+├── server/
+│     Scripts and files for setting up and updating a server
 └── src/
     ├── _renderer/
     │     Custom renderer and bundler to generate the output html. Unless
     │     you intend to modify how the project is bundled you do not need
     │     to touch this code.
+    ├── componentHelpers/
+    │     Helper functions used across several components
     ├── components/
-    │   │ This folder contains the main code the app is made of. There are
-    │   │ a few more components than listed below which are more auxiliary
-    │   │ and not integral to the core functionality.
+    │   │ This folder contains the view part of the app is made of. There are
+    │   │ main components for the editor with webgl canvas are:
     │   ├── App/Canvas/
     │   │     The render window at the top left. This folder contains
     │   │     all the webGl state management.
@@ -93,10 +118,25 @@ ROOT
     │   └── App/Header/
     │         The header at the top.
     ├── helpers/
-    │     Helper functions used across several components
+    │     Helper functions used in models and routers
+    ├── models/
+    │     Database models
+    ├── pages/
+    │     Technically, pages are just like ordinary components but since they
+    │     are the root of the render tree with enclosing html tags their setup
+    │     is a little bit different.
+    ├── routes/
+    │     Contains definition of the routes (i.e. URLs) of the web app.
     └── defaultState.json
           The state loaded into the app on startup
 ```
+
+The project uses [koa](https://koajs.com) as its web framework. Routes are defined in the
+`routes/` directory. These routes either render a page from the `pages/` directory
+or a component from the `components/` directory. The app uses sqlite as persistent
+data storage. Records are loaded from the sqlite database via the models in the
+`models/` directory. Models are defined with the help of the `helpers/View` class
+which uses `helpers/database/queryBuilder.js` to build its SQL queries.
 
 
 ### Component Structure
@@ -131,8 +171,8 @@ the ES6 [import][1] and [export][2] statements are not supported.
 [1]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import
 [2]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/export
 
-In general, all components are organized in a way that a component only imports components
-that are placed directly in their folder. The exception are a few general-purpose top-level
+In general, all components are organized in a way that they only imports components that
+are placed directly in their folder. The exception are a few general-purpose top-level
 components like `Tabs` or `Initializer` which might be included by a component at any level.
 All used instances of these components are then compiled by the code in the `src/_renderer`
 folder to the html output.
@@ -170,11 +210,9 @@ While initializing the app with the default state or when loading a saved state 
 header, the app's state is set by calling the `App.prototype.state` setter. From there
 the state is passed through the sub components by calling *their* `state` setter. All
 components having a `state` setter also have a `state` getter which is used to collect
-the state of all components. (Except for the `App/Canvas` component which is treated a
-bit differently because its state is derived from the state of other components as can
-be seen in the `App.prototype.state` setter.) More details about how and where a specific
-state is set or comes from can be learned about by following the state setter and getter
-chain through all participating components.
+the state of all components. More details about how and where a specific state is set
+or comes from can be learned about by following the state setter and getter chain through
+all participating components.
 
 When some value is changed by setting the state, it usually triggers two side-effects.
 For one, the input field in the UI is changed to the new value and secondly, the update
@@ -206,3 +244,25 @@ name. If a value is set and has a type equal to one of GLSL's recognized types `
 possible attachment in the *attach to:*-dropdown for a uniform of that type. A simple
 example is the 'Time in Milliseconds' value of type `int` that is set in the render
 loop in `App.prototype.initialize()`.
+
+
+### Feedback Mechanism
+
+In the web app, clicking the *Get Feedback* button at the bottom right in a project
+takes a screenshot of the render window, collects the current state of the project
+and `POST`s it to URL `/` of the feedback server. The screenshot is sent as file
+`screenshot` and the state is stored in field `state` of the body. The html response
+of the feedback server is then output to the log of the web app.
+
+The feedback server is expected to run on `localhost` one port above the web server, i.e.
+if the web server runs under `http://localhost:3000`, the feedback server must run under
+`http://localhost:3001`. And if if the web server runs under `http://localhost:3002`,
+the feedback server must run under `http://localhost:3003`
+
+There is an example feedback server written in Javascript located at
+`exampleFeedbackServer/serve.js` in this repository. To run the feedback server
+under a specific port in the background execute the command line:
+
+```
+$ PORT=3003 ./exampleFeedbackServer/serve.js &
+```
