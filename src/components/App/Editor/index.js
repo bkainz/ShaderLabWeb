@@ -10,7 +10,7 @@ export default Component.register(import.meta.url, ({className, id}) => {
            </form>
            <div className={className+'-Controls'}>
              <button className={className+'-CompileButton'} form={id+'-Form'}>Compile & Link</button>
-             <Feedback/>
+             {/*<Feedback/>*/}
            </div>
            <Initializer/>
          </div>
