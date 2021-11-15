@@ -3,7 +3,7 @@
 USR_SRV=(${1//@/ })
 USR=${USR_SRV[0]}
 SRV=${USR_SRV[1]}
-PORT=$(test -n "$2" && echo $2 || 3000)
+PORT=$(test -n "$2" && echo $2 || echo 3000)
 
 DIR="$(cd "$(dirname "$BASH_SOURCE")" &> /dev/null && pwd)"
 URL=$SRV
