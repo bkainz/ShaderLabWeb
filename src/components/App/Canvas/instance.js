@@ -25,27 +25,34 @@ function Canvas(el, {className}) {
 Canvas.prototype = {
   initialize() {
     this.canvasEl = this.el.querySelector(`.${escapeCSS(this.className)}-Canvas`)
-    this.webGL = this.canvasEl.getContext('webgl', {alpha: false, preserveDrawingBuffer: true})
+    this.webGL = this.canvasEl.getContext('webgl2', {alpha: false, preserveDrawingBuffer: true})
     this.webGL.enable(this.webGL.BLEND)
     this.webGL.blendFunc(this.webGL.SRC_ALPHA, this.webGL.ONE_MINUS_SRC_ALPHA);
     this.webGL.getExtension('OES_standard_derivatives')
 
     const outputProgram = new Program(this.webGL, 'quad')
     outputProgram.update({
-      vertex: {source: `attribute vec3 vertex_worldSpace;
-                        attribute vec2 textureCoordinate_input;
-                        varying vec2 uvs;
+      vertex: {source: `#version 300 es
+
+                        in vec3 vertex_worldSpace;
+                        in vec2 textureCoordinate_input;
+                        out vec2 uvs;
   
                         void main() {
                           gl_Position = vec4(vertex_worldSpace, 1.0);
                           uvs = textureCoordinate_input;
                         }`},
-      fragment: {source: `precision mediump float;
+      fragment: {source: `#version 300 es
+
+                          precision highp float;
+
                           uniform sampler2D image;
-                          varying vec2 uvs;
-  
+
+                          in vec2 uvs;
+                          out vec4 fragColor;
+
                           void main() {
-                            gl_FragColor = texture2D(image, uvs.st);
+                            fragColor = texture(image, uvs.st);
                           }`}
     })
     const outputMesh = new Mesh(this.webGL, 'quad', loadMesh('quad'))
@@ -54,24 +61,29 @@ Canvas.prototype = {
 
     const originProgram = new Program(this.webGL, 'origin')
     originProgram.update({
-      vertex: {source: `attribute vec3 vertex_worldSpace;
+      vertex: {source: `#version 300 es
+
+                        in vec3 vertex_worldSpace;
   
                         uniform mat4 mMatrix;
                         uniform mat4 vMatrix;
                         uniform mat4 pMatrix;
   
-                        varying vec3 fragment_worldSpace;
+                        out vec3 fragment_worldSpace;
   
                         void main() {
                           gl_Position = pMatrix * vMatrix * mMatrix * vec4(vertex_worldSpace, 1);
                           fragment_worldSpace = vertex_worldSpace;
                         }`},
-      fragment: {source: `precision mediump float;
-  
-                          varying vec3 fragment_worldSpace;
+      fragment: {source: `#version 300 es
+
+                          precision highp float;
+
+                          in vec3 fragment_worldSpace;
+                          out vec4 fragColor;
   
                           void main() {
-                            gl_FragColor = vec4(step(0.0001, fragment_worldSpace), 1);
+                            fragColor = vec4(step(0.0001, fragment_worldSpace), 1);
                           }`}
     })
     const originMesh = new Mesh(this.webGL, 'origin', loadMesh('origin'))
@@ -131,25 +143,29 @@ Canvas.prototype = {
       if (!program.isValid) return
 
       program.wireframe.update({
-        vertex: {source: `attribute vec3 vertex_barycentric;
-                          varying vec3 fragment_barycentric;
+        vertex: {source: `#version 300 es
+        
+                          in vec3 vertex_barycentric;
+                          out vec3 fragment_barycentric;
 
                           ${program.shaders.vertex.source.replace(/gl_Position\s*=\s*[^;]+;/, `
                           $&
                           fragment_barycentric = vertex_barycentric;`)}`},
-        fragment: {source: `#extension GL_OES_standard_derivatives : enable
-                            precision mediump float;
-                            varying vec3 fragment_barycentric;
+        fragment: {source: `#version 300 es
 
-                            vec4 blendWireframe(vec4 fragColor) {
+                            precision highp float;
+                            in vec3 fragment_barycentric;
+                            out vec4 fragColor;
+
+                            vec4 blendWireframe(vec4 color) {
                               vec3 w = fwidth(fragment_barycentric);
                               vec3 d = step(w*0.5, fragment_barycentric);
                               float dEdge = min(min(d.x, d.y), d.z);
-                              return mix(vec4(1.0), fragColor, dEdge);
+                              return mix(vec4(1.0), color, dEdge);
                             }
 
                             void main() {
-                              gl_FragColor = blendWireframe(vec4(0.0));
+                              fragColor = blendWireframe(vec4(0.0));
                             }`}
       })
     })
