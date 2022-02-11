@@ -101,7 +101,7 @@ App.prototype = {
                              : uniform.attachment === 'R2T Pass depth' ? 'Quad/R2T Pass depth'
                              : uniform.attachment
         }
-        else {
+        else if (uniform && typeof uniform === 'object') {
           for (const key in uniform)
             migrateOldUniformState(uniform[key])
         }
