@@ -1,5 +1,5 @@
 import algebra from '../../../../componentHelpers/algebra'
-const {minus, plus, length, cross, R, Mv} = algebra
+const {minus, plus, length, cross, I, R, Mv} = algebra
 
 const EVENTS = {
   start: ['mousedown'],
@@ -39,24 +39,57 @@ CameraRotation.prototype = {
 
     const target = this.canvas.app.getValue('vec3', 'Camera Target')
     const position = this.canvas.app.getValue('vec3', 'Camera Position')
-
+    const fov = this.canvas.app.getValue('float', 'Perspective FOV')
+    
     let targetToPosition = minus(position, target)
     if (dClientX || dClientY) {
-      // do not rotate beyond the poles
-      const dThetaMin = -Math.atan2(length([targetToPosition[0], targetToPosition[2]]), targetToPosition[1])/Math.PI * 180
-      const dThetaMax = 180+dThetaMin
 
-      const dPhi = dClientX/this.radius * 180
-      const dTheta = Math.max(dThetaMin+0.01, Math.min(dClientY/this.radius * 180, dThetaMax-0.01))
+      if (event.shiftKey) {
+        // translate target
+        const viewMatrix = this.canvas.app.getValue('mat4', 'View Matrix')
+        const cameraMatrix = I(viewMatrix)
 
-      const Rt = R(-dTheta, cross(targetToPosition, [0, 1, 0]))
-      const Rp = R(-dPhi, [0, 1, 0])
+        lookOffsetLength = length(targetToPosition)
 
-      targetToPosition = Mv(Rp, Mv(Rt, targetToPosition))
+        // Code from: https://github.com/chrismile/sgl/blob/master/src/Utils/SciVis/Navigation/TurntableNavigator.cpp
+        let wPixel = this.canvas.size.width
+        let hPixel = this.canvas.size.height
+        let fovy = fov
+        let fovx = wPixel / hPixel * fovy
+        let wWorld = 2.0 * lookOffsetLength * Math.tan(fovx * 0.5)
+        let hWorld = 2.0 * lookOffsetLength * Math.tan(fovy * 0.5)
+        let shiftX = dClientX / wPixel * wWorld
+        let shiftY = -dClientY / hPixel * hWorld
+
+        let vectorRight = [cameraMatrix[0], cameraMatrix[1], cameraMatrix[2]]
+        let vectorUp = [cameraMatrix[4], cameraMatrix[5], cameraMatrix[6]]
+        let shiftVector = plus(
+          [vectorRight[0] * shiftX, vectorRight[1] * shiftX, vectorRight[2] * shiftX],
+          [vectorUp[0] * shiftY, vectorUp[1] * shiftY, vectorUp[2] * shiftY])
+
+        let newTarget = plus(target, shiftVector)
+        let newPosition = plus(newTarget, targetToPosition)
+
+        this.canvas.app.setValue('vec3', 'Camera Position', newPosition)
+        this.canvas.app.setValue('vec3', 'Camera Target', newTarget)
+      } else {
+        // rotate around target
+        // do not rotate beyond the poles
+        const dThetaMin = -Math.atan2(length([targetToPosition[0], targetToPosition[2]]), targetToPosition[1])/Math.PI * 180
+        const dThetaMax = 180+dThetaMin
+
+        const dPhi = dClientX/this.radius * 180
+        const dTheta = Math.max(dThetaMin+0.01, Math.min(dClientY/this.radius * 180, dThetaMax-0.01))
+
+        const Rt = R(-dTheta, cross(targetToPosition, [0, 1, 0]))
+        const Rp = R(-dPhi, [0, 1, 0])
+
+        targetToPosition = Mv(Rp, Mv(Rt, targetToPosition))
+
+        this.canvas.app.setValue('vec3', 'Camera Position', plus(target, targetToPosition))
+      }
     }
-
-    this.canvas.app.setValue('vec3', 'Camera Position', plus(target, targetToPosition))
-  },
+},
 
   end(event) {
     event.preventDefault()
