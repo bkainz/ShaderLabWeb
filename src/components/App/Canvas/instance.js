@@ -194,6 +194,12 @@ Canvas.prototype = {
       programmedMesh.wireframe.faceCull = this.app.getValue('config', 'Face Culling')
       programmedMesh.frontFace = this.app.getValue('config', 'Front Face')
       programmedMesh.wireframe.frontFace = this.app.getValue('config', 'Front Face')
+      programmedMesh.blendMode = this.app.getValue('config', 'Blend Mode')
+      programmedMesh.wireframe.blendMode = this.app.getValue('config', 'Blend Mode')
+      programmedMesh.textureFiltering = this.app.getValue('config', 'Texture Filtering')
+      programmedMesh.wireframe.textureFiltering = this.app.getValue('config', 'Texture Filtering')
+      programmedMesh.maxAnisotropy = this.app.getValue('config', 'Max. Anisotropy')
+      programmedMesh.wireframe.maxAnisotropy = this.app.getValue('config', 'Max. Anisotropy')
 
       const eventListeners = {
         depthTest: ({detail: value}) => {
@@ -207,17 +213,65 @@ Canvas.prototype = {
         frontFace: ({detail: value}) => {
           programmedMesh.frontFace = value
           programmedMesh.wireframe.frontFace = value
+        },
+        blendEnable: ({detail: value}) => {
+          programmedMesh.blendEnable = value
+          programmedMesh.wireframe.blendEnable = value
+        },
+        blendOperation: ({detail: value}) => {
+          programmedMesh.blendOperation = value
+          programmedMesh.wireframe.blendOperation = value
+        },
+        srcColorBlendFactor: ({detail: value}) => {
+          programmedMesh.srcColorBlendFactor = value
+          programmedMesh.wireframe.srcColorBlendFactor = value
+        },
+        dstColorBlendFactor: ({detail: value}) => {
+          programmedMesh.dstColorBlendFactor = value
+          programmedMesh.wireframe.dstColorBlendFactor = value
+        },
+        srcAlphaBlendFactor: ({detail: value}) => {
+          programmedMesh.srcAlphaBlendFactor = value
+          programmedMesh.wireframe.srcAlphaBlendFactor = value
+        },
+        dstAlphaBlendFactor: ({detail: value}) => {
+          programmedMesh.dstAlphaBlendFactor = value
+          programmedMesh.wireframe.dstAlphaBlendFactor = value
+        },
+        textureFiltering: ({detail: value}) => {
+          programmedMesh.textureFiltering = value
+          programmedMesh.wireframe.textureFiltering = value
+        },
+        maxAnisotropy: ({detail: value}) => {
+          programmedMesh.maxAnisotropy = value
+          programmedMesh.wireframe.maxAnisotropy = value
         }
       }
 
       this.app.values.config['Depth Test'].el.addEventListener('valueChanged', eventListeners.depthTest)
       this.app.values.config['Face Culling'].el.addEventListener('valueChanged', eventListeners.faceCull)
       this.app.values.config['Front Face'].el.addEventListener('valueChanged', eventListeners.frontFace)
+      this.app.values.config['Blend Enable'].el.addEventListener('valueChanged', eventListeners.blendEnable)
+      this.app.values.config['Blend Operation'].el.addEventListener('valueChanged', eventListeners.blendOperation)
+      this.app.values.config['Src Color Blend Factor'].el.addEventListener('valueChanged', eventListeners.srcColorBlendFactor)
+      this.app.values.config['Dst Color Blend Factor'].el.addEventListener('valueChanged', eventListeners.dstColorBlendFactor)
+      this.app.values.config['Src Alpha Blend Factor'].el.addEventListener('valueChanged', eventListeners.srcAlphaBlendFactor)
+      this.app.values.config['Dst Alpha Blend Factor'].el.addEventListener('valueChanged', eventListeners.dstAlphaBlendFactor)
+      this.app.values.config['Texture Filtering'].el.addEventListener('valueChanged', eventListeners.textureFiltering)
+      this.app.values.config['Max. Anisotropy'].el.addEventListener('valueChanged', eventListeners.maxAnisotropy)
 
       programmedMesh.eventEl.addEventListener('destroyed', e => {
         this.app.values.config['Depth Test'].el.removeEventListener('valueChanged', eventListeners.depthTest)
         this.app.values.config['Face Culling'].el.removeEventListener('valueChanged', eventListeners.faceCull)
         this.app.values.config['Front Face'].el.removeEventListener('valueChanged', eventListeners.frontFace)
+        this.app.values.config['Blend Enable'].el.removeEventListener('valueChanged', eventListeners.blendEnable)
+        this.app.values.config['Blend Operation'].el.removeEventListener('valueChanged', eventListeners.blendOperation)
+        this.app.values.config['Src Color Blend Factor'].el.removeEventListener('valueChanged', eventListeners.srcColorBlendFactor)
+        this.app.values.config['Dst Color Blend Factor'].el.removeEventListener('valueChanged', eventListeners.dstColorBlendFactor)
+        this.app.values.config['Src Alpha Blend Factor'].el.removeEventListener('valueChanged', eventListeners.srcAlphaBlendFactor)
+        this.app.values.config['Dst Alpha Blend Factor'].el.removeEventListener('valueChanged', eventListeners.dstAlphaBlendFactor)
+        this.app.values.config['Texture Filtering'].el.removeEventListener('valueChanged', eventListeners.textureFiltering)
+        this.app.values.config['Max. Anisotropy'].el.removeEventListener('valueChanged', eventListeners.maxAnisotropy)
       })
     }
 
@@ -225,8 +279,9 @@ Canvas.prototype = {
   },
 
   updateViewport() {
-    this.canvasEl.width = this.canvasEl.offsetWidth
-    this.canvasEl.height = this.canvasEl.offsetHeight
+    var devicePixelRatio = window.devicePixelRatio || 1;
+    this.canvasEl.width = this.canvasEl.offsetWidth * devicePixelRatio
+    this.canvasEl.height = this.canvasEl.offsetHeight * devicePixelRatio
     this.webGL.viewport(0, 0, this.canvasEl.width, this.canvasEl.height)
     for (const framebuffer of this.framebuffers ) framebuffer.updateSize(this.size)
     this.app.el.dispatchEvent(new CustomEvent('viewportChanged', {detail: this.size}))
