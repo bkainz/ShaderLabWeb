@@ -76,6 +76,14 @@ const meshes = {
   get teapot() {
     const path = new URL('/assets/teapot.obj', document.baseURI).href
     return fetch(path).then(response => response.text()).then(content => parseWavefront(path, content))
+  },
+  get plane() {
+    const path = new URL('/assets/plane.obj', document.baseURI).href
+    return fetch(path).then(response => response.text()).then(content => parseWavefront(path, content))
+  },
+  get sphere() {
+    const path = new URL('/assets/sphere.obj', document.baseURI).href
+    return fetch(path).then(response => response.text()).then(content => parseWavefront(path, content))
   }
 }
 

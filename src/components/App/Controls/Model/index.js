@@ -12,6 +12,8 @@ export default Component.register(import.meta.url, ({className, id}) =>
           <select className={className+'-FieldInput '+className+'-MeshName'}>
             <option value="teapot" selected={true}>Teapot</option>
             <option value="cube">Cube</option>
+            <option value="quad">Plane</option>
+            <option value="sphere">Sphere</option>
             <option value="file">.obj File</option>
           </select>
           <input type="file" className={className+'-MeshFile'}/>
