@@ -14,8 +14,6 @@ window.requireAvailable(() => {
 function Shader(el, {className, props}) {
   this.el = el
   this.className = className
-  this.meshId = props.meshId
-  this.passId = props.passId
   this.type = props.type
   this.sourceEl = this.el.querySelector(`.${escapeCSS(this.className)}-Source`)
 
