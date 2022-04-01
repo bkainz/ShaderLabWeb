@@ -36,7 +36,7 @@ export default Component.register(import.meta.url, ({className, id, props}) =>
               </ul>
             </div>
           </div>
-        : <a href="/projects">log in</a>}
+        : <a href="/projects"></a>}
       </div>
   </div>
 )
