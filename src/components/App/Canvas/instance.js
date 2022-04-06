@@ -142,13 +142,14 @@ Canvas.prototype = {
     program.eventEl.addEventListener('updated', e => {
       if (!program.isValid) return
 
+      inputSource = program.shaders.vertex.source.replace('#version 300 es', '')
       program.wireframe.update({
         vertex: {source: `#version 300 es
         
                           in vec3 vertex_barycentric;
                           out vec3 fragment_barycentric;
 
-                          ${program.shaders.vertex.source.replace(/gl_Position\s*=\s*[^;]+;/, `
+                          ${inputSource.replace(/gl_Position\s*=\s*[^;]+;/, `
                           $&
                           fragment_barycentric = vertex_barycentric;`)}`},
         fragment: {source: `#version 300 es
