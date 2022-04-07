@@ -4,8 +4,10 @@ function Mesh(webGL, id, mesh) {
   this.elementBuffer = this.webGL.createBuffer()
   this.elementCount = 0
   this.elementType = this.webGL.TRIANGLES
-  this.elementDataType = this.webGL.getExtension('OES_element_index_uint') ? this.webGL.UNSIGNED_INT
-                                                                           : this.webGL.UNSIGNED_SHORT
+  // OES_element_index_uint is supported by WebGL 2 by default.
+  //this.elementDataType = this.webGL.getExtension('OES_element_index_uint') ? this.webGL.UNSIGNED_INT
+  //                                                                         : this.webGL.UNSIGNED_SHORT
+  this.elementDataType = this.webGL.UNSIGNED_INT
   this.dataBuffer = this.webGL.createBuffer()
   this.attributes = null
   this.update(mesh)
@@ -13,7 +15,9 @@ function Mesh(webGL, id, mesh) {
 
 Mesh.prototype = {
   update({data, elements, type, attributes}) {
-    const IndexArrayType = this.webGL.getExtension('OES_element_index_uint') ? Uint32Array : Uint16Array
+    // OES_element_index_uint is supported by WebGL 2 by default.
+    //const IndexArrayType = this.webGL.getExtension('OES_element_index_uint') ? Uint32Array : Uint16Array
+    const IndexArrayType = Uint32Array
     this.webGL.bindBuffer(this.webGL.ELEMENT_ARRAY_BUFFER, this.elementBuffer)
     this.webGL.bufferData(this.webGL.ELEMENT_ARRAY_BUFFER, new IndexArrayType(elements), this.webGL.STATIC_DRAW)
     this.webGL.bindBuffer(this.webGL.ELEMENT_ARRAY_BUFFER, null)
