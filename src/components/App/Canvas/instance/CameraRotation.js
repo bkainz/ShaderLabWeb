@@ -58,7 +58,7 @@ CameraRotation.prototype = {
         let fovx = wPixel / hPixel * fovy
         let wWorld = 2.0 * lookOffsetLength * Math.tan(fovx * 0.5)
         let hWorld = 2.0 * lookOffsetLength * Math.tan(fovy * 0.5)
-        let shiftX = dClientX / wPixel * wWorld
+        let shiftX = -dClientX / wPixel * wWorld
         let shiftY = -dClientY / hPixel * hWorld
 
         let vectorRight = [cameraMatrix[0], cameraMatrix[1], cameraMatrix[2]]
