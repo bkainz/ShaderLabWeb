@@ -29,10 +29,10 @@ Mesh.prototype = {
     this.elementType = this.webGL[type]
     this.elementCount = elements.length
     this.attributes = {}
-    if (attributes.vertex) this.attributes.vertex_worldSpace = attributes.vertex
-    if (attributes.normal) this.attributes.normal_worldSpace = attributes.normal
-    if (attributes.tCoord) this.attributes.textureCoordinate_input = attributes.tCoord
-    if (attributes.bCoord) this.attributes.vertex_barycentric = attributes.bCoord
+    if (attributes.vertex) this.attributes.vertexPosition = attributes.vertex
+    if (attributes.normal) this.attributes.vertexNormal = attributes.normal
+    if (attributes.tCoord) this.attributes.vertexTextureCoordinates = attributes.tCoord
+    if (attributes.bCoord) this.attributes.vertexBarycentric = attributes.bCoord
   },
 
   renderWith(program) {
