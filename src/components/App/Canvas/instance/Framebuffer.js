@@ -53,6 +53,8 @@ Framebuffer.prototype = {
       this.webGL.bindTexture(this.webGL.TEXTURE_2D, this.attachments.depth)
       this.webGL.texImage2D(this.webGL.TEXTURE_2D, 0, this.webGL.DEPTH_COMPONENT24, width, height, 0,
                             this.webGL.DEPTH_COMPONENT, this.webGL.UNSIGNED_INT, null)
+      //this.webGL.texImage2D(this.webGL.TEXTURE_2D, 0, this.webGL.DEPTH_COMPONENT32F, width, height, 0,
+      //                      this.webGL.DEPTH_COMPONENT, this.webGL.FLOAT, null)
       this.webGL.texParameteri(this.webGL.TEXTURE_2D, this.webGL.TEXTURE_MIN_FILTER, this.webGL.NEAREST)
       this.webGL.texParameteri(this.webGL.TEXTURE_2D, this.webGL.TEXTURE_MAG_FILTER, this.webGL.NEAREST)
       this.webGL.texParameteri(this.webGL.TEXTURE_2D, this.webGL.TEXTURE_WRAP_S, this.webGL.CLAMP_TO_EDGE)

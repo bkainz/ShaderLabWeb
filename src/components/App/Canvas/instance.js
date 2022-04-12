@@ -29,6 +29,7 @@ Canvas.prototype = {
     this.webGL.enable(this.webGL.BLEND)
     this.webGL.blendFunc(this.webGL.SRC_ALPHA, this.webGL.ONE_MINUS_SRC_ALPHA);
     this.webGL.getExtension('OES_standard_derivatives')
+    //this.webGL.getExtension('EXT_color_buffer_float')
 
     const outputProgram = new Program(this.webGL, 'quad')
     outputProgram.update({

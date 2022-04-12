@@ -72,7 +72,6 @@ ProgrammedMesh.prototype = {
           this.textures[unit] = value
           this.texturesPow2[unit] = true
           this.texturesIsRenderTarget[unit] = true
-          console.log("Added render target")
         }
         else {
           this.textures[unit] = this.createdTextures[unit] = this.webGL.createTexture()
@@ -80,7 +79,6 @@ ProgrammedMesh.prototype = {
                        : type === 'samplerCube' ? this.webGL.TEXTURE_CUBE_MAP
                        :                          null
           this.texturesIsRenderTarget[unit] = false
-          console.log("Added image")
           this.webGL.activeTexture(this.webGL.TEXTURE0)
           this.webGL.bindTexture(target, this.textures[unit])
 
