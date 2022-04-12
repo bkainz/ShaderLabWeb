@@ -6,7 +6,8 @@ function Framebuffer(webGL, size) {
   this.framebuffer = this.webGL.createFramebuffer()
   this.attachments = {color: this.webGL.createTexture()}
 
-  if (this.webGL.getExtension('WEBGL_depth_texture')) {
+  // WEBGL_depth_texture is only available to WebGL 1.
+  if (/* this.webGL.getExtension('WEBGL_depth_texture') */ true) {
     this.attachments.depth = this.webGL.createTexture()
   } else {
     this.depthBuffer = this.webGL.createRenderbuffer()
@@ -75,7 +76,8 @@ Framebuffer.prototype = {
     this.webGL.deleteFramebuffer(this.framebuffer)
     this.webGL.deleteTexture(this.attachments.color)
 
-    if (this.webGL.getExtension('WEBGL_depth_texture')) {
+  // WEBGL_depth_texture is only available to WebGL 1.
+  if (/* this.webGL.getExtension('WEBGL_depth_texture') */ true) {
       this.webGL.deleteTexture(this.attachments.depth)
     } else {
       this.webGL.deleteRenderbuffer(this.depthBuffer)
