@@ -35,6 +35,7 @@ ProgrammedMesh.prototype = {
     this.uniforms = {}
     this.textures = []
     this.texturesPow2 = []
+    this.texturesIsRenderTarget = []
   },
 
   updateUniform(type, name, value) {
@@ -70,12 +71,16 @@ ProgrammedMesh.prototype = {
         if (value === null || value instanceof WebGLTexture) {
           this.textures[unit] = value
           this.texturesPow2[unit] = true
+          this.texturesIsRenderTarget[unit] = true
+          console.log("Added render target")
         }
         else {
           this.textures[unit] = this.createdTextures[unit] = this.webGL.createTexture()
           const target = type === 'sampler2D'   ? this.webGL.TEXTURE_2D
                        : type === 'samplerCube' ? this.webGL.TEXTURE_CUBE_MAP
                        :                          null
+          this.texturesIsRenderTarget[unit] = false
+          console.log("Added image")
           this.webGL.activeTexture(this.webGL.TEXTURE0)
           this.webGL.bindTexture(target, this.textures[unit])
 
@@ -193,7 +198,7 @@ ProgrammedMesh.prototype = {
                        :                          null
           this.webGL.bindTexture(target, this.textures[value])
 
-          if (this.textureFiltering) {
+          if (this.textureFiltering && !this.texturesIsRenderTarget[value]) {
             let isPow2 = this.texturesPow2[value]
             if (isPow2) {
               this.webGL.texParameteri(target, this.webGL.TEXTURE_MIN_FILTER, this.webGL[this.textureFiltering])
