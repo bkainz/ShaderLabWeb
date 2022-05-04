@@ -2,6 +2,7 @@ const rConstInt = /const\s+int\s+(\w+)\s*=([^;]+);/g
 const rUniform = /uniform\s+/g
 const rComment = /\/\/[^\n]*(?:\n|$)|\/\*(?:[^*]*|\*(?!\/))*\*\//g
 const rNamedStruct = /struct\s+(\w+)\s*{\s*/g
+const rUniformInterfaceBlock = /uniform\s+(\w+)\s*{\s*/g
 
 const rType = /(\w+)\s+/y
 const rStruct = /struct(?:\s+(\w+))?\s*{\s*/y
@@ -170,5 +171,13 @@ export default {
       uniforms[uniformMatch.name] = buildField(uniformMatch, structs, constInts)
     }
     return uniforms
+  },
+
+  getHasUniformInterfaceBlocks(string, constInts) {
+    let uniformPtr = 0
+    rUniformInterfaceBlock.lastIndex = uniformPtr
+    const uniformMatch = rUniformInterfaceBlock.exec(string)
+    if (!uniformMatch) return false
+    return true
   }
 }

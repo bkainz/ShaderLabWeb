@@ -6,7 +6,8 @@ function Framebuffer(webGL, size) {
   this.framebuffer = this.webGL.createFramebuffer()
   this.attachments = {color: this.webGL.createTexture()}
 
-  if (this.webGL.getExtension('WEBGL_depth_texture')) {
+  // WEBGL_depth_texture is only available to WebGL 1.
+  if (/* this.webGL.getExtension('WEBGL_depth_texture') */ true) {
     this.attachments.depth = this.webGL.createTexture()
   } else {
     this.depthBuffer = this.webGL.createRenderbuffer()
@@ -22,6 +23,8 @@ function Framebuffer(webGL, size) {
   if (this.attachments.depth) {
     this.webGL.activeTexture(this.webGL.TEXTURE0)
     this.webGL.bindTexture(this.webGL.TEXTURE_2D, this.attachments.depth)
+    this.webGL.texParameteri(this.webGL.TEXTURE_2D, this.webGL.TEXTURE_MIN_FILTER, this.webGL.NEAREST)
+    this.webGL.texParameteri(this.webGL.TEXTURE_2D, this.webGL.TEXTURE_MAG_FILTER, this.webGL.NEAREST)
     this.webGL.framebufferTexture2D(this.webGL.FRAMEBUFFER, this.webGL.DEPTH_ATTACHMENT, this.webGL.TEXTURE_2D, this.attachments.depth, 0)
     this.webGL.bindTexture(this.webGL.TEXTURE_2D, null)
   } else {
@@ -48,9 +51,12 @@ Framebuffer.prototype = {
     if (this.attachments.depth) {
       this.webGL.activeTexture(this.webGL.TEXTURE0)
       this.webGL.bindTexture(this.webGL.TEXTURE_2D, this.attachments.depth)
-      this.webGL.texImage2D(this.webGL.TEXTURE_2D, 0, this.webGL.DEPTH_COMPONENT, width, height, 0,
+      this.webGL.texImage2D(this.webGL.TEXTURE_2D, 0, this.webGL.DEPTH_COMPONENT24, width, height, 0,
                             this.webGL.DEPTH_COMPONENT, this.webGL.UNSIGNED_INT, null)
-      this.webGL.texParameteri(this.webGL.TEXTURE_2D, this.webGL.TEXTURE_MIN_FILTER, this.webGL.LINEAR)
+      //this.webGL.texImage2D(this.webGL.TEXTURE_2D, 0, this.webGL.DEPTH_COMPONENT32F, width, height, 0,
+      //                      this.webGL.DEPTH_COMPONENT, this.webGL.FLOAT, null)
+      this.webGL.texParameteri(this.webGL.TEXTURE_2D, this.webGL.TEXTURE_MIN_FILTER, this.webGL.NEAREST)
+      this.webGL.texParameteri(this.webGL.TEXTURE_2D, this.webGL.TEXTURE_MAG_FILTER, this.webGL.NEAREST)
       this.webGL.texParameteri(this.webGL.TEXTURE_2D, this.webGL.TEXTURE_WRAP_S, this.webGL.CLAMP_TO_EDGE)
       this.webGL.texParameteri(this.webGL.TEXTURE_2D, this.webGL.TEXTURE_WRAP_T, this.webGL.CLAMP_TO_EDGE)
       this.webGL.bindTexture(this.webGL.TEXTURE_2D, null)
@@ -75,7 +81,8 @@ Framebuffer.prototype = {
     this.webGL.deleteFramebuffer(this.framebuffer)
     this.webGL.deleteTexture(this.attachments.color)
 
-    if (this.webGL.getExtension('WEBGL_depth_texture')) {
+  // WEBGL_depth_texture is only available to WebGL 1.
+  if (/* this.webGL.getExtension('WEBGL_depth_texture') */ true) {
       this.webGL.deleteTexture(this.attachments.depth)
     } else {
       this.webGL.deleteRenderbuffer(this.depthBuffer)

@@ -24,9 +24,9 @@ export default Component.register(import.meta.url, ({className, id}) =>
         <div className={className+'/Section-ContentInfo attributes'}>
           <div style={{display: 'inline-block', verticalAlign: 'top'}}>Attributes:&nbsp;</div>
           <ul style={{display: 'inline-block'}}>
-            <li><span className={className+'-VertexType'}>float</span> vertex_worldSpace</li>
-            <li><span className={className+'-NormalType'}>no</span> normal_worldSpace</li>
-            <li><span className={className+'-TCoordType'}>no</span> textureCoordinate_input</li>
+            <li><span className={className+'-VertexType'}>float</span> vertexPosition</li>
+            <li><span className={className+'-NormalType'}>no</span> vertexNormal</li>
+            <li><span className={className+'-TCoordType'}>no</span> vertexTextureCoordinates</li>
           </ul>
         </div>
       </div>

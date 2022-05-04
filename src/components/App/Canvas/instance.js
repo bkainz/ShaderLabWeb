@@ -29,18 +29,19 @@ Canvas.prototype = {
     this.webGL.enable(this.webGL.BLEND)
     this.webGL.blendFunc(this.webGL.SRC_ALPHA, this.webGL.ONE_MINUS_SRC_ALPHA);
     this.webGL.getExtension('OES_standard_derivatives')
+    //this.webGL.getExtension('EXT_color_buffer_float')
 
     const outputProgram = new Program(this.webGL, 'quad')
     outputProgram.update({
       vertex: {source: `#version 300 es
 
-                        in vec3 vertex_worldSpace;
-                        in vec2 textureCoordinate_input;
-                        out vec2 uvs;
+                        in vec3 vertexPosition;
+                        in vec2 vertexTextureCoordinates;
+                        out vec2 fragmentTextureCoordinates;
   
                         void main() {
-                          gl_Position = vec4(vertex_worldSpace, 1.0);
-                          uvs = textureCoordinate_input;
+                          gl_Position = vec4(vertexPosition, 1.0);
+                          fragmentTextureCoordinates = vertexTextureCoordinates;
                         }`},
       fragment: {source: `#version 300 es
 
@@ -48,11 +49,11 @@ Canvas.prototype = {
 
                           uniform sampler2D image;
 
-                          in vec2 uvs;
+                          in vec2 fragmentTextureCoordinates;
                           out vec4 fragColor;
 
                           void main() {
-                            fragColor = texture(image, uvs.st);
+                            fragColor = texture(image, fragmentTextureCoordinates.st);
                           }`}
     })
     const outputMesh = new Mesh(this.webGL, 'quad', loadMesh('quad'))
@@ -63,7 +64,7 @@ Canvas.prototype = {
     originProgram.update({
       vertex: {source: `#version 300 es
 
-                        in vec3 vertex_worldSpace;
+                        in vec3 vertexPosition;
   
                         uniform mat4 mMatrix;
                         uniform mat4 vMatrix;
@@ -72,8 +73,8 @@ Canvas.prototype = {
                         out vec3 fragment_worldSpace;
   
                         void main() {
-                          gl_Position = pMatrix * vMatrix * mMatrix * vec4(vertex_worldSpace, 1);
-                          fragment_worldSpace = vertex_worldSpace;
+                          gl_Position = pMatrix * vMatrix * mMatrix * vec4(vertexPosition, 1);
+                          fragment_worldSpace = vertexPosition;
                         }`},
       fragment: {source: `#version 300 es
 
@@ -142,24 +143,25 @@ Canvas.prototype = {
     program.eventEl.addEventListener('updated', e => {
       if (!program.isValid) return
 
+      inputSource = program.shaders.vertex.source.replace('#version 300 es', '')
       program.wireframe.update({
         vertex: {source: `#version 300 es
         
-                          in vec3 vertex_barycentric;
-                          out vec3 fragment_barycentric;
+                          in vec3 vertexBarycentric;
+                          out vec3 fragmentBarycentric;
 
-                          ${program.shaders.vertex.source.replace(/gl_Position\s*=\s*[^;]+;/, `
+                          ${inputSource.replace(/gl_Position\s*=\s*[^;]+;/, `
                           $&
-                          fragment_barycentric = vertex_barycentric;`)}`},
+                          fragmentBarycentric = vertexBarycentric;`)}`},
         fragment: {source: `#version 300 es
 
                             precision highp float;
-                            in vec3 fragment_barycentric;
+                            in vec3 fragmentBarycentric;
                             out vec4 fragColor;
 
                             vec4 blendWireframe(vec4 color) {
-                              vec3 w = fwidth(fragment_barycentric);
-                              vec3 d = step(w*0.5, fragment_barycentric);
+                              vec3 w = fwidth(fragmentBarycentric);
+                              vec3 d = step(w*0.5, fragmentBarycentric);
                               float dEdge = min(min(d.x, d.y), d.z);
                               return mix(vec4(1.0), color, dEdge);
                             }
