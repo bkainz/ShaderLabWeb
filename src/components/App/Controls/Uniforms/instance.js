@@ -18,7 +18,7 @@ Uniforms.prototype = {
     this.app.el.addEventListener('passUpdated', ({detail: pass}) => {
       const uniforms = Object.values(pass.program.shaders).reduce((uniforms, shader) => Object.assign(uniforms, shader.uniforms), {})
       const uniformsConfig = {name: '', fields: []}
-      const oldUniforms = this.perPass[pass.meshId] && this.perPass[pass.meshId][pass.id]
+      const oldUniforms = this.perPass[pass.id]
       for (const key in uniforms) {
         const newUniform = uniforms[key]
         const oldUniform = oldUniforms && oldUniforms.fields[newUniform.name]
@@ -27,10 +27,9 @@ Uniforms.prototype = {
         const newType = newUniform && newUniform.type && (newUniform.type.signature || newUniform.type)
         uniformsConfig.fields.push(oldType === newType ? oldUniform : newUniform)
       }
-      const newUniforms = new CollectionValue(this.app, '', pass.name, uniformsConfig, pass.mesh)
+      const newUniforms = new CollectionValue(this.app, '', pass.stateId, uniformsConfig, pass.mesh)
       newUniforms.stateEl.checked = !oldUniforms || oldUniforms.stateEl.checked
-      this.perPass[pass.meshId] = this.perPass[pass.meshId] || {}
-      this.perPass[pass.meshId][pass.id] = newUniforms
+      this.perPass[pass.id] = newUniforms
 
       let uniformGroupEl = this.shaderUniformsEl.querySelector(`.${escapeCSS(this.className)}-UniformGroup.${escapeCSS(pass.meshId)}`)
       if (!uniformGroupEl) {
@@ -42,16 +41,13 @@ Uniforms.prototype = {
                   : uniformGroupEl.appendChild(newUniforms.el)
     })
 
-    this.app.el.addEventListener('passRenamed', ({detail: {pass, oldId}}) => {
-      this.perPass[pass.meshId][pass.id] = this.perPass[pass.meshId][oldId]
-      delete this.perPass[pass.meshId][oldId]
-      this.perPass[pass.meshId][pass.id].name = pass.name
+    this.app.el.addEventListener('passRenamed', ({detail: {pass}}) => {
+      this.perPass[pass.id].name = pass.stateId
     })
 
     this.app.el.addEventListener('passDestroyed', ({detail: pass}) => {
-      this.perPass[pass.meshId][pass.id].el.remove()
-      this.perPass[pass.meshId][pass.id].destroy()
-      delete this.perPass[pass.meshId][pass.id]
+      this.perPass[pass.id].destroy()
+      delete this.perPass[pass.id]
     })
   },
 
