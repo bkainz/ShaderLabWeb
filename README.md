@@ -3,8 +3,8 @@
 ## docker
 
 ```
-docker pull biomediaicl/shaderlabweb
-docker run -p 80:3000 -d -t biomediaicl/shaderlabweb
+docker pull biomediaicl/shaderlabweb_webgl2
+docker run -p 80:3000 -d -t biomediaicl/shaderlabweb_webgl2
 ```
 
 ## Building the Project
