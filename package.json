@@ -24,6 +24,7 @@
     "koa": "^2.13.4",
     "koa-body": "^4.2.0",
     "koa-static": "^5.0.0",
+    "koa-favicon": "^1.0.0",
     "monaco-editor": "^0.21.3",
     "postcss": "^8.4.14",
     "postcss-nesting": "^8.0.1",
