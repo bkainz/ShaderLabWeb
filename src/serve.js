@@ -1,6 +1,7 @@
 import path from 'path'
 import http from 'http'
 import Koa from 'koa'
+import koaFavicon from 'koa-favicon'
 import koaBody from 'koa-body'
 import koaStatic from 'koa-static'
 import App from './helpers/App'
@@ -26,7 +27,7 @@ koa.use(koaBody({multipart: true}))
  * Serve static files
  */
 koa.use(koaStatic(path.join(global.rootDir, 'public')))
-
+koa.use(koaFavicon(path.join(global.rootDir, 'public/assets/teapot_favicon.ico')))
 /*
  * Serve Frontend
  */
