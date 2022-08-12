@@ -54,6 +54,7 @@ function Value(app, uniformName, name, type, programmedMesh) {
           optionEl.value = newName
           optionEl.innerText = newName
           this.attachmentListeners[newName] = this.attachmentListeners[name]
+          delete this.attachmentListeners[name]
           if (this.attachment === name) this._attachment = newName
           name = newName
         },
@@ -139,6 +140,8 @@ Value.prototype = {
   },
 
   destroy() {
+    this.el.remove()
+
     const typeSignature = this.type.signature || this.type
 
     for (const name in this.attachmentListeners)
