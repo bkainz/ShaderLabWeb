@@ -31,7 +31,7 @@ function Camera(el, {className}) {
 const STATE = {
   position: {type: 'vec3', name: 'Camera Position', onChange: updateViewMatrix},
   target: {type: 'vec3', name: 'Camera Target', onChange: updateViewMatrix},
-  nearClipping: {type: 'float', name: 'Near Clipping Plan', onChange: updateProjectionMatrix},
+  nearClipping: {type: 'float', name: 'Near Clipping Plane', onChange: updateProjectionMatrix},
   farClipping: {type: 'float', name: 'Far Clipping Plane', onChange: updateProjectionMatrix},
   projection: {type: 'config', name: 'Projection', onChange: updateProjectionMatrix},
   perspectiveFov: {type: 'float', name: 'Perspective FOV', onChange: updateProjectionMatrix},

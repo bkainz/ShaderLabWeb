@@ -1,5 +1,11 @@
 # ShaderLabWeb
 
+## docker
+
+```
+docker pull biomediaicl/shaderlabweb
+docker run -p 80:3000 -d -t biomediaicl/shaderlabweb
+```
 
 ## Building the Project
 

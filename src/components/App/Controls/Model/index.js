@@ -12,6 +12,7 @@ export default Component.register(import.meta.url, ({className, id}) =>
           <select className={className+'-FieldInput '+className+'-MeshName'}>
             <option value="teapot" selected={true}>Teapot</option>
             <option value="cube">Cube</option>
+            <option value="quad">Plane</option>
             <option value="sphere">Sphere</option>
             <option value="file">.obj File</option>
           </select>
@@ -23,9 +24,9 @@ export default Component.register(import.meta.url, ({className, id}) =>
         <div className={className+'/Section-ContentInfo attributes'}>
           <div style={{display: 'inline-block', verticalAlign: 'top'}}>Attributes:&nbsp;</div>
           <ul style={{display: 'inline-block'}}>
-            <li><span className={className+'-VertexType'}>float</span> vertex_worldSpace</li>
-            <li><span className={className+'-NormalType'}>no</span> normal_worldSpace</li>
-            <li><span className={className+'-TCoordType'}>no</span> textureCoordinate_input</li>
+            <li><span className={className+'-VertexType'}>float</span> vertexPosition</li>
+            <li><span className={className+'-NormalType'}>no</span> vertexNormal</li>
+            <li><span className={className+'-TCoordType'}>no</span> vertexTextureCoordinates</li>
           </ul>
         </div>
       </div>
@@ -122,6 +123,133 @@ export default Component.register(import.meta.url, ({className, id}) =>
               <option value="BACK">Back</option>
               <option value="FRONT">Front</option>
               <option value="FRONT_AND_BACK">Front & Back</option>
+            </select>
+          </div>
+        </div>
+        <div className={className+'-Field blendEnable'}>
+          <div className={className+'-FieldLabel'}>
+            Blend Enabled:
+          </div>
+          <div className={className+'-FieldValue'}>
+            <input type='checkbox' className={className+'-FieldInput blendEnable'}/>
+          </div>
+        </div>
+        <div className={className+'-Field blend-operation'}>
+          <div className={className+'-FieldLabel'}>
+            Blend Operation:
+          </div>
+          <div className={className+'-FieldValue'}>
+            <select className={className+'-FieldInput blendOperation'}>
+              <option value="FUNC_ADD" selected={true}>Additive</option>
+              <option value="FUNC_SUBTRACT">Subtractive</option>
+              <option value="FUNC_REVERSE_SUBTRACT">Reverse Subtractive</option>
+              <option value="MIN">Minimum</option>
+              <option value="MAX">Maximum</option>
+            </select>
+          </div>
+        </div>
+        <div className={className+'-Field src-color-blend-factor'}>
+          <div className={className+'-FieldLabel'}>
+            Src Color Blend Factor:
+          </div>
+          <div className={className+'-FieldValue'}>
+            <select className={className+'-FieldInput srcColorBlendFactor'}>
+              <option value="ZERO">ZERO</option>
+              <option value="ONE">ONE</option>
+              <option value="SRC_COLOR">SRC_COLOR</option>
+              <option value="ONE_MINUS_SRC_COLOR">ONE_MINUS_SRC_COLOR</option>
+              <option value="DST_COLOR">DST_COLOR</option>
+              <option value="ONE_MINUS_DST_COLOR">ONE_MINUS_DST_COLOR</option>
+              <option value="SRC_ALPHA" selected={true}>SRC_ALPHA</option>
+              <option value="ONE_MINUS_SRC_ALPHA">ONE_MINUS_SRC_ALPHA</option>
+              <option value="DST_ALPHA">DST_ALPHA</option>
+              <option value="ONE_MINUS_DST_ALPHA">ONE_MINUS_DST_ALPHA</option>
+            </select>
+          </div>
+        </div>
+        <div className={className+'-Field dst-color-blend-factor'}>
+          <div className={className+'-FieldLabel'}>
+            Dst Color Blend Factor:
+          </div>
+          <div className={className+'-FieldValue'}>
+            <select className={className+'-FieldInput dstColorBlendFactor'}>
+              <option value="ZERO">ZERO</option>
+              <option value="ONE">ONE</option>
+              <option value="SRC_COLOR">SRC_COLOR</option>
+              <option value="ONE_MINUS_SRC_COLOR">ONE_MINUS_SRC_COLOR</option>
+              <option value="DST_COLOR">DST_COLOR</option>
+              <option value="ONE_MINUS_DST_COLOR">ONE_MINUS_DST_COLOR</option>
+              <option value="SRC_ALPHA">SRC_ALPHA</option>
+              <option value="ONE_MINUS_SRC_ALPHA" selected={true}>ONE_MINUS_SRC_ALPHA</option>
+              <option value="DST_ALPHA">DST_ALPHA</option>
+              <option value="ONE_MINUS_DST_ALPHA">ONE_MINUS_DST_ALPHA</option>
+            </select>
+          </div>
+        </div>
+        <div className={className+'-Field src-alpha-blend-factor'}>
+          <div className={className+'-FieldLabel'}>
+            Src Alpha Blend Factor:
+          </div>
+          <div className={className+'-FieldValue'}>
+            <select className={className+'-FieldInput srcAlphaBlendFactor'}>
+              <option value="ZERO">ZERO</option>
+              <option value="ONE">ONE</option>
+              <option value="SRC_COLOR">SRC_COLOR</option>
+              <option value="ONE_MINUS_SRC_COLOR">ONE_MINUS_SRC_COLOR</option>
+              <option value="DST_COLOR">DST_COLOR</option>
+              <option value="ONE_MINUS_DST_COLOR">ONE_MINUS_DST_COLOR</option>
+              <option value="SRC_ALPHA" selected={true}>SRC_ALPHA</option>
+              <option value="ONE_MINUS_SRC_ALPHA">ONE_MINUS_SRC_ALPHA</option>
+              <option value="DST_ALPHA">DST_ALPHA</option>
+              <option value="ONE_MINUS_DST_ALPHA">ONE_MINUS_DST_ALPHA</option>
+            </select>
+          </div>
+        </div>
+        <div className={className+'-Field dst-alpha-blend-factor'}>
+          <div className={className+'-FieldLabel'}>
+            Dst Alpha Blend Factor:
+          </div>
+          <div className={className+'-FieldValue'}>
+            <select className={className+'-FieldInput dstAlphaBlendFactor'}>
+              <option value="ZERO">ZERO</option>
+              <option value="ONE">ONE</option>
+              <option value="SRC_COLOR">SRC_COLOR</option>
+              <option value="ONE_MINUS_SRC_COLOR">ONE_MINUS_SRC_COLOR</option>
+              <option value="DST_COLOR">DST_COLOR</option>
+              <option value="ONE_MINUS_DST_COLOR">ONE_MINUS_DST_COLOR</option>
+              <option value="SRC_ALPHA">SRC_ALPHA</option>
+              <option value="ONE_MINUS_SRC_ALPHA" selected={true}>ONE_MINUS_SRC_ALPHA</option>
+              <option value="DST_ALPHA">DST_ALPHA</option>
+              <option value="ONE_MINUS_DST_ALPHA">ONE_MINUS_DST_ALPHA</option>
+            </select>
+          </div>
+        </div>
+        <div className={className+'-Field texture-filtering'}>
+          <div className={className+'-FieldLabel'}>
+            Texture Filtering:
+          </div>
+          <div className={className+'-FieldValue'}>
+            <select className={className+'-FieldInput textureFiltering'}>
+              <option value="NEAREST">Nearest</option>
+              <option value="LINEAR">Linear</option>
+              <option value="NEAREST_MIPMAP_NEAREST">Nearest Mipmap Nearest</option>
+              <option value="LINEAR_MIPMAP_NEAREST">Linear Mipmap Nearest</option>
+              <option value="NEAREST_MIPMAP_LINEAR">Nearest Mipmap Linear</option>
+              <option value="LINEAR_MIPMAP_LINEAR" selected={true}>Linear Mipmap Linear</option>
+            </select>
+          </div>
+        </div>
+        <div className={className+'-Field max-anisotropy'}>
+          <div className={className+'-FieldLabel'}>
+            Max. Anisotropy:
+          </div>
+          <div className={className+'-FieldValue'}>
+            <select className={className+'-FieldInput maxAnisotropy'}>
+              <option value="1" selected={true}>1</option>
+              <option value="2">2</option>
+              <option value="4">4</option>
+              <option value="8">8</option>
+              <option value="16">16</option>
             </select>
           </div>
         </div>

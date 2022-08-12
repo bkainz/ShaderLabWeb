@@ -8,6 +8,20 @@ function ProgrammedMesh(mesh, program) {
   this.depthTest = ''
   this.faceCull = ''
   this.frontFace = 'CCW'
+  this.blendEnable = true
+  this.blendOperation = 'FUNC_ADD'
+  this.srcColorBlendFactor = 'SRC_ALPHA'
+  this.dstColorBlendFactor = 'ONE_MINUS_SRC_ALPHA'
+  this.srcAlphaBlendFactor = 'SRC_ALPHA'
+  this.dstAlphaBlendFactor = 'ONE_MINUS_SRC_ALPHA'
+  this.textureFiltering = 'NEAREST'
+  this.maxAnisotropy = '1'
+
+  this.anisotropyExt = (
+    this.webGL.getExtension('EXT_texture_filter_anisotropic') ||
+    this.webGL.getExtension('MOZ_EXT_texture_filter_anisotropic') ||
+    this.webGL.getExtension('WEBKIT_EXT_texture_filter_anisotropic')
+  );
 
   this.resetListener = e => this.reset()
   this.program.eventEl.addEventListener('updated', this.resetListener)
@@ -20,6 +34,8 @@ ProgrammedMesh.prototype = {
     this.createdTextures = []
     this.uniforms = {}
     this.textures = []
+    this.texturesPow2 = []
+    this.texturesIsRenderTarget = []
   },
 
   updateUniform(type, name, value) {
@@ -54,12 +70,15 @@ ProgrammedMesh.prototype = {
 
         if (value === null || value instanceof WebGLTexture) {
           this.textures[unit] = value
+          this.texturesPow2[unit] = true
+          this.texturesIsRenderTarget[unit] = true
         }
         else {
           this.textures[unit] = this.createdTextures[unit] = this.webGL.createTexture()
           const target = type === 'sampler2D'   ? this.webGL.TEXTURE_2D
                        : type === 'samplerCube' ? this.webGL.TEXTURE_CUBE_MAP
                        :                          null
+          this.texturesIsRenderTarget[unit] = false
           this.webGL.activeTexture(this.webGL.TEXTURE0)
           this.webGL.bindTexture(target, this.textures[unit])
 
@@ -79,6 +98,10 @@ ProgrammedMesh.prototype = {
 
           }
 
+          // Flip loaded HTMLImageElement objects.
+          this.webGL.pixelStorei(this.webGL.UNPACK_FLIP_Y_WEBGL, true)
+
+          this.texturesPow2[unit] = isPow2
           if (isPow2) {
             this.webGL.generateMipmap(target)
             this.webGL.texParameteri(target, this.webGL.TEXTURE_MIN_FILTER, this.webGL.LINEAR_MIPMAP_LINEAR)
@@ -120,6 +143,20 @@ ProgrammedMesh.prototype = {
       this.webGL.disable(this.webGL.CULL_FACE)
     }
 
+    if (this.blendEnable) {
+      this.webGL.enable(this.webGL.BLEND)
+    } else {
+      this.webGL.disable(this.webGL.BLEND)
+    }
+    if (this.blendOperation) {
+      this.webGL.blendEquation(this.webGL[this.blendOperation]);
+    }
+    if (this.srcColorBlendFactor && this.dstColorBlendFactor && this.srcAlphaBlendFactor && this.dstAlphaBlendFactor) {
+      this.webGL.blendFuncSeparate(
+        this.webGL[this.srcColorBlendFactor], this.webGL[this.dstColorBlendFactor],
+        this.webGL[this.srcAlphaBlendFactor], this.webGL[this.dstAlphaBlendFactor]);
+    }
+
     this.webGL.frontFace(this.webGL[this.frontFace])
 
     for (const name in this.uniforms) {
@@ -158,6 +195,30 @@ ProgrammedMesh.prototype = {
                        : type === 'samplerCube' ? this.webGL.TEXTURE_CUBE_MAP
                        :                          null
           this.webGL.bindTexture(target, this.textures[value])
+
+          if (this.textureFiltering && !this.texturesIsRenderTarget[value]) {
+            let isPow2 = this.texturesPow2[value]
+            if (isPow2) {
+              this.webGL.texParameteri(target, this.webGL.TEXTURE_MIN_FILTER, this.webGL[this.textureFiltering])
+            } else {
+              if (this.textureFiltering.includes("LINEAR")) {
+                this.webGL.texParameteri(target, this.webGL.TEXTURE_MIN_FILTER, this.webGL.LINEAR)
+              } else {
+                this.webGL.texParameteri(target, this.webGL.TEXTURE_MIN_FILTER, this.webGL.NEAREST)
+              }
+            }
+
+            if (this.textureFiltering.includes("LINEAR")) {
+              this.webGL.texParameteri(target, this.webGL.TEXTURE_MAG_FILTER, this.webGL.LINEAR)
+            } else {
+              this.webGL.texParameteri(target, this.webGL.TEXTURE_MAG_FILTER, this.webGL.NEAREST)
+            }
+          }
+
+          if (this.maxAnisotropy && target == this.webGL.TEXTURE_2D) {
+            this.webGL.texParameterf(target, this.anisotropyExt.TEXTURE_MAX_ANISOTROPY_EXT, this.maxAnisotropy);
+          }
+
           this.webGL.uniform1i(location, value)
           break
         default:

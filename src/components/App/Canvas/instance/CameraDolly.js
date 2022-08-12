@@ -14,7 +14,8 @@ CameraDolly.prototype = {
     const startPosition = this.canvas.app.getValue('vec3', 'Camera Position')
     const target = this.canvas.app.getValue('vec3', 'Camera Target')
     const targetToPosition = minus(startPosition, target)
-    const dPosition = times(targetToPosition, Math.sign(event.deltaY)/10)
+    const normalizationFactor = event.deltaMode == 0 ? 1000 : 30
+    const dPosition = times(targetToPosition, event.deltaY / normalizationFactor)
     this.canvas.app.setValue('vec3', 'Camera Position', plus(target, plus(targetToPosition, dPosition)))
   }
 }

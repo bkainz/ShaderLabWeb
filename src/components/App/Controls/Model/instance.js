@@ -100,6 +100,16 @@ const STATE = {
   depthTest: {type: 'config', name: 'Depth Test'},
   faceCulling: {type: 'config', name: 'Face Culling'},
   frontFace: {type: 'config', name: 'Front Face'},
+  blendEnable: {type: 'config', name: 'Blend Enable'},
+  blendOperation: {type: 'config', name: 'Blend Operation'},
+  srcColorBlendFactor: {type: 'config', name: 'Src Color Blend Factor'},
+  dstColorBlendFactor: {type: 'config', name: 'Dst Color Blend Factor'},
+  srcAlphaBlendFactor: {type: 'config', name: 'Src Alpha Blend Factor'},
+  dstAlphaBlendFactor: {type: 'config', name: 'Dst Alpha Blend Factor'},
+  blendMode: {type: 'config', name: 'Blend Mode'},
+  blendMode: {type: 'config', name: 'Blend Mode'},
+  textureFiltering: {type: 'config', name: 'Texture Filtering'},
+  maxAnisotropy: {type: 'config', name: 'Max. Anisotropy'},
   showWorldCoordinates: {type: 'config', name: 'Show World Coordinates'},
   showWireframe: {type: 'config', name: 'Show Wireframe'}
 }

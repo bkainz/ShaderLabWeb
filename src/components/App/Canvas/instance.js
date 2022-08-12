@@ -25,27 +25,35 @@ function Canvas(el, {className}) {
 Canvas.prototype = {
   initialize() {
     this.canvasEl = this.el.querySelector(`.${escapeCSS(this.className)}-Canvas`)
-    this.webGL = this.canvasEl.getContext('webgl', {alpha: false, preserveDrawingBuffer: true})
+    this.webGL = this.canvasEl.getContext('webgl2', {alpha: false, preserveDrawingBuffer: true})
     this.webGL.enable(this.webGL.BLEND)
     this.webGL.blendFunc(this.webGL.SRC_ALPHA, this.webGL.ONE_MINUS_SRC_ALPHA);
     this.webGL.getExtension('OES_standard_derivatives')
+    //this.webGL.getExtension('EXT_color_buffer_float')
 
     const outputProgram = new Program(this.webGL, 'quad')
     outputProgram.update({
-      vertex: {source: `attribute vec3 vertex_worldSpace;
-                        attribute vec2 textureCoordinate_input;
-                        varying vec2 uvs;
+      vertex: {source: `#version 300 es
+
+                        in vec3 vertexPosition;
+                        in vec2 vertexTextureCoordinates;
+                        out vec2 fragmentTextureCoordinates;
   
                         void main() {
-                          gl_Position = vec4(vertex_worldSpace, 1.0);
-                          uvs = textureCoordinate_input;
+                          gl_Position = vec4(vertexPosition, 1.0);
+                          fragmentTextureCoordinates = vertexTextureCoordinates;
                         }`},
-      fragment: {source: `precision mediump float;
+      fragment: {source: `#version 300 es
+
+                          precision highp float;
+
                           uniform sampler2D image;
-                          varying vec2 uvs;
-  
+
+                          in vec2 fragmentTextureCoordinates;
+                          out vec4 fragColor;
+
                           void main() {
-                            gl_FragColor = texture2D(image, uvs.st);
+                            fragColor = texture(image, fragmentTextureCoordinates.st);
                           }`}
     })
     const outputMesh = new Mesh(this.webGL, 'quad', loadMesh('quad'))
@@ -54,24 +62,29 @@ Canvas.prototype = {
 
     const originProgram = new Program(this.webGL, 'origin')
     originProgram.update({
-      vertex: {source: `attribute vec3 vertex_worldSpace;
+      vertex: {source: `#version 300 es
+
+                        in vec3 vertexPosition;
   
                         uniform mat4 mMatrix;
                         uniform mat4 vMatrix;
                         uniform mat4 pMatrix;
   
-                        varying vec3 fragment_worldSpace;
+                        out vec3 fragment_worldSpace;
   
                         void main() {
-                          gl_Position = pMatrix * vMatrix * mMatrix * vec4(vertex_worldSpace, 1);
-                          fragment_worldSpace = vertex_worldSpace;
+                          gl_Position = pMatrix * vMatrix * mMatrix * vec4(vertexPosition, 1);
+                          fragment_worldSpace = vertexPosition;
                         }`},
-      fragment: {source: `precision mediump float;
-  
-                          varying vec3 fragment_worldSpace;
+      fragment: {source: `#version 300 es
+
+                          precision highp float;
+
+                          in vec3 fragment_worldSpace;
+                          out vec4 fragColor;
   
                           void main() {
-                            gl_FragColor = vec4(step(0.0001, fragment_worldSpace), 1);
+                            fragColor = vec4(step(0.0001, fragment_worldSpace), 1);
                           }`}
     })
     const originMesh = new Mesh(this.webGL, 'origin', loadMesh('origin'))
@@ -130,26 +143,31 @@ Canvas.prototype = {
     program.eventEl.addEventListener('updated', e => {
       if (!program.isValid) return
 
+      inputSource = program.shaders.vertex.source.replace('#version 300 es', '')
       program.wireframe.update({
-        vertex: {source: `attribute vec3 vertex_barycentric;
-                          varying vec3 fragment_barycentric;
+        vertex: {source: `#version 300 es
+        
+                          in vec3 vertexBarycentric;
+                          out vec3 fragmentBarycentric;
 
-                          ${program.shaders.vertex.source.replace(/gl_Position\s*=\s*[^;]+;/, `
+                          ${inputSource.replace(/gl_Position\s*=\s*[^;]+;/, `
                           $&
-                          fragment_barycentric = vertex_barycentric;`)}`},
-        fragment: {source: `#extension GL_OES_standard_derivatives : enable
-                            precision mediump float;
-                            varying vec3 fragment_barycentric;
+                          fragmentBarycentric = vertexBarycentric;`)}`},
+        fragment: {source: `#version 300 es
 
-                            vec4 blendWireframe(vec4 fragColor) {
-                              vec3 w = fwidth(fragment_barycentric);
-                              vec3 d = step(w*0.5, fragment_barycentric);
+                            precision highp float;
+                            in vec3 fragmentBarycentric;
+                            out vec4 fragColor;
+
+                            vec4 blendWireframe(vec4 color) {
+                              vec3 w = fwidth(fragmentBarycentric);
+                              vec3 d = step(w*0.5, fragmentBarycentric);
                               float dEdge = min(min(d.x, d.y), d.z);
-                              return mix(vec4(1.0), fragColor, dEdge);
+                              return mix(vec4(1.0), color, dEdge);
                             }
 
                             void main() {
-                              gl_FragColor = blendWireframe(vec4(0.0));
+                              fragColor = blendWireframe(vec4(0.0));
                             }`}
       })
     })
@@ -178,6 +196,12 @@ Canvas.prototype = {
       programmedMesh.wireframe.faceCull = this.app.getValue('config', 'Face Culling')
       programmedMesh.frontFace = this.app.getValue('config', 'Front Face')
       programmedMesh.wireframe.frontFace = this.app.getValue('config', 'Front Face')
+      programmedMesh.blendMode = this.app.getValue('config', 'Blend Mode')
+      programmedMesh.wireframe.blendMode = this.app.getValue('config', 'Blend Mode')
+      programmedMesh.textureFiltering = this.app.getValue('config', 'Texture Filtering')
+      programmedMesh.wireframe.textureFiltering = this.app.getValue('config', 'Texture Filtering')
+      programmedMesh.maxAnisotropy = this.app.getValue('config', 'Max. Anisotropy')
+      programmedMesh.wireframe.maxAnisotropy = this.app.getValue('config', 'Max. Anisotropy')
 
       const eventListeners = {
         depthTest: ({detail: value}) => {
@@ -191,17 +215,65 @@ Canvas.prototype = {
         frontFace: ({detail: value}) => {
           programmedMesh.frontFace = value
           programmedMesh.wireframe.frontFace = value
+        },
+        blendEnable: ({detail: value}) => {
+          programmedMesh.blendEnable = value
+          programmedMesh.wireframe.blendEnable = value
+        },
+        blendOperation: ({detail: value}) => {
+          programmedMesh.blendOperation = value
+          programmedMesh.wireframe.blendOperation = value
+        },
+        srcColorBlendFactor: ({detail: value}) => {
+          programmedMesh.srcColorBlendFactor = value
+          programmedMesh.wireframe.srcColorBlendFactor = value
+        },
+        dstColorBlendFactor: ({detail: value}) => {
+          programmedMesh.dstColorBlendFactor = value
+          programmedMesh.wireframe.dstColorBlendFactor = value
+        },
+        srcAlphaBlendFactor: ({detail: value}) => {
+          programmedMesh.srcAlphaBlendFactor = value
+          programmedMesh.wireframe.srcAlphaBlendFactor = value
+        },
+        dstAlphaBlendFactor: ({detail: value}) => {
+          programmedMesh.dstAlphaBlendFactor = value
+          programmedMesh.wireframe.dstAlphaBlendFactor = value
+        },
+        textureFiltering: ({detail: value}) => {
+          programmedMesh.textureFiltering = value
+          programmedMesh.wireframe.textureFiltering = value
+        },
+        maxAnisotropy: ({detail: value}) => {
+          programmedMesh.maxAnisotropy = value
+          programmedMesh.wireframe.maxAnisotropy = value
         }
       }
 
       this.app.values.config['Depth Test'].el.addEventListener('valueChanged', eventListeners.depthTest)
       this.app.values.config['Face Culling'].el.addEventListener('valueChanged', eventListeners.faceCull)
       this.app.values.config['Front Face'].el.addEventListener('valueChanged', eventListeners.frontFace)
+      this.app.values.config['Blend Enable'].el.addEventListener('valueChanged', eventListeners.blendEnable)
+      this.app.values.config['Blend Operation'].el.addEventListener('valueChanged', eventListeners.blendOperation)
+      this.app.values.config['Src Color Blend Factor'].el.addEventListener('valueChanged', eventListeners.srcColorBlendFactor)
+      this.app.values.config['Dst Color Blend Factor'].el.addEventListener('valueChanged', eventListeners.dstColorBlendFactor)
+      this.app.values.config['Src Alpha Blend Factor'].el.addEventListener('valueChanged', eventListeners.srcAlphaBlendFactor)
+      this.app.values.config['Dst Alpha Blend Factor'].el.addEventListener('valueChanged', eventListeners.dstAlphaBlendFactor)
+      this.app.values.config['Texture Filtering'].el.addEventListener('valueChanged', eventListeners.textureFiltering)
+      this.app.values.config['Max. Anisotropy'].el.addEventListener('valueChanged', eventListeners.maxAnisotropy)
 
       programmedMesh.eventEl.addEventListener('destroyed', e => {
         this.app.values.config['Depth Test'].el.removeEventListener('valueChanged', eventListeners.depthTest)
         this.app.values.config['Face Culling'].el.removeEventListener('valueChanged', eventListeners.faceCull)
         this.app.values.config['Front Face'].el.removeEventListener('valueChanged', eventListeners.frontFace)
+        this.app.values.config['Blend Enable'].el.removeEventListener('valueChanged', eventListeners.blendEnable)
+        this.app.values.config['Blend Operation'].el.removeEventListener('valueChanged', eventListeners.blendOperation)
+        this.app.values.config['Src Color Blend Factor'].el.removeEventListener('valueChanged', eventListeners.srcColorBlendFactor)
+        this.app.values.config['Dst Color Blend Factor'].el.removeEventListener('valueChanged', eventListeners.dstColorBlendFactor)
+        this.app.values.config['Src Alpha Blend Factor'].el.removeEventListener('valueChanged', eventListeners.srcAlphaBlendFactor)
+        this.app.values.config['Dst Alpha Blend Factor'].el.removeEventListener('valueChanged', eventListeners.dstAlphaBlendFactor)
+        this.app.values.config['Texture Filtering'].el.removeEventListener('valueChanged', eventListeners.textureFiltering)
+        this.app.values.config['Max. Anisotropy'].el.removeEventListener('valueChanged', eventListeners.maxAnisotropy)
       })
     }
 
@@ -209,8 +281,9 @@ Canvas.prototype = {
   },
 
   updateViewport() {
-    this.canvasEl.width = this.canvasEl.offsetWidth
-    this.canvasEl.height = this.canvasEl.offsetHeight
+    var devicePixelRatio = window.devicePixelRatio || 1;
+    this.canvasEl.width = this.canvasEl.offsetWidth * devicePixelRatio
+    this.canvasEl.height = this.canvasEl.offsetHeight * devicePixelRatio
     this.webGL.viewport(0, 0, this.canvasEl.width, this.canvasEl.height)
     for (const framebuffer of this.framebuffers ) framebuffer.updateSize(this.size)
     this.app.el.dispatchEvent(new CustomEvent('viewportChanged', {detail: this.size}))
