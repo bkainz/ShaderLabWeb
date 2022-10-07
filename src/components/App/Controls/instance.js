@@ -38,31 +38,29 @@ Controls.prototype = {
       })
     })
 
-    let onUpload = e => {}
-    const uploadEl = document.createElement('input')
-    uploadEl.type = 'file'
-    uploadEl.style.display = 'none'
-    uploadEl.addEventListener('change', e => onUpload(e))
-    this.el.appendChild(uploadEl)
+    const jsonInput = this.el.querySelector(`.${escapeCSS(this.className)}-Input.load-json`)
 
-    this.el.querySelector(`.${escapeCSS(this.className)}-Button.load-json`).addEventListener('click', e => {
-      onUpload = e => {
+    jsonInput.addEventListener('change', e => {
         const reader = new FileReader()
-        reader.readAsText(uploadEl.files[0])
+        reader.readAsText(jsonInput.files[0])
         reader.onloadend = () => this.app.state = JSON.parse(reader.result)
-      }
-      uploadEl.accept = 'text/json'
-      uploadEl.click()
     })
 
+    this.el.querySelector(`.${escapeCSS(this.className)}-Button.load-json`).addEventListener('click', e => {
+      jsonInput.click()
+    })
+
+    const zipInput = this.el.querySelector(`.${escapeCSS(this.className)}-Input.load-zip`)
+
+    zipInput.addEventListener('change', e => {
+      JSZip.loadAsync(zipInput.files[0])
+        .then(zip => zip.file('state.json').async('text'))
+        .then(json => this.app.state = JSON.parse(json))
+    })
+    
+
     this.el.querySelector(`.${escapeCSS(this.className)}-Button.load-zip`).addEventListener('click', e => {
-      onUpload = e => {
-        JSZip.loadAsync(uploadEl.files[0])
-             .then(zip => zip.file('state.json').async('text'))
-             .then(json => this.app.state = JSON.parse(json))
-      }
-      uploadEl.accept = 'application/zip'
-      uploadEl.click()
+      zipInput.click()
     })
   }
 }
