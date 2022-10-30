@@ -20,7 +20,9 @@ export default Component.register(import.meta.url, ({className, id}) =>
       &nbsp;<button type="button" className={className+'-Button save-zip'}>.zip</button>
       <div className={className+'-StateHeadline'}>Upload State:</div>
       &nbsp;<button type="button" className={className+'-Button load-json'}>.json</button>
+      &nbsp;<input type="file" className={className+'-Input load-json'} name="input-json" accept="text/json" hidden/>
       &nbsp;<button type="button" className={className+'-Button load-zip'}>.zip</button>
+      &nbsp;<input type="file" className={className+'-Input load-zip'} name="input-zip" accept="application/zip" hidden/>
     </div>
     <Initializer/>
   </div>
