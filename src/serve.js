@@ -2,7 +2,7 @@ import path from 'path'
 import http from 'http'
 import Koa from 'koa'
 import koaFavicon from 'koa-favicon'
-import koaBody from 'koa-body'
+import koaBodyModule from 'koa-body'
 import koaStatic from 'koa-static'
 import App from './helpers/App'
 import Model from './helpers/Model'
@@ -15,8 +15,9 @@ import userRoutes from './routes/users'
 import projectRoutes from './routes/projects'
 import exitHandler from './helpers/exitHandler'
 
-const app = new App()
-const koa = new Koa()
+const koa = new Koa();
+const app = new App();
+const koaBody = koaBodyModule.default
 
 /*
  * Parse POST bodies
