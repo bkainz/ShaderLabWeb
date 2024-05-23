@@ -2,13 +2,13 @@
 
 import fs from 'fs'
 import http from 'http'
-import Koa from 'koa'
 import koaRouter from '@koa/router'
-import koaBody from 'koa-body'
 import exitHandler from '../src/helpers/exitHandler.js'
 
+const Koa = require('koa');
 const app = new Koa()
 const router = new koaRouter()
+const koaBody = require('koa-body').default;
 
 router.post('/', koaBody({multipart: true}), async ctx => {
   const state = JSON.parse(ctx.request.body.state || '{}')

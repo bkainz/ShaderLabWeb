@@ -9,8 +9,8 @@ export default Component.register(import.meta.url, ({className, id}) =>
       </header>
       <div className={className+'/Section-Content'}>
         <div className={className+'-FieldValue'}>
-          <select className={className+'-FieldInput '+className+'-MeshName'}>
-            <option value="teapot" selected={true}>Teapot</option>
+          <select className={className+'-FieldInput '+className+'-MeshName'} defaultValue={"teapot"}>
+            <option value="teapot">Teapot</option>
             <option value="cube">Cube</option>
             <option value="quad">Plane</option>
             <option value="sphere">Sphere</option>
@@ -89,10 +89,10 @@ export default Component.register(import.meta.url, ({className, id}) =>
             Depth Test:
           </div>
           <div className={className+'-FieldValue'}>
-            <select className={className+'-FieldInput depthTest'}>
+            <select className={className+'-FieldInput depthTest'}  defaultValue={'LESS'}>
               <option value="">Disabled</option>
               <option value="NEVER">Never</option>
-              <option value="LESS" selected={true}>Less</option>
+              <option value="LESS">Less</option>
               <option value="LEQUAL">Less Or Equal</option>
               <option value="EQUAL">Equal</option>
               <option value="NOTEQUAL">Not Equal</option>
@@ -139,8 +139,8 @@ export default Component.register(import.meta.url, ({className, id}) =>
             Blend Operation:
           </div>
           <div className={className+'-FieldValue'}>
-            <select className={className+'-FieldInput blendOperation'}>
-              <option value="FUNC_ADD" selected={true}>Additive</option>
+            <select className={className+'-FieldInput blendOperation'} defaultValue={'FUNC_ADD'}>
+              <option value="FUNC_ADD">Additive</option>
               <option value="FUNC_SUBTRACT">Subtractive</option>
               <option value="FUNC_REVERSE_SUBTRACT">Reverse Subtractive</option>
               <option value="MIN">Minimum</option>
@@ -153,14 +153,14 @@ export default Component.register(import.meta.url, ({className, id}) =>
             Src Color Blend Factor:
           </div>
           <div className={className+'-FieldValue'}>
-            <select className={className+'-FieldInput srcColorBlendFactor'}>
+            <select className={className+'-FieldInput srcColorBlendFactor'} defaultValue={'SRC_ALPHA'}>
               <option value="ZERO">ZERO</option>
               <option value="ONE">ONE</option>
               <option value="SRC_COLOR">SRC_COLOR</option>
               <option value="ONE_MINUS_SRC_COLOR">ONE_MINUS_SRC_COLOR</option>
               <option value="DST_COLOR">DST_COLOR</option>
               <option value="ONE_MINUS_DST_COLOR">ONE_MINUS_DST_COLOR</option>
-              <option value="SRC_ALPHA" selected={true}>SRC_ALPHA</option>
+              <option value="SRC_ALPHA">SRC_ALPHA</option>
               <option value="ONE_MINUS_SRC_ALPHA">ONE_MINUS_SRC_ALPHA</option>
               <option value="DST_ALPHA">DST_ALPHA</option>
               <option value="ONE_MINUS_DST_ALPHA">ONE_MINUS_DST_ALPHA</option>
@@ -172,7 +172,7 @@ export default Component.register(import.meta.url, ({className, id}) =>
             Dst Color Blend Factor:
           </div>
           <div className={className+'-FieldValue'}>
-            <select className={className+'-FieldInput dstColorBlendFactor'}>
+            <select className={className+'-FieldInput dstColorBlendFactor'} defaultValue={'ONE_MINUS_SRC_ALPHA'}>
               <option value="ZERO">ZERO</option>
               <option value="ONE">ONE</option>
               <option value="SRC_COLOR">SRC_COLOR</option>
@@ -180,7 +180,7 @@ export default Component.register(import.meta.url, ({className, id}) =>
               <option value="DST_COLOR">DST_COLOR</option>
               <option value="ONE_MINUS_DST_COLOR">ONE_MINUS_DST_COLOR</option>
               <option value="SRC_ALPHA">SRC_ALPHA</option>
-              <option value="ONE_MINUS_SRC_ALPHA" selected={true}>ONE_MINUS_SRC_ALPHA</option>
+              <option value="ONE_MINUS_SRC_ALPHA">ONE_MINUS_SRC_ALPHA</option>
               <option value="DST_ALPHA">DST_ALPHA</option>
               <option value="ONE_MINUS_DST_ALPHA">ONE_MINUS_DST_ALPHA</option>
             </select>
@@ -191,14 +191,14 @@ export default Component.register(import.meta.url, ({className, id}) =>
             Src Alpha Blend Factor:
           </div>
           <div className={className+'-FieldValue'}>
-            <select className={className+'-FieldInput srcAlphaBlendFactor'}>
+            <select className={className+'-FieldInput srcAlphaBlendFactor'} defaultValue={'SRC_ALPHA'}>
               <option value="ZERO">ZERO</option>
               <option value="ONE">ONE</option>
               <option value="SRC_COLOR">SRC_COLOR</option>
               <option value="ONE_MINUS_SRC_COLOR">ONE_MINUS_SRC_COLOR</option>
               <option value="DST_COLOR">DST_COLOR</option>
               <option value="ONE_MINUS_DST_COLOR">ONE_MINUS_DST_COLOR</option>
-              <option value="SRC_ALPHA" selected={true}>SRC_ALPHA</option>
+              <option value="SRC_ALPHA">SRC_ALPHA</option>
               <option value="ONE_MINUS_SRC_ALPHA">ONE_MINUS_SRC_ALPHA</option>
               <option value="DST_ALPHA">DST_ALPHA</option>
               <option value="ONE_MINUS_DST_ALPHA">ONE_MINUS_DST_ALPHA</option>
@@ -210,7 +210,7 @@ export default Component.register(import.meta.url, ({className, id}) =>
             Dst Alpha Blend Factor:
           </div>
           <div className={className+'-FieldValue'}>
-            <select className={className+'-FieldInput dstAlphaBlendFactor'}>
+            <select className={className+'-FieldInput dstAlphaBlendFactor'} defaultValue={'ONE_MINUS_SRC_ALPHA'}>
               <option value="ZERO">ZERO</option>
               <option value="ONE">ONE</option>
               <option value="SRC_COLOR">SRC_COLOR</option>
@@ -218,7 +218,7 @@ export default Component.register(import.meta.url, ({className, id}) =>
               <option value="DST_COLOR">DST_COLOR</option>
               <option value="ONE_MINUS_DST_COLOR">ONE_MINUS_DST_COLOR</option>
               <option value="SRC_ALPHA">SRC_ALPHA</option>
-              <option value="ONE_MINUS_SRC_ALPHA" selected={true}>ONE_MINUS_SRC_ALPHA</option>
+              <option value="ONE_MINUS_SRC_ALPHA">ONE_MINUS_SRC_ALPHA</option>
               <option value="DST_ALPHA">DST_ALPHA</option>
               <option value="ONE_MINUS_DST_ALPHA">ONE_MINUS_DST_ALPHA</option>
             </select>
@@ -229,13 +229,13 @@ export default Component.register(import.meta.url, ({className, id}) =>
             Texture Filtering:
           </div>
           <div className={className+'-FieldValue'}>
-            <select className={className+'-FieldInput textureFiltering'}>
+            <select className={className+'-FieldInput textureFiltering'} defaultValue={'LINEAR_MIPMAP_LINEAR'}>
               <option value="NEAREST">Nearest</option>
               <option value="LINEAR">Linear</option>
               <option value="NEAREST_MIPMAP_NEAREST">Nearest Mipmap Nearest</option>
               <option value="LINEAR_MIPMAP_NEAREST">Linear Mipmap Nearest</option>
               <option value="NEAREST_MIPMAP_LINEAR">Nearest Mipmap Linear</option>
-              <option value="LINEAR_MIPMAP_LINEAR" selected={true}>Linear Mipmap Linear</option>
+              <option value="LINEAR_MIPMAP_LINEAR">Linear Mipmap Linear</option>
             </select>
           </div>
         </div>
@@ -244,8 +244,8 @@ export default Component.register(import.meta.url, ({className, id}) =>
             Max. Anisotropy:
           </div>
           <div className={className+'-FieldValue'}>
-            <select className={className+'-FieldInput maxAnisotropy'}>
-              <option value="1" selected={true}>1</option>
+            <select className={className+'-FieldInput maxAnisotropy'} defaultValue={'1'}>
+              <option value="1">1</option>
               <option value="2">2</option>
               <option value="4">4</option>
               <option value="8">8</option>
