@@ -7,6 +7,9 @@ URL=$1
 test -z "$2" && echo "No email for Let's Encrypt given as second argument" && exit 1
 EMAIL=$2
 
+test -z "$3" && echo "No user specified for SSH, git and other ssh-based commands will fail"
+SSHUSR=$3
+
 # Variables
 APPUSR=shaderLabWeb
 GITDIR=/srv/git/$URL
@@ -16,10 +19,13 @@ TEMPSCRIPT="$(mktemp /tmp/init.XXXXXXXXX.sh)" || exit 1
 
 cat << EOF >> $TEMPSCRIPT
 # Create linux group and user
-groupadd deployment
-useradd -m -G deployment $APPUSR
+groupadd -r --gid 99 deployment
+useradd -r --uid 99 -m -G deployment $APPUSR
+
+sudo usermod -a -G deployment $SSHUSR
 cd \$(sudo -i -u $APPUSR echo \\\$HOME)
 
+# Install nvm for managing node versions
 NVMPATH=\$(sudo -i -u $APPUSR command -v nvm)
 if [ -z "\${NVMPATH}" ]
 then
@@ -28,6 +34,11 @@ then
     sudo -i -u $APPUSR rm install.sh
 fi
 
+# Set node 18 to default
+sudo -i -u $APPUSR nvm install 18
+sudo -i -u $APPUSR nvm alias default 18
+
+# Install yarn globally
 YARNPATH=\$(sudo -i -u $APPUSR which yarn)
 if [ -z "\${YARNPATH}" ]
 then
@@ -40,11 +51,11 @@ then
   rm -rf $GITDIR
 fi
 mkdir -p $GITDIR
-chown $APPUSR:deployment $GITDIR
+chown -R $APPUSR:deployment $GITDIR
 
 GITPATH=\$(which git)
-ksu $APPUSR -e \$GITPATH init --bare --shared $GITDIR
-git config -f $GITDIR/config receive.denynonfastforwards false
+sudo -i -u $APPUSR \$GITPATH init --bare --shared $GITDIR
+sudo -i -u $APPUSR \$GITPATH config -f $GITDIR/config receive.denynonfastforwards false
 
 # Create app dir
 if [ -d "$APPDIR" ]
@@ -52,16 +63,24 @@ then
   rm -rf $APPDIR
 fi
 mkdir -p $APPDIR
-chown $APPUSR:$APPUSR $APPDIR
+chown -R $APPUSR:$APPUSR $APPDIR
 
 # Create web root
 mkdir -p /var/www/html/$URL
-chown $APPUSR:deployment /var/www/html/$URL
+chown -R $APPUSR:deployment /var/www/html/$URL
 chmod g+w /var/www/html/$URL
 
 # Create SSL certificate
 # echo "server { server_name $URL; listen 80; }" > /etc/nginx/sites-available/$URL
 # certbot certonly --nginx -n --agree-tos -d $URL -m $EMAIL
+# Create self-signed SSL certificate
+if [ ! -f /etc/ssl/private/nginx-selfsigned.key ]
+    openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/nginx-selfsigned.key -out /etc/ssl/certs/nginx-selfsigned.crt
+fi
+if [ ! -f /etc/ssl/certs/dhparam.pem 2048 ]
+    openssl dhparam -out /etc/ssl/certs/dhparam.pem 2048
+fi
+cp /tmp/ssl-params-self-signed.conf /etc/nginx/snippets/
 
 # Open ports
 ufw allow http
