@@ -74,6 +74,8 @@ chmod g+w /var/www/html/$URL
 # echo "server { server_name $URL; listen 80; }" > /etc/nginx/sites-available/$URL
 # certbot certonly --nginx -n --agree-tos -d $URL -m $EMAIL
 # Create self-signed SSL certificate
+## Following this guide: 
+## https://web.archive.org/web/20240221174906/https://www.digitalocean.com/community/tutorials/how-to-create-a-self-signed-ssl-certificate-for-nginx-in-ubuntu-16-04
 if [ ! -f /etc/ssl/private/nginx-selfsigned.key ]
     openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/nginx-selfsigned.key -out /etc/ssl/certs/nginx-selfsigned.crt
 fi
