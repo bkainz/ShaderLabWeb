@@ -7,8 +7,10 @@ URL=$1
 # Variables
 APPUSR=shaderLabWeb
 APPDIR=/srv/http/$URL
-SCRIPT="$(which yarn) serve"
+SCRIPT="\"source \~/nvm.sh \&\& yarn serve\""
 PORT=$(test -n "$2" && echo $2 || 3000)
+
+echo "USING YARN: ${SCRIPT}"
 
 sed -i -e "s!\$URL!$URL!" /etc/systemd/system/$URL.service
 sed -i -e "s!\$USR!$APPUSR!" /etc/systemd/system/$URL.service

@@ -5,7 +5,7 @@
   "license": "MIT",
   "type": "module",
   "engines": {
-    "node": ">=14"
+    "node": ">=16, <19"
   },
   "scripts": {
     "transpile": "yarn babel src --out-dir _transpiled --delete-dir-on-start --copy-files",
