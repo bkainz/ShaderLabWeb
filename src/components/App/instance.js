@@ -12,7 +12,8 @@ function App(el, {className, props}) {
 App.prototype = {
   initialize() {
     this.stateEl = this.el.querySelector(`.${escapeCSS(this.className)}-State`)
-    this.state = JSON.parse(this.stateEl.value)
+    this.state = JSON.parse(localStorage.getItem('state') || this.stateEl.value)
+    this.defaultState = JSON.parse(this.stateEl.value)
     this.stateChangeThrottle && clearTimeout(this.stateChangeThrottle)
 
     // Watch canvas panel size and update the canvas' viewport
@@ -124,11 +125,16 @@ App.prototype = {
     this.canvas.state = state.output
   },
 
+  onStateChanged() {
+    localStorage.setItem('state', JSON.stringify(this.state))
+  },
+
   announceStateChange() {
     this.stateChangeThrottle && clearTimeout(this.stateChangeThrottle)
     this.stateChangeThrottle = setTimeout(() => {
       this.stateChangeThrottle = undefined
       this.stateEl.value = JSON.stringify(this.state)
+      this.onStateChanged()
       this.el.dispatchEvent(new Event('stateChanged'))
     }, 500)
   }

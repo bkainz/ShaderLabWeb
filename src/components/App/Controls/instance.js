@@ -19,6 +19,10 @@ Controls.prototype = {
     downloadEl.style.display = 'none'
     this.el.appendChild(downloadEl)
 
+    this.el.querySelector(`.${escapeCSS(this.className)}-Button.clear-state`).addEventListener('click', e => {
+      this.app.state = this.app.defaultState
+    })
+
     this.el.querySelector(`.${escapeCSS(this.className)}-Button.save-json`).addEventListener('click', e => {
       const file = new Blob([JSON.stringify(this.app.state)], {type: 'text/json'})
       downloadEl.download = 'shaderlab.json'
