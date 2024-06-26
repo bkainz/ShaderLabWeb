@@ -15,6 +15,7 @@ export default Component.register(import.meta.url, ({className, id}) =>
                    {id: 'uniforms', label: 'Uniforms', content: <Uniforms/>}]}/>
     </div>
     <div className={className+'-State'}>
+      &nbsp;<button type="button" className={className+'-Button clear-state'}>Clear State</button>
       <div className={className+'-StateHeadline'}>Download State:</div>
       &nbsp;<button type="button" className={className+'-Button save-json'}>.json</button>
       &nbsp;<button type="button" className={className+'-Button save-zip'}>.zip</button>
