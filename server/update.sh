@@ -36,10 +36,22 @@ rsync -v --info=progress2 $DIR/app/nginx-server-block/update.sh $USR@$SRV:/tmp/$
 rsync -v --info=progress2 $DIR/app/systemd-unit-file/unit-file $USR@$SRV:/tmp/$URL.service.tmp
 rsync -v --info=progress2 $DIR/app/nginx-server-block/server-block $USR@$SRV:/tmp/$URL.sites-available.tmp
 
-ssh $USR@$SRV "cd /tmp/ && chmod ug+rwx $APP_UPDATE_SCRIPT && $COMMAND_PREFIX ./$APP_UPDATE_SCRIPT \"$URL\"$COMMAND_SUFFIX"
 
-ssh $USR@$SRV "$COMMAND_PREFIX mv /tmp/$URL.service.tmp /etc/systemd/system/$URL.service$COMMAND_SUFFIX"
-ssh $USR@$SRV "cd /tmp/ && chmod ug+rwx $SYSTEMD_UPDATE_SCRIPT && $COMMAND_PREFIX ./$SYSTEMD_UPDATE_SCRIPT \"$URL\" \"$PORT\"$COMMAND_SUFFIX"
+TEMPSCRIPT="$(mktemp /tmp/init.XXXXXXXXX.sh)" || exit 1
 
-ssh $USR@$SRV "$COMMAND_PREFIX mv /tmp/$URL.sites-available.tmp /etc/nginx/sites-available/$URL$COMMAND_SUFFIX"
-ssh $USR@$SRV "cd /tmp/ && chmod ug+rwx $SERVER_UPDATE_SCRIPT && $COMMAND_PREFIX ./$SERVER_UPDATE_SCRIPT \"$URL\" \"$PORT\"$COMMAND_SUFFIX"
+cat << EOF >> $TEMPSCRIPT
+cd /tmp/
+chmod ug+rwx $APP_UPDATE_SCRIPT
+chmod ug+rwx $SYSTEMD_UPDATE_SCRIPT
+chmod ug+rwx $SERVER_UPDATE_SCRIPT
+
+sudo ./$APP_UPDATE_SCRIPT $URL
+sudo mv /tmp/$URL.service.tmp /etc/systemd/system/$URL.service
+sudo ./$SYSTEMD_UPDATE_SCRIPT $URL $PORT
+sudo mv /tmp/$URL.sites-available.tmp /etc/nginx/sites-available/$URL
+sudo ./$SERVER_UPDATE_SCRIPT $URL $PORT
+EOF
+
+rsync -v --info=progress2 $TEMPSCRIPT $USR@$SRV:/tmp/configure-remaining-scripts.sh
+
+ssh $USR@$SRV "$COMMAND_PREFIX bash /tmp/configure-remaining-scripts.sh$COMMAND_SUFFIX && rm /tmp/configure-remaining-scripts.sh"
