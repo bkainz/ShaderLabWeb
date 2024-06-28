@@ -21,8 +21,6 @@ else
     COMMAND_SUFFIX="\""
 fi
 
-ssh $USR@$SRV "$COMMAND_PREFIX usermod -a -G deployment $USR$COMMAND_SUFFIX"
-
 git push --force ssh://$USR@$SRV:$GITDIR HEAD:master
 APP_UPDATE_SCRIPT="$(basename `git rev-parse --show-toplevel`)-$(git rev-parse HEAD)-app-update.sh"
 rsync -v --info=progress2 $DIR/app/update.sh $USR@$SRV:/tmp/$APP_UPDATE_SCRIPT
