@@ -4,19 +4,21 @@ server {
     listen [::]:443 ssl http2;
     listen 443 ssl http2;
     
-    ssl_certificate /etc/ssl/certs/$URL/nginx-selfsigned.crt;
-    ssl_certificate_key /etc/ssl/private/$URL/nginx-selfsigned.key;
+    # Uncomment for self-signed cert
+    # ssl_certificate /etc/ssl/certs/$URL/nginx-selfsigned.crt;
+    # ssl_certificate_key /etc/ssl/private/$URL/nginx-selfsigned.key;
     
-    include snippets/ssl-params-selfsigned.conf;
+    # include snippets/ssl-params-selfsigned.conf;
 
-    # ssl_certificate /etc/letsencrypt/live/$URL/fullchain.pem;
-    # ssl_certificate_key /etc/letsencrypt/live/$URL/privkey.pem;
-    # include /etc/letsencrypt/options-ssl-nginx.conf;
-    # ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
-    # add_header Strict-Transport-Security "max-age=31536000" always;
-    # ssl_trusted_certificate /etc/letsencrypt/live/$URL/chain.pem;
-    # ssl_stapling on;
-    # ssl_stapling_verify on;
+    # Uncomment for letsencrypt-signed cert
+    ssl_certificate /etc/letsencrypt/live/$URL/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/$URL/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+    add_header Strict-Transport-Security "max-age=31536000" always;
+    ssl_trusted_certificate /etc/letsencrypt/live/$URL/chain.pem;
+    ssl_stapling on;
+    ssl_stapling_verify on;
 
     access_log /var/log/nginx/$URL.access.log;
     error_log /var/log/nginx/$URL.error.log;
