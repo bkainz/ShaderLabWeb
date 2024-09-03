@@ -297,6 +297,9 @@ $ PORT=3003 ./exampleFeedbackServer/serve.js &
 	
 References:
 [1] https://docs.gitlab.com/ee/api/oauth2.html
+
 [2] https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps#web-application-flow
+
 [3] https://dominictobias.medium.com/writing-an-oauth-flow-from-scratch-in-nodejs-397496acafbe
+
 [4] https://permify.co/post/oauth-20-implementation-nodejs-expressjs/
