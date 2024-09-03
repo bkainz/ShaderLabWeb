@@ -272,3 +272,31 @@ under a specific port in the background execute the command line:
 ```
 $ PORT=3003 ./exampleFeedbackServer/serve.js &
 ```
+
+### Notes on Implementing GitLab integration for ShaderLabWeb
+ * The general workflow is to essentially implement the OAuth 2.0 authentication workflow
+ * This workflow involves the following four things:
+	1. A button on the main website that requests a redirect via the backend to the OAuth authentication endpoint for gitlab (this is https://gitlab.com/oauth/authorize)
+		1. The redirect requires multiple query parameters that identify the application and where to redirect users after authentication
+		2. The query parameters are:
+			* client_id=APP_ID
+			* redirect_uri=REDIRECT_URI
+			* response_type=code
+			* state=STATE
+			* scope=REQUESTED_SCOPES
+			* code_challenge=CODE_CHALLENGE
+			* code_challenge_method=S256
+		3. The `client_id` parameter specifies the application making the requests
+		4. The `redirect_uri` is where gitlab should redirect users post-authentication
+		5. The `response_type=code` requests that gitlab redirects to the `redirect_uri` endpoint with the query parameter `code` which is the authentication code that identifies a user is logged in and is used to make requests to gitlab on the users behalf. This parameter needs to be stored (encrypted) in a cookie or, better yet, on the server backend and associated with a randomized user identifier stored in browser cookies.  The latter enforces that any requests made to gitlab go through the server backend rather than through the users browser allowing for more secure communication as it is easier to harden the server to attacks than the browser application.
+		6. The `scope` is the access scope for the user, this specifies what the authentication code allows the backend to do.
+		7. The `code_challenge` and `code_challenge_method` parameters specify the additional security mechanism used by the OAuth backend for identifying that the request is from the application in question rather than a bad actor with access to the app ID.
+	2. A callback endpoint on the backend that can accept a query parameter of `code` and appropriately manage successful and unsuccessful authentication as well as associate the user with the authentication code. If the authentication code is stored entirely in the backend, then the redirect URI from above might also include a way of identifying the user who made the request and then associating the user with the authentication code.
+	3. Ability to refresh the authentication code when it expires as the code is valid for only a limited amount of time.
+	4. Ability to log-out the user post-authentication and correctly handle invalidation of codes as well as proper syncing with gitlab states as needed.
+	
+References:
+[1] https://docs.gitlab.com/ee/api/oauth2.html
+[2] https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps#web-application-flow
+[3] https://dominictobias.medium.com/writing-an-oauth-flow-from-scratch-in-nodejs-397496acafbe
+[4] https://permify.co/post/oauth-20-implementation-nodejs-expressjs/
