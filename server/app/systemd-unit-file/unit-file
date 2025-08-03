@@ -5,7 +5,7 @@ Description=$URL Server
 User=$USR
 WorkingDirectory=$DIR
 Environment="PORT=$PORT"
-ExecStart=$SCRIPT
+ExecStart=/bin/bash -c $SCRIPT
 
 [Install]
 WantedBy=multi-user.target

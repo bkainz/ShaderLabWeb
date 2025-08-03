@@ -3,7 +3,14 @@ server {
 
     listen [::]:443 ssl http2;
     listen 443 ssl http2;
+    
+    # Uncomment for self-signed cert
+    # ssl_certificate /etc/ssl/certs/$URL/nginx-selfsigned.crt;
+    # ssl_certificate_key /etc/ssl/private/$URL/nginx-selfsigned.key;
+    
+    # include snippets/ssl-params-selfsigned.conf;
 
+    # Uncomment for letsencrypt-signed cert
     ssl_certificate /etc/letsencrypt/live/$URL/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/$URL/privkey.pem;
     include /etc/letsencrypt/options-ssl-nginx.conf;
@@ -59,5 +66,5 @@ server {
     listen [::]:80;
     listen 80;
 
-    return 301 https://$host$request_uri;
+    return 302 https://$host$request_uri;
 }
